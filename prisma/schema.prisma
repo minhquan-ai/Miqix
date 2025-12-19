@@ -1,0 +1,467 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String  @id @default(cuid())
+  name      String
+  email     String  @unique
+  role      String // 'teacher' | 'student'
+  password  String  @default("$2a$10$cwW.O.C.O.C.O.C.O.C.O.C.O.C.O.C.O.C.O.C.O.C.O.C.O.C.O") // Default hash for "123456"
+  avatarUrl String?
+
+  // Student specific
+  classId            String? // DEPRECATED: Will be removed after migration to ClassEnrollment
+  xp                 Int       @default(0)
+  level              Int       @default(1)
+  streak             Int       @default(0)
+  lastSubmissionDate DateTime?
+
+  // Relations
+  badges        Badge[]
+  submissions   Submission[]
+  missions      Mission[]
+  notifications Notification[]
+  socialEvents  SocialEvent[]
+  reactions     Reaction[]
+  enrollments   ClassEnrollment[] // NEW: Many-to-many with Class
+
+  // Teacher specific
+  classes            Class[]         @relation("TeacherClasses")
+  createdAssignments Assignment[]
+  announcements      Announcement[]
+  uploadedResources  ClassResource[]
+  comments           Comment[]
+
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  classSessions       ClassSession[]
+  attendanceRecords   AttendanceRecord[]
+  studentGuardians    StudentGuardian[]   @relation("StudentGuardians")
+  behaviorRecords     BehaviorRecord[]
+  guardian            Guardian?
+  worksheetProgresses WorksheetProgress[]
+}
+
+model Class {
+  id          String  @id @default(cuid())
+  name        String
+  subject     String
+  description String?
+  teacherId   String
+  schedule    String?
+  avatar      String?
+  code        String  @unique
+  role        String  @default("extra") // 'main' | 'extra' - DEPRECATED: Moving to ClassEnrollment
+  grade       String?
+
+  // NEW: Class management fields
+  codeEnabled Boolean   @default(true) // Allow teacher to disable join code
+  maxStudents Int       @default(45) // Vietnam standard: 45 regular, 35 gifted
+  color       String    @default("blue") // 'blue', 'violet', 'emerald', 'rose', 'amber', 'cyan'
+  classType   String    @default("NORMAL") // 'HOMEROOM', 'NORMAL', 'EXTRA'
+  tuitionFee  Int? // For EXTRA classes
+  startDate   DateTime? // For EXTRA classes (SQLite does not support dynamic default on add column)
+  stream      String? // For HOMEROOM: 'KHTN', 'KHXH', 'COBAN'
+
+  teacher       User              @relation("TeacherClasses", fields: [teacherId], references: [id])
+  enrollments   ClassEnrollment[] // NEW: Many-to-many with User
+  announcements Announcement[] // NEW: Relation to Announcement
+  resources     ClassResource[] // NEW: Relation to ClassResource
+  settings      ClassSettings? // NEW: Class settings relation
+  // assignments Assignment[] - Managed manually via classIds JSON
+
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  classSessions     ClassSession[]
+  behaviorRecords   BehaviorRecord[]
+  assignmentClasses AssignmentClass[]
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  classId     String
+  teacherId   String
+  content     String
+  title       String? // New: Title of the announcement
+  type        String   @default("NORMAL") // New: NORMAL, IMPORTANT, URGENT, EVENT
+  tags        String? // Topic tags for filtering
+  isPinned    Boolean  @default(false)
+  attachments String?  @default("[]") // JSON array of {name, url, type}
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  class     Class      @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacher   User       @relation(fields: [teacherId], references: [id])
+  reactions Reaction[]
+  comments  Comment[]
+
+  @@index([classId, createdAt(sort: Desc)]) // Performance: sort by date
+  @@index([isPinned])
+}
+
+model Comment {
+  id             String   @id @default(cuid())
+  announcementId String
+  userId         String
+  content        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id])
+}
+
+model ClassResource {
+  id          String   @id @default(cuid())
+  classId     String
+  title       String
+  description String?
+  fileUrl     String
+  fileType    String // 'pdf' | 'image' | 'document' | 'other'
+  fileSize    Int // in bytes
+  uploadedBy  String // teacherId
+  folderId    String? // Optional: for folder organization
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  class    Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  uploader User  @relation(fields: [uploadedBy], references: [id])
+
+  @@index([classId])
+  @@index([uploadedBy])
+}
+
+// NEW: Pivot table for User-Class many-to-many relationship
+model ClassEnrollment {
+  id      String @id @default(cuid())
+  userId  String
+  classId String
+
+  // Expanded role: student | monitor | vice_monitor
+  role String @default("student")
+
+  joinedAt  DateTime @default(now())
+  status    String   @default("active") // 'active' | 'dropped' | 'pending'
+  isPinned  Boolean  @default(false)
+  updatedAt DateTime @default(now()) @updatedAt
+
+  // NEW: Notification settings
+  mutedUntil           DateTime?
+  notificationsEnabled Boolean   @default(true)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classId])
+  @@index([userId])
+  @@index([classId])
+  @@index([status])
+}
+
+// NEW: Class settings for permissions and controls
+model ClassSettings {
+  id      String @id @default(cuid())
+  classId String @unique
+
+  // Stream/Announcement permissions
+  announcementPermission String  @default("TEACHER_ONLY") // TEACHER_ONLY | TEACHER_AND_MONITOR | ALL
+  attachmentPermission   String  @default("TEACHER_ONLY") // TEACHER_ONLY | TEACHER_AND_MONITOR | ALL
+  allowComments          Boolean @default(true)
+  allowReactions         Boolean @default(true)
+
+  // Assignment settings
+  defaultMaxScore     Int     @default(10)
+  allowLateSubmission Boolean @default(true)
+  latePenaltyPercent  Int     @default(10) // Percentage penalty per day late
+  autoReminder        Boolean @default(true)
+  reminderDaysBefore  Int     @default(1) // Days before deadline to send reminder
+
+  // Resource settings  
+  resourceUploadPermission String @default("TEACHER_ONLY") // TEACHER_ONLY | TEACHER_AND_MONITOR | ALL
+  maxFileSizeMB            Int    @default(50) // Max file size in MB
+
+  // Member settings
+  requireApproval       Boolean @default(false)
+  allowStudentDirectory Boolean @default(true) // Show student list to students
+
+  // Grade settings
+  hideGradesFromStudents Boolean @default(false)
+  showGradeStatistics    Boolean @default(true) // Show class statistics
+
+  // Notification settings
+  emailNotifications     Boolean @default(true)
+  pushNotifications      Boolean @default(true)
+  newAnnouncementNotify  Boolean @default(true)
+  newAssignmentNotify    Boolean @default(true)
+  deadlineReminderNotify Boolean @default(true)
+  gradePostedNotify      Boolean @default(true)
+
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  dueDate     DateTime
+  teacherId   String
+  status      String   @default("open") // 'draft' | 'open' | 'closed'
+  type        String   @default("exercise") // 'exercise' | 'test' | 'project' | 'worksheet'
+  xpReward    Int      @default(100)
+  subject     String?
+  maxScore    Int?
+
+  // JSON fields for complex objects
+  classIds          String? // DEPRECATED: Moving to AssignmentClass. Made optional for migration.
+  assignmentClasses AssignmentClass[]
+  attachments       String? // Stored as JSON string
+  rubric            String? // Stored as JSON string
+  aiSettings        String? // Stored as JSON string
+  isPhysical        Boolean           @default(false) // New field for physical assignments
+
+  // NEW: Worksheet-specific fields
+  worksheetCode     String? // "3.6", "BT-T10-C2" - teacher's custom code
+  worksheetFileUrl  String? // URL to PDF/Image
+  worksheetFileType String? // 'pdf' | 'image'
+  isWorksheetMode   Boolean @default(false) // True = no submission needed, just mark complete
+  requirePhoto      Boolean @default(false) // Require photo proof of completion
+
+  teacher           User                @relation(fields: [teacherId], references: [id])
+  submissions       Submission[]
+  worksheetProgress WorksheetProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// NEW: Track worksheet completion (different from Submission)
+model WorksheetProgress {
+  id           String @id @default(cuid())
+  assignmentId String
+  studentId    String
+
+  status      String    @default("not_started") // 'not_started' | 'viewed' | 'completed'
+  viewedAt    DateTime?
+  completedAt DateTime?
+
+  // Optional photo proof
+  photoUrl        String?
+  photoUploadedAt DateTime?
+
+  // AI hints tracking
+  hintsUsed Int @default(0)
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([assignmentId, studentId])
+  @@index([studentId, status])
+}
+
+model Submission {
+  id           String   @id @default(cuid())
+  assignmentId String
+  studentId    String
+  content      String
+  submittedAt  DateTime @default(now())
+  status       String   @default("submitted") // 'submitted' | 'graded'
+  score        Float?
+  feedback     String?
+
+  // JSON fields
+  attachments   String? // Stored as JSON string
+  errorAnalysis String? // Stored as JSON string
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id])
+  student    User       @relation(fields: [studentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Mission {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  type        String // 'system' | 'custom'
+  category    String // 'grading' | 'teaching' | 'admin' | 'learning' | 'personal'
+  createdBy   String
+  assignedTo  String
+
+  relatedAssignmentId String?
+  relatedClassId      String?
+  dueDate             DateTime?
+  status              String    @default("pending") // 'pending' | 'in_progress' | 'completed'
+  completedAt         DateTime?
+  xpReward            Int?
+
+  // JSON fields
+  progress String? // Stored as JSON string
+
+  user User @relation(fields: [assignedTo], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id      String  @id @default(cuid())
+  userId  String
+  type    String // 'academic' | 'gamification' | 'system'
+  title   String
+  message String
+  link    String?
+  isRead  Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String
+  icon        String
+  description String
+  earnedAt    DateTime @default(now())
+  userId      String
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model SocialEvent {
+  id        String   @id @default(cuid())
+  type      String // 'achievement' | 'streak' | 'help_request' | 'challenge' | 'submission'
+  userId    String
+  content   String
+  timestamp DateTime @default(now())
+  xpGained  Int?
+  classId   String
+
+  user      User       @relation(fields: [userId], references: [id])
+  reactions Reaction[]
+}
+
+model Reaction {
+  id             String  @id @default(cuid())
+  socialEventId  String? // Made optional
+  announcementId String? // New field
+  userId         String
+  type           String // 'respect' | 'challenge' | 'heart' | 'like'
+
+  socialEvent  SocialEvent?  @relation(fields: [socialEventId], references: [id], onDelete: Cascade)
+  announcement Announcement? @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ClassSession {
+  id      String @id @default(cuid())
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  teacherId String
+  teacher   User   @relation(fields: [teacherId], references: [id])
+
+  date   DateTime
+  period Int // Tiết 1, 2, 3...
+
+  subject        String? // Môn học (Math, Literature...)
+  lessonContent  String? // Nội dung bài dạy
+  note           String? // Nhận xét của GV
+  classification String? // Xếp loại (A, B, C, D)
+
+  attendanceRecords AttendanceRecord[] // Link to existing attendance
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([classId])
+  @@index([date])
+}
+
+model AttendanceRecord {
+  id        String   @id @default(cuid())
+  sessionId String
+  studentId String
+  status    String   @default("PRESENT") // PRESENT, ABSENT, LATE, EXCUSED
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  session ClassSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student User         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, studentId])
+  @@index([studentId])
+}
+
+model BehaviorRecord {
+  id          String   @id @default(cuid())
+  studentId   String
+  classId     String
+  type        String // VIOLATION, REWARD
+  description String
+  scoreChange Int // Điểm cộng/trừ thi đua
+  recordedBy  String // Teacher ID
+  createdAt   DateTime @default(now())
+
+  student User  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class   Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([classId])
+}
+
+model Guardian {
+  id     String @id @default(cuid())
+  userId String @unique // Link to existing User model (if guardians have login)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  phone  String?
+  zaloId String?
+
+  students  StudentGuardian[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+model StudentGuardian {
+  studentId String
+  student   User   @relation("StudentGuardians", fields: [studentId], references: [id], onDelete: Cascade)
+
+  guardianId String
+  guardian   Guardian @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+
+  relationship String // FATHER, MOTHER, GRANDPARENT, OTHER
+  isPrimary    Boolean @default(false)
+
+  @@id([studentId, guardianId])
+}
+
+model AssignmentClass {
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  classId String
+  class   Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  dueDate DateTime? // Override original due date if needed
+  config  String? // Per-class config (e.g., visibility) - Stored as JSON string
+
+  @@id([assignmentId, classId])
+}

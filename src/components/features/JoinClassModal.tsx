@@ -1,10 +1,10 @@
-"use client";
-
 import { useState } from "react";
-import { X, LogIn, Loader2, Hash } from "lucide-react";
-import { DataService } from "@/lib/data";
+import { UserPlus, Loader2, KeyRound } from "lucide-react";
+import { joinClassAction } from "@/lib/actions";
 import { useToast } from "@/components/ui/Toast";
 import { useRouter } from "next/navigation";
+import { DraggableModal } from "@/components/ui/DraggableModal";
+import { ModalHeader } from "@/components/ui/ModalHeader";
 
 interface JoinClassModalProps {
     isOpen: boolean;
@@ -24,13 +24,13 @@ export function JoinClassModal({ isOpen, onClose, onSuccess, userId }: JoinClass
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (code.length < 6) {
-            showToast("Mã lớp phải có 6 ký tự", "error");
+            showToast("Mã lớp phải có ít nhất 6 ký tự", "error");
             return;
         }
 
         setLoading(true);
         try {
-            const result = await DataService.joinClass(userId, code);
+            const result = await joinClassAction({ classCode: code });
             if (result.success) {
                 showToast(result.message, "success");
                 onSuccess();
@@ -49,56 +49,67 @@ export function JoinClassModal({ isOpen, onClose, onSuccess, userId }: JoinClass
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-                    <h2 className="text-lg font-semibold">Tham Gia Lớp Học</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors">
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
+        <DraggableModal isOpen={isOpen} onClose={onClose} className="max-w-md">
+            {(dragControls) => (
+                <>
+                    <ModalHeader
+                        title="Tham gia lớp học"
+                        onClose={onClose}
+                        dragControls={dragControls}
+                        icon={<UserPlus className="w-5 h-5 text-white" />}
+                    />
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    <div className="text-center space-y-2">
-                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Hash className="w-8 h-8 text-primary" />
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                            Nhập mã lớp gồm 6 ký tự do giáo viên cung cấp để tham gia lớp học.
-                        </p>
-                    </div>
+                    <div className="p-6">
+                        <p className="text-gray-500 mb-6">Nhập mã lớp học do giáo viên cung cấp để tham gia.</p>
 
-                    <div className="space-y-2">
-                        <input
-                            required
-                            type="text"
-                            placeholder="Nhập mã lớp (VD: X7K9P2)"
-                            className="w-full p-4 text-center text-2xl font-mono tracking-widest border-2 border-border rounded-xl focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none uppercase transition-all"
-                            value={code}
-                            onChange={e => setCode(e.target.value.toUpperCase())}
-                            maxLength={6}
-                        />
-                    </div>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Mã lớp</label>
+                                <div className="relative">
+                                    <KeyRound className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        required
+                                        className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-mono uppercase tracking-wider"
+                                        placeholder="VD: C_10A1"
+                                        value={code}
+                                        onChange={(e) => setCode(e.target.value.toUpperCase())}
+                                        maxLength={8}
+                                    />
+                                </div>
+                                <p className="mt-2 text-xs text-gray-500">Mã lớp thường có 6-8 ký tự, ví dụ: C_10A1</p>
+                            </div>
 
-                    <div className="pt-2 flex justify-end gap-3">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors"
-                        >
-                            Hủy
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading || code.length < 6}
-                            className="px-6 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
-                            Tham gia ngay
-                        </button>
+                            <div className="flex justify-end gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-xl transition-colors"
+                                >
+                                    Hủy bỏ
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={loading || !code}
+                                    className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            <span>Đang xử lý...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <UserPlus className="w-4 h-4" />
+                                            <span>Tham gia</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </form>
-            </div>
-        </div>
+                </>
+            )}
+        </DraggableModal>
     );
 }

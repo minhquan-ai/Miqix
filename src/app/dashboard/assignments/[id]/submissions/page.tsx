@@ -1,147 +1,244 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle, Clock, Search, User } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
 import { DataService } from "@/lib/data";
-import { Assignment, Submission } from "@/types";
-import Link from "next/link";
+import { getCurrentUserAction } from "@/lib/actions";
+import { Assignment, Submission, User } from "@/types";
+import { ArrowLeft, BookOpen, Calendar, CheckCircle, Clock, FileText, Search, User as UserIcon, X } from "lucide-react";
+import SubmissionView from "@/components/SubmissionView";
+import { useToast } from "@/components/ui/Toast";
 
-export default function SubmissionListPage() {
+export default function AssignmentSubmissionsPage() {
     const params = useParams();
     const router = useRouter();
     const assignmentId = params.id as string;
+    const { showToast } = useToast();
 
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [assignment, setAssignment] = useState<Assignment | null>(null);
     const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [students, setStudents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+
+    const loadData = async () => {
+        try {
+            const user = await getCurrentUserAction();
+            if (!user) {
+                router.push('/login');
+                return;
+            }
+            setCurrentUser(user as any);
+
+            if (user.role !== 'teacher') {
+                router.push(`/dashboard/assignments/${assignmentId}`);
+                return;
+            }
+
+            const assignmentData = await DataService.getAssignmentById(assignmentId);
+            if (!assignmentData) {
+                showToast("Bài tập không tồn tại", "error");
+                router.push('/dashboard/assignments');
+                return;
+            }
+            setAssignment(assignmentData);
+
+            // Load submissions
+            const subs = await DataService.getSubmissionsByAssignmentId(assignmentId);
+            setSubmissions(subs);
+
+            // Load students from the first class (assuming assignment is for one class for now)
+            // In a real app, we might need to handle multiple classes or filter by class
+            if (assignmentData.classIds && assignmentData.classIds.length > 0) {
+                const classId = assignmentData.classIds[0];
+                const classMembers = await DataService.getClassMembers(classId);
+                // Filter only students and map to flat structure
+                const studentMembers = classMembers
+                    .filter((m: any) => m.user.role === 'student')
+                    .map((m: any) => ({
+                        userId: m.userId,
+                        name: m.user.name,
+                        email: m.user.email,
+                        avatarUrl: m.user.avatarUrl,
+                        role: m.user.role
+                    }));
+                setStudents(studentMembers);
+            }
+
+        } catch (error) {
+            console.error("Failed to load data", error);
+            showToast("Có lỗi xảy ra khi tải dữ liệu", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        async function loadData() {
-            try {
-                const [assignData, subsData] = await Promise.all([
-                    DataService.getAssignmentById(assignmentId),
-                    DataService.getSubmissionsByAssignmentId(assignmentId)
-                ]);
-
-                if (assignData) setAssignment(assignData);
-                setSubmissions(subsData);
-            } catch (error) {
-                console.error("Failed to load data", error);
-            } finally {
-                setLoading(false);
-            }
-        }
         loadData();
-    }, [assignmentId]);
+    }, [assignmentId, router, showToast]);
 
-    const filteredSubmissions = submissions.filter(sub =>
-        sub.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    if (loading) return <div className="p-8 text-center">Đang tải dữ liệu...</div>;
+    if (!currentUser || !assignment) return null;
 
-    if (loading) return <div className="p-8 text-center">Đang tải danh sách...</div>;
-    if (!assignment) return null;
+    const selectedSubmission = selectedStudentId
+        ? submissions.find(s => s.studentId === selectedStudentId) || null
+        : null;
+
+    const stats = {
+        total: students.length,
+        submitted: submissions.length,
+        graded: submissions.filter(s => s.status === 'graded').length,
+        late: submissions.filter(s => {
+            const isLate = new Date(s.submittedAt) > new Date(assignment.dueDate);
+            return isLate;
+        }).length
+    };
 
     return (
-        <div className="space-y-6 -m-8 p-8">
+        <div className="space-y-6 p-8 -m-8 h-[calc(100vh-64px)] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="flex items-center gap-4 mb-6">
-                <button
-                    onClick={() => router.back()}
-                    className="p-2 hover:bg-muted rounded-full transition-colors"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                </button>
-                <div>
-                    <h1 className="text-2xl font-bold">{assignment.title}</h1>
-                    <p className="text-muted-foreground">Danh sách bài nộp ({submissions.length} học sinh)</p>
-                </div>
-            </div>
-
-            {/* Filters */}
-            <div className="flex items-center justify-between gap-4 bg-card p-4 rounded-xl border border-border shadow-sm">
-                <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm học sinh..."
-                        className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background text-sm"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <div className="flex gap-2">
-                    <div className="px-3 py-1.5 rounded-md bg-green-50 text-green-700 text-sm font-medium border border-green-100">
-                        Đã chấm: {submissions.filter(s => s.status === 'graded').length}
-                    </div>
-                    <div className="px-3 py-1.5 rounded-md bg-orange-50 text-orange-700 text-sm font-medium border border-orange-100">
-                        Chờ chấm: {submissions.filter(s => s.status === 'submitted').length}
+            <div className="flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => router.back()}
+                        className="p-2 hover:bg-muted rounded-full transition-colors"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                    </button>
+                    <div>
+                        <h1 className="text-2xl font-bold flex items-center gap-2">
+                            {assignment.title}
+                            <span className={`text-sm font-normal px-2 py-0.5 rounded ${assignment.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                                }`}>
+                                {assignment.status === 'open' ? 'Đang mở' : 'Đã đóng'}
+                            </span>
+                        </h1>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> Hạn nộp: {new Date(assignment.dueDate).toLocaleString('vi-VN')}</span>
+                            <span className="flex items-center gap-1"><BookOpen className="w-4 h-4" /> {assignment.subject}</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* List */}
-            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-muted/50 text-muted-foreground font-medium border-b border-border">
-                        <tr>
-                            <th className="px-6 py-3">Học sinh</th>
-                            <th className="px-6 py-3">Thời gian nộp</th>
-                            <th className="px-6 py-3">Trạng thái</th>
-                            <th className="px-6 py-3">Điểm số</th>
-                            <th className="px-6 py-3 text-right">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                        {filteredSubmissions.map((sub) => (
-                            <tr key={sub.id} className="hover:bg-muted/20 transition-colors">
-                                <td className="px-6 py-4 font-medium flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                                        {sub.studentName?.charAt(0)}
+            <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6 h-full min-h-0">
+                {/* Left Sidebar - Student List */}
+                <div className="bg-card border border-border rounded-xl flex flex-col overflow-hidden shadow-sm">
+                    <div className="p-4 border-b border-border bg-muted/30">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-semibold">Danh sách học sinh</h3>
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">
+                                {stats.submitted}/{stats.total} đã nộp
+                            </span>
+                        </div>
+
+                        {/* Stats Mini-cards */}
+                        <div className="grid grid-cols-2 gap-2 mb-4">
+                            <div className="bg-green-50 p-2 rounded border border-green-100 text-center">
+                                <div className="text-lg font-bold text-green-700">{stats.graded}</div>
+                                <div className="text-xs text-green-600">Đã chấm</div>
+                            </div>
+                            <div className="bg-orange-50 p-2 rounded border border-orange-100 text-center">
+                                <div className="text-lg font-bold text-orange-700">{stats.total - stats.submitted}</div>
+                                <div className="text-xs text-orange-600">Chưa nộp</div>
+                            </div>
+                        </div>
+
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <input
+                                type="text"
+                                placeholder="Tìm học sinh..."
+                                className="w-full pl-9 pr-4 py-2 text-sm border border-input rounded-lg bg-background focus:ring-2 focus:ring-primary/20"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                        {students.map(student => {
+                            const sub = submissions.find(s => s.studentId === student.userId);
+                            const status = sub?.status || 'pending';
+                            const isLate = sub && new Date(sub.submittedAt) > new Date(assignment.dueDate);
+                            const isSelected = selectedStudentId === student.userId;
+
+                            return (
+                                <div
+                                    key={student.userId}
+                                    onClick={() => setSelectedStudentId(student.userId)}
+                                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${isSelected ? 'bg-primary/10 border-primary/20 border' : 'hover:bg-muted border border-transparent'
+                                        }`}
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0 border border-border">
+                                        <img src={student.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${student.name}`} alt={student.name} className="w-full h-full object-cover" />
                                     </div>
-                                    {sub.studentName}
-                                </td>
-                                <td className="px-6 py-4 text-muted-foreground">
-                                    {new Date(sub.submittedAt).toLocaleString('vi-VN')}
-                                </td>
-                                <td className="px-6 py-4">
-                                    {sub.status === 'graded' ? (
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                            <CheckCircle className="w-3 h-3" /> Đã chấm
-                                        </span>
-                                    ) : (
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
-                                            <Clock className="w-3 h-3" /> Chờ chấm
-                                        </span>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 font-semibold">
-                                    {sub.score !== undefined ? (
-                                        <span className={sub.score >= 80 ? "text-green-600" : sub.score >= 50 ? "text-yellow-600" : "text-red-600"}>
-                                            {sub.score}/100
-                                        </span>
-                                    ) : (
-                                        <span className="text-muted-foreground">-</span>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                    <Link href={`/dashboard/grading/${sub.id}`}>
-                                        <button className="text-xs bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:bg-primary/90 transition-colors">
-                                            {sub.status === 'graded' ? "Xem lại" : "Chấm bài"}
-                                        </button>
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                {filteredSubmissions.length === 0 && (
-                    <div className="p-8 text-center text-muted-foreground">
-                        Không tìm thấy học sinh nào.
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-medium truncate">{student.name}</div>
+                                        <div className="flex items-center gap-2 text-xs">
+                                            {status === 'graded' ? (
+                                                <span className="text-green-600 font-bold">{sub?.score} điểm</span>
+                                            ) : status === 'submitted' ? (
+                                                <span className="text-blue-600 font-medium">Đã nộp</span>
+                                            ) : (
+                                                <span className="text-muted-foreground">Chưa nộp</span>
+                                            )}
+                                            {isLate && <span className="text-red-500 font-medium">• Muộn</span>}
+                                        </div>
+                                    </div>
+                                    {status === 'graded' && <CheckCircle className="w-4 h-4 text-green-600" />}
+                                </div>
+                            );
+                        })}
                     </div>
-                )}
+                </div>
+
+                {/* Right Content - Grading Area */}
+                <div className="bg-card border border-border rounded-xl flex flex-col overflow-hidden shadow-sm h-full">
+                    {selectedStudentId ? (
+                        <div className="flex flex-col h-full">
+                            <div className="p-4 border-b border-border flex justify-between items-center bg-muted/10">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-muted overflow-hidden border border-border">
+                                        <img
+                                            src={students.find(s => s.userId === selectedStudentId)?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedStudentId}`}
+                                            alt="Student"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold">{students.find(s => s.userId === selectedStudentId)?.name}</h3>
+                                        <div className="text-xs text-muted-foreground">
+                                            {selectedSubmission ? `Nộp lúc: ${new Date(selectedSubmission.submittedAt).toLocaleString('vi-VN')}` : 'Chưa nộp bài'}
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onClick={() => setSelectedStudentId(null)} className="p-2 hover:bg-muted rounded-full">
+                                    <X className="w-5 h-5 text-muted-foreground" />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-6">
+                                <SubmissionView
+                                    assignmentId={assignmentId}
+                                    submission={selectedSubmission}
+                                    currentUser={currentUser}
+                                    isTeacher={true}
+                                    dueDate={assignment.dueDate}
+                                    classId={assignment.classIds?.[0] || ""}
+                                    onSuccess={loadData}
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 text-center">
+                            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                                <UserIcon className="w-8 h-8 opacity-50" />
+                            </div>
+                            <h3 className="text-lg font-semibold mb-2">Chọn một học sinh</h3>
+                            <p className="max-w-xs mx-auto">Chọn học sinh từ danh sách bên trái để xem bài làm và chấm điểm.</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -1,40 +1,55 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Copy, Plus, Users } from "lucide-react";
-import { DataService } from "@/lib/data";
-import { Class, User } from "@/types";
+import { Plus, GraduationCap, BookOpen, Search } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { getClassesAction, togglePinClassAction, joinClassAction } from "@/lib/actions";
+import { getCurrentUserAction } from "@/lib/actions";
+import { User } from "@/types";
+import { ClassCardTeacher } from "@/components/classes/ClassCardTeacher";
+import { ClassCardStudent } from "@/components/classes/ClassCardStudent";
+import { ClassesFilterBar } from "@/components/classes/ClassesFilterBar";
+import { JoinClassWidget } from "@/components/classes/JoinClassWidget";
+
+import { ClassCreatorModal } from '@/components/features/ClassCreatorModal';
 
 export default function ClassesPage() {
     const router = useRouter();
-    const [classes, setClasses] = useState<Class[]>([]);
+    const [classes, setClasses] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<User | null>(null);
+    const [classStats] = useState<Record<string, any>>({});
+    const [studentSearch, setStudentSearch] = useState("");
+
+    // State for modal
+    const [showCreateModal, setShowCreateModal] = useState(false);
+
+    // Filter states
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedSubject, setSelectedSubject] = useState("");
+    const [selectedType, setSelectedType] = useState("");
+    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
     useEffect(() => {
         async function loadData() {
             try {
-                const currentUser = await DataService.getCurrentUser();
+                const currentUser = await getCurrentUserAction();
                 if (!currentUser) {
-                    router.push('/login');
+                    router.push("/login");
                     return;
                 }
                 setUser(currentUser);
 
-                if (currentUser.role === 'teacher') {
-                    const classList = await DataService.getClasses(currentUser.id);
+                if (currentUser.role === "teacher") {
+                    const classList = await getClassesAction();
                     setClasses(classList);
                 } else {
-                    // For student, get their class if they have one
-                    if (currentUser.classId) {
-                        const cls = await DataService.getClassById(currentUser.classId);
-                        if (cls) setClasses([cls]);
-                    }
+                    const studentClasses = await getClassesAction();
+                    setClasses(studentClasses);
                 }
-            } catch (error) {
-                console.error("Failed to load classes", error);
+            } catch (_error) {
+                console.error("Failed to load classes", _error);
             } finally {
                 setLoading(false);
             }
@@ -42,89 +57,295 @@ export default function ClassesPage() {
         loadData();
     }, [router]);
 
-    const copyInviteCode = (code: string) => {
-        navigator.clipboard.writeText(code);
-        alert(`Đã sao chép mã mời: ${code}`);
+    // Filter logic
+    const filteredClasses = useMemo(() => {
+        const query = user?.role === "teacher" ? searchQuery : studentSearch;
+        return classes.filter((cls) => {
+            const matchesSearch = cls.name.toLowerCase().includes(query.toLowerCase()) ||
+                cls.subject.toLowerCase().includes(query.toLowerCase());
+            const matchesSubject = !selectedSubject || cls.subject === selectedSubject;
+            const matchesType = !selectedType || cls.role === selectedType;
+            return matchesSearch && matchesSubject && matchesType;
+        });
+    }, [classes, searchQuery, studentSearch, selectedSubject, selectedType, user]);
+
+    // Sort logic
+    const sortedClasses = useMemo(() => {
+        return [...filteredClasses].sort((a, b) => {
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            return 0;
+        });
+    }, [filteredClasses]);
+
+
+
+    const handleJoinClass = async (code: string) => {
+        const result = await joinClassAction({ classCode: code });
+        if (result.success) {
+            const studentClasses = await getClassesAction();
+            setClasses(studentClasses);
+        } else {
+            throw new Error(result.message || "Lỗi khi tham gia lớp");
+        }
     };
 
-    if (loading) return <div className="p-8 text-center">Đang tải...</div>;
-    if (!user) return null;
+    const handlePinClass = async (classId: string) => {
+        await togglePinClassAction(classId);
+        const classList = await getClassesAction();
+        setClasses(classList);
+    };
 
-    return (
-        <div className="space-y-6 -m-8 p-8">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <Link href="/dashboard">
-                        <button className="p-2 hover:bg-muted rounded-full transition-colors">
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                    </Link>
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight">{user.role === 'teacher' ? 'Quản lý lớp học' : 'Lớp học của tôi'}</h1>
-                        <p className="text-muted-foreground">{user.role === 'teacher' ? 'Danh sách các lớp bạn đang phụ trách.' : 'Thông tin lớp học bạn đã tham gia.'}</p>
-                    </div>
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+                    <p className="text-gray-600 font-medium">Đang tải dữ liệu...</p>
                 </div>
-                {user.role === 'teacher' && (
-                    <Link href="/dashboard/classes/create">
-                        <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium hover:bg-primary/90 transition-colors flex items-center gap-2">
-                            <Plus className="w-4 h-4" /> Tạo lớp mới
-                        </button>
-                    </Link>
-                )}
             </div>
+        );
+    }
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {classes.map((cls) => (
-                    <Link key={cls.id} href={user.role === 'teacher' ? `/dashboard/classes/${cls.id}` : '#'}>
-                        <div className={`bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col ${user.role === 'student' ? 'cursor-default' : ''}`}>
+    if (!user) return null;
+    const isTeacher = user.role === "teacher";
+
+    // ============ STUDENT VIEW ============
+    if (!isTeacher) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white -m-8 p-6">
+                <div className="max-w-full mx-auto space-y-5">
+                    {/* Hero Header */}
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-8 text-white shadow-xl shadow-blue-500/20"
+                    >
+                        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+                        <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+                        <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl" />
+
+                        <div className="relative z-10 flex items-start justify-between">
                             <div>
-                                <h3 className="font-bold text-lg">{cls.name}</h3>
-                                <p className="text-sm text-muted-foreground">{cls.subject}</p>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                                        <BookOpen className="w-6 h-6" />
+                                    </div>
+                                    <span className="text-sm font-medium text-white/80">Danh sách lớp học</span>
+                                </div>
+                                <h1 className="text-3xl font-bold mb-2">Lớp học của tôi</h1>
+                                <p className="text-white/80 text-sm max-w-md">
+                                    Tiếp tục hành trình học tập và chinh phục những thử thách mới
+                                </p>
                             </div>
 
-                            {cls.description && (
-                                <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-1">
-                                    {cls.description}
-                                </p>
-                            )}
-
-                            <div className="pt-4 border-t border-border mt-auto" onClick={(e) => e.preventDefault()}>
-                                <div className="text-xs text-muted-foreground mb-1">Mã mời tham gia</div>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        copyInviteCode(cls.code);
-                                    }}
-                                    className="w-full flex items-center justify-between bg-muted/50 hover:bg-muted p-2 rounded-md border border-dashed border-border transition-colors group"
-                                >
-                                    <code className="font-mono font-bold text-primary">{cls.code}</code>
-                                    <Copy className="w-4 h-4 text-muted-foreground group-hover:text-foreground" />
-                                </button>
+                            {/* Stats Badges */}
+                            <div className="hidden md:flex flex-col gap-2">
+                                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2">
+                                    <GraduationCap className="w-4 h-4 text-white" />
+                                    <span className="font-bold">{classes.length} Lớp học</span>
+                                </div>
                             </div>
                         </div>
-                    </Link>
-                ))}
+                    </motion.div>
 
-                {classes.length === 0 && (
-                    <div className="col-span-full text-center py-12 bg-muted/20 rounded-xl border border-dashed border-border">
-                        <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="font-semibold text-lg mb-2">{user.role === 'teacher' ? 'Chưa có lớp học nào' : 'Bạn chưa tham gia lớp học nào'}</h3>
-                        <p className="text-muted-foreground mb-6">{user.role === 'teacher' ? 'Hãy tạo lớp học đầu tiên để bắt đầu quản lý học sinh.' : 'Hãy nhập mã mời từ giáo viên để tham gia lớp học.'}</p>
-                        {user.role === 'teacher' ? (
-                            <Link href="/dashboard/classes/create">
-                                <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium hover:bg-primary/90 transition-colors">
-                                    Tạo lớp ngay
-                                </button>
-                            </Link>
+
+
+                    {/* Search & Join Row */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.15 }}
+                        className="flex flex-col md:flex-row gap-4"
+                    >
+                        {/* Search Bar */}
+                        <div className="flex-1 relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type="text"
+                                value={studentSearch}
+                                onChange={(e) => setStudentSearch(e.target.value)}
+                                placeholder="Tìm kiếm lớp học..."
+                                className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm"
+                            />
+                        </div>
+
+                        {/* Join Class Button */}
+                        <JoinClassWidget onJoin={handleJoinClass} />
+                    </motion.div>
+
+                    {/* Classes Grid */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                    >
+                        {sortedClasses.length > 0 ? (
+                            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                                <AnimatePresence mode="popLayout">
+                                    {sortedClasses.map((cls, index) => (
+                                        <motion.div
+                                            key={cls.id}
+                                            layout
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.95 }}
+                                            transition={{ delay: index * 0.05 }}
+                                        >
+                                            <ClassCardStudent
+                                                classData={cls}
+                                                progress={{
+                                                    unreadCount: 0
+                                                }}
+                                            />
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+                            </div>
                         ) : (
-                            <Link href="/dashboard">
-                                <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium hover:bg-primary/90 transition-colors">
-                                    Về Dashboard để tham gia
-                                </button>
-                            </Link>
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="py-20 flex flex-col items-center text-center"
+                            >
+                                <div className="w-24 h-24 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                                    <GraduationCap className="w-12 h-12 text-gray-300" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                    {studentSearch ? "Không tìm thấy lớp học" : "Chưa có lớp học nào"}
+                                </h3>
+                                <p className="text-gray-500 max-w-md mx-auto">
+                                    {studentSearch
+                                        ? "Thử tìm kiếm với từ khóa khác"
+                                        : "Hãy nhập mã lớp từ giáo viên để tham gia lớp học đầu tiên của bạn!"}
+                                </p>
+                            </motion.div>
                         )}
+                    </motion.div>
+                </div>
+            </div>
+        );
+    }
+
+    // ============ TEACHER VIEW ============
+    return (
+        <div className="min-h-screen bg-gray-50 -m-8 p-6">
+            <div className="max-w-full mx-auto space-y-5">
+                {/* Hero Header */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="relative overflow-hidden bg-gradient-to-r from-teal-600 via-emerald-600 to-green-600 rounded-3xl p-8 text-white shadow-xl shadow-teal-500/20"
+                >
+                    <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+                    <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+                    <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl" />
+
+                    <div className="relative z-10 flex items-start justify-between">
+                        <div>
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                                    <GraduationCap className="w-6 h-6" />
+                                </div>
+                                <span className="text-sm font-medium text-white/80">Danh sách lớp học</span>
+                            </div>
+                            <h1 className="text-3xl font-bold mb-2">Quản lý lớp học</h1>
+                            <p className="text-white/80 text-sm max-w-md">
+                                Quản lý hiệu quả, theo dõi sát sao và nâng cao chất lượng giảng dạy
+                            </p>
+                        </div>
+
+                        {/* Action Custom Button */}
+                        <div className="hidden md:block">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setShowCreateModal(true)}
+                                className="bg-white text-teal-700 px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Tạo lớp mới
+                            </motion.button>
+                        </div>
                     </div>
-                )}
+                </motion.div>
+
+
+
+                {/* Filter & Controls */}
+                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                    <ClassesFilterBar
+                        searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
+                        selectedSubject={selectedSubject}
+                        onSubjectChange={setSelectedSubject}
+                        selectedType={selectedType}
+                        onTypeChange={setSelectedType}
+                        viewMode={viewMode}
+                        onViewModeChange={setViewMode}
+                    />
+                </div>
+
+                {/* Main Content Grid */}
+                <div className={`grid gap-6 ${viewMode === "grid" ? "md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
+                    {/* Class Cards */}
+                    <AnimatePresence mode="popLayout">
+                        {sortedClasses.map((cls, index) => (
+                            <motion.div
+                                key={cls.id}
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{ delay: index * 0.05 }}
+                                className="h-full"
+                            >
+                                <ClassCardTeacher
+                                    classData={cls}
+                                    stats={classStats[cls.id]}
+                                    isPinned={cls.isPinned}
+                                    onPin={handlePinClass}
+                                />
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+
+                    {/* Empty State */}
+                    {sortedClasses.length === 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="col-span-full py-20 flex flex-col items-center text-center px-4"
+                        >
+                            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                                <GraduationCap className="w-12 h-12 text-gray-300" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Chưa tìm thấy lớp học nào</h3>
+                            <p className="text-gray-500 max-w-md mx-auto mb-8">
+                                Bạn chưa có lớp học nào hoặc không tìm thấy kết quả phù hợp.
+                            </p>
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setShowCreateModal(true)}
+                                className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20"
+                            >
+                                Tạo lớp học đầu tiên
+                            </motion.button>
+                        </motion.div>
+                    )}
+                </div>
+
+                <ClassCreatorModal
+                    isOpen={showCreateModal}
+                    onClose={() => setShowCreateModal(false)}
+                    onSuccess={async () => {
+                        setShowCreateModal(false);
+                        // Reload classes
+                        const classList = await getClassesAction();
+                        setClasses(classList);
+                    }}
+                />
             </div>
         </div>
     );

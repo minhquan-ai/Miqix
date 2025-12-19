@@ -1,0 +1,629 @@
+
+> ergonix@0.1.0 lint
+> eslint
+
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/prisma/seed.ts
+  92:19  warning  'student' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/(auth)/login/page.tsx
+  5:10  warning  'useRouter' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/activity/page.tsx
+  6:21  warning  'Clock' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/assignments/[id]/page.tsx
+   8:10  warning  'Skeleton' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+  11:20  warning  'Calendar' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+  11:53  warning  'Trophy' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+  53:8   warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/assignments/[id]/submissions/page.tsx
+   8:31  warning  'Calendar' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+   8:61  warning  'FileText' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+  79:8   warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/assignments/page.tsx
+   14:10  warning  'Class' is defined but never used             @typescript-eslint/no-unused-vars
+   28:12  warning  'classes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  152:11  warning  'stats' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/classes/[id]/attendance-history/page.tsx
+   5:79  warning  'Download' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+  59:9   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/classes/[id]/attendance-history/page.tsx:59:9
+  57 |
+  58 |     useEffect(() => {
+> 59 |         loadData();
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  60 |     }, [loadData]);
+  61 |
+  62 |     const formatDate = (dateString: string) => {  react-hooks/set-state-in-effect
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/classes/[id]/attendance/page.tsx
+   12:10  warning  'Input' is defined but never used               @typescript-eslint/no-unused-vars
+   13:18  warning  'AnimatePresence' is defined but never used     @typescript-eslint/no-unused-vars
+   54:20  warning  'setPeriod' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  145:18  warning  'error' is defined but never used               @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/classes/[id]/attendance/report/page.tsx
+   7:105  warning  'Loader2' is defined but never used          @typescript-eslint/no-unused-vars
+  13:18   warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/classes/[id]/grades/page.tsx
+   5:39  warning  'Filter' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+   5:47  warning  'MoreVertical' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+   5:61  warning  'FileSpreadsheet' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+   9:10  warning  'motion' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  13:11  warning  'router' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+  37:9   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/classes/[id]/grades/page.tsx:37:9
+  35 |
+  36 |     useEffect(() => {
+> 37 |         loadData();
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |     }, [loadData]);
+  39 |
+  40 |     const handleExport = () => {  react-hooks/set-state-in-effect
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/classes/[id]/page.tsx
+    3:31   warning  'useMemo' is defined but never used                      @typescript-eslint/no-unused-vars
+    5:76   warning  'Settings' is defined but never used                     @typescript-eslint/no-unused-vars
+    5:93   warning  'CalendarCheck' is defined but never used                @typescript-eslint/no-unused-vars
+    5:108  warning  'Home' is defined but never used                         @typescript-eslint/no-unused-vars
+    5:114  warning  'Trash2' is defined but never used                       @typescript-eslint/no-unused-vars
+    5:135  warning  'Trophy' is defined but never used                       @typescript-eslint/no-unused-vars
+    5:173  warning  'Filter' is defined but never used                       @typescript-eslint/no-unused-vars
+    5:194  warning  'FileSpreadsheet' is defined but never used              @typescript-eslint/no-unused-vars
+    5:221  warning  'Sparkles' is defined but never used                     @typescript-eslint/no-unused-vars
+    8:10   warning  'createAnnouncementAction' is defined but never used     @typescript-eslint/no-unused-vars
+    8:65   warning  'getStudentSubmissionsAction' is defined but never used  @typescript-eslint/no-unused-vars
+    8:94   warning  'getTeacherAssignmentsAction' is defined but never used  @typescript-eslint/no-unused-vars
+   11:10   warning  'ResourceCard' is defined but never used                 @typescript-eslint/no-unused-vars
+   12:30   warning  'NoStudentsEmpty' is defined but never used              @typescript-eslint/no-unused-vars
+   13:10   warning  'FileUpload' is defined but never used                   @typescript-eslint/no-unused-vars
+   14:8    warning  'AttendanceStudentView' is defined but never used        @typescript-eslint/no-unused-vars
+   16:8    warning  'AnnouncementComposer' is defined but never used         @typescript-eslint/no-unused-vars
+   17:8    warning  'StreamFilterSidebar' is defined but never used          @typescript-eslint/no-unused-vars
+   21:35   warning  'useDragControls' is defined but never used              @typescript-eslint/no-unused-vars
+   22:10   warning  'fadeInUp' is defined but never used                     @typescript-eslint/no-unused-vars
+   22:20   warning  'staggerContainer' is defined but never used             @typescript-eslint/no-unused-vars
+   36:10   warning  'DraggableModal' is defined but never used               @typescript-eslint/no-unused-vars
+   46:7    warning  'formatSchedule' is assigned a value but never used      @typescript-eslint/no-unused-vars
+   69:14   warning  'e' is defined but never used                            @typescript-eslint/no-unused-vars
+   88:12   warning  'filterType' is assigned a value but never used          @typescript-eslint/no-unused-vars
+   88:24   warning  'setFilterType' is assigned a value but never used       @typescript-eslint/no-unused-vars
+   94:12   warning  'copied' is assigned a value but never used              @typescript-eslint/no-unused-vars
+   96:12   warning  'peopleSubTab' is assigned a value but never used        @typescript-eslint/no-unused-vars
+   96:26   warning  'setPeopleSubTab' is assigned a value but never used     @typescript-eslint/no-unused-vars
+   97:12   warning  'showMenu' is assigned a value but never used            @typescript-eslint/no-unused-vars
+   97:22   warning  'setShowMenu' is assigned a value but never used         @typescript-eslint/no-unused-vars
+   98:12   warning  'resources' is assigned a value but never used           @typescript-eslint/no-unused-vars
+  107:12   warning  'peopleSearch' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  107:26   warning  'setPeopleSearch' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  113:11   warning  'PAGE_SIZE' is assigned a value but never used           @typescript-eslint/no-unused-vars
+  124:9    warning  'filteredCount' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  142:12   warning  'isSavingSettings' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  153:11   warning  'handleLeaveClass' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  165:18   warning  'error' is defined but never used                        @typescript-eslint/no-unused-vars
+  222:11   warning  'handleUpdateClass' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  233:18   warning  'error' is defined but never used                        @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/classes/[id]/roster/page.tsx
+   11:8   warning  'InviteStudentModal' is defined but never used  @typescript-eslint/no-unused-vars
+  107:18  warning  'error' is defined but never used               @typescript-eslint/no-unused-vars
+  334:66  warning  '_error' is defined but never used              @typescript-eslint/no-unused-vars
+  355:66  warning  '_error' is defined but never used              @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/classes/[id]/settings/page.tsx
+  203:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  337:45  warning  'index' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/grading/[id]/page.tsx
+  5:65  warning  'Send' is defined but never used                  @typescript-eslint/no-unused-vars
+  7:10  warning  'getCurrentUserAction' is defined but never used  @typescript-eslint/no-unused-vars
+  8:42  warning  'UserType' is defined but never used              @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/grading/page.tsx
+  6:75  warning  'UserIcon' is defined but never used              @typescript-eslint/no-unused-vars
+  7:64  warning  'getAssignmentsAction' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/layout.tsx
+   6:10  warning  'DataService' is defined but never used        @typescript-eslint/no-unused-vars
+  18:11  warning  'pathname' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/missions/page.tsx
+    8:10  warning  'formatDistanceToNow' is defined but never used      @typescript-eslint/no-unused-vars
+    9:10  warning  'vi' is defined but never used                       @typescript-eslint/no-unused-vars
+   41:12  warning  'userId' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  171:11  warning  'pendingCount' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  172:11  warning  'completedCount' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/page.tsx
+  4:10  warning  'DataService' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/profile/page.tsx
+   6:5   warning  'Award' is defined but never used         @typescript-eslint/no-unused-vars
+   6:41  warning  'Shield' is defined but never used        @typescript-eslint/no-unused-vars
+   7:21  warning  'LinkIcon' is defined but never used      @typescript-eslint/no-unused-vars
+   7:55  warning  'Phone' is defined but never used         @typescript-eslint/no-unused-vars
+   7:62  warning  'Globe' is defined but never used         @typescript-eslint/no-unused-vars
+   8:31  warning  'Star' is defined but never used          @typescript-eslint/no-unused-vars
+   8:37  warning  'Clock' is defined but never used         @typescript-eslint/no-unused-vars
+   8:44  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+   9:5   warning  'LogOut' is defined but never used        @typescript-eslint/no-unused-vars
+  14:10  warning  'motion' is defined but never used        @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/settings/page.tsx
+  10:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/dashboard/teacher-missions/page.tsx
+  5:40  warning  'BookOpen' is defined but never used     @typescript-eslint/no-unused-vars
+  5:60  warning  'CheckCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/join/page.tsx
+  33:8  warning  React Hook useEffect has missing dependencies: 'handleJoin' and 'joining'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/app/page.tsx
+  2:10  warning  'ArrowRight' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/AIAssistantFAB.tsx
+  6:24  warning  'Mic' is defined but never used           @typescript-eslint/no-unused-vars
+  6:29  warning  'FileText' is defined but never used      @typescript-eslint/no-unused-vars
+  7:28  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+  7:47  warning  'Zap' is defined but never used           @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/AnnouncementCard.tsx
+   39:43   warning  'currentUserId' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+   39:129  warning  'onClose' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   56:13   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/AnnouncementCard.tsx:56:13
+  54 |         // But never collapse in overlay or detail mode
+  55 |         if (isOverlay || isDetail) {
+> 56 |             setIsCollapsed(false);
+     |             ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  57 |             return;
+  58 |         }
+  59 |         const daysOld = differenceInDays(new Date(), new Date(announcement.createdAt));  react-hooks/set-state-in-effect
+   61:13   warning  Unused eslint-disable directive (no problems were reported)
+  413:38   warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/AnnouncementComposer.tsx
+  60:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/CSVImportModal.tsx
+  94:18  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ClassCard.tsx
+  18:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ClassCodeCard.tsx
+  3:23  warning  'Share2' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ClassInfoPanel.tsx
+   25:5   warning  'Megaphone' is defined but never used     @typescript-eslint/no-unused-vars
+   29:5   warning  'GripVertical' is defined but never used  @typescript-eslint/no-unused-vars
+  131:18  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/CreateAnnouncementForm.tsx
+  4:27  warning  'X' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/FileUpload.tsx
+  111:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/InviteStudentModal.tsx
+  22:13  warning  'showToast' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  45:18  warning  'err' is defined but never used                 @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/JoinClassModal.tsx
+  18:59  warning  'userId' is defined but never used  @typescript-eslint/no-unused-vars
+  44:18  warning  'error' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/MissionCard.tsx
+  3:23  warning  'Circle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/MissionEditor.tsx
+  4:20  warning  'Star' is defined but never used   @typescript-eslint/no-unused-vars
+  4:37  warning  'Users' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/NavigationProvider.tsx
+  36:9   warning  Unused eslint-disable directive (no problems were reported)
+  51:13  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/NavigationProvider.tsx:51:13
+  49 |     useEffect(() => {
+  50 |         if (isNavigating) {
+> 51 |             setProgress(0);
+     |             ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  52 |             const timer1 = setTimeout(() => setProgress(30), 50);
+  53 |             const timer2 = setTimeout(() => setProgress(60), 200);
+  54 |             const timer3 = setTimeout(() => setProgress(80), 400);  react-hooks/set-state-in-effect
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ResourceCard.tsx
+  29:44  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ScheduleBuilder.tsx
+   4:19  warning  'Clock' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+  26:8   warning  React Hook useEffect has a missing dependency: 'value'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/Sidebar.tsx
+    4:8   warning  'Link' is defined but never used                                                                    @typescript-eslint/no-unused-vars
+   12:5   warning  'Trophy' is defined but never used                                                                  @typescript-eslint/no-unused-vars
+   21:5   warning  'Plus' is defined but never used                                                                    @typescript-eslint/no-unused-vars
+   24:5   warning  'ChevronLeft' is defined but never used                                                             @typescript-eslint/no-unused-vars
+   26:5   warning  'TrendingUp' is defined but never used                                                              @typescript-eslint/no-unused-vars
+  104:13  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+  110:11  warning  'toggleCollapse' is assigned a value but never used                                                 @typescript-eslint/no-unused-vars
+  214:11  warning  'personalItems' is assigned a value but never used                                                  @typescript-eslint/no-unused-vars
+  547:33  warning  Expected an assignment or function call and instead saw an expression                               @typescript-eslint/no-unused-expressions
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/StreamFilterSidebar.tsx
+  4:26  warning  'Calendar' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/analytics/ClassPerformanceOverview.tsx
+  3:33  warning  'ClassOverviewStats' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/class/SessionForm.tsx
+  6:24  warning  'User' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/class/SessionsTab.tsx
+   8:34  warning  'addDays' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+  42:8   warning  React Hook useEffect has a missing dependency: 'fetchSessions'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/classes/ClassCardStudent.tsx
+  3:27  warning  'Star' is defined but never used        @typescript-eslint/no-unused-vars
+  3:40  warning  'Bell' is defined but never used        @typescript-eslint/no-unused-vars
+  3:46  warning  'Zap' is defined but never used         @typescript-eslint/no-unused-vars
+  3:51  warning  'TrendingUp' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/classes/ClassCardTeacher.tsx
+  17:71  warning  'onEdit' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/classes/ClassesFilterBar.tsx
+  3:36  warning  'BookOpen' is defined but never used  @typescript-eslint/no-unused-vars
+  4:10  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/classes/TeacherClassesStats.tsx
+  3:17  warning  'FileText' is defined but never used  @typescript-eslint/no-unused-vars
+  4:10  warning  'motion' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/dashboard-widgets/AssignmentShelf.tsx
+  2:18  warning  'useScroll' is defined but never used     @typescript-eslint/no-unused-vars
+  2:29  warning  'useTransform' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/dashboard-widgets/AtRiskWidget.tsx
+  12:50  warning  'classId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/dashboard-widgets/RecentActivityWidget.tsx
+  17:11  warning  'getActivityIcon' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  65:49  warning  'index' is defined but never used                     @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/dashboard-widgets/RecentFeedbackWidget.tsx
+  1:25  warning  'Star' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/dashboard-widgets/TodoListWidget.tsx
+   4:44  warning  'Square' is defined but never used  @typescript-eslint/no-unused-vars
+  55:18  warning  'error' is defined but never used   @typescript-eslint/no-unused-vars
+  75:18  warning  'error' is defined but never used   @typescript-eslint/no-unused-vars
+  87:18  warning  'error' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/dashboard-widgets/UpcomingWidget.tsx
+  12:53  warning  'classId' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/dashboard/FocusCard.tsx
+  4:10  warning  'motion' is defined but never used       @typescript-eslint/no-unused-vars
+  5:29  warning  'AlertCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/AIInsightsWidget.tsx
+   7:5   warning  'CheckCircle2' is defined but never used                @typescript-eslint/no-unused-vars
+   7:33  warning  'Send' is defined but never used                        @typescript-eslint/no-unused-vars
+   8:5   warning  'BookOpen' is defined but never used                    @typescript-eslint/no-unused-vars
+   8:15  warning  'Users' is defined but never used                       @typescript-eslint/no-unused-vars
+   8:37  warning  'MessageCircle' is defined but never used               @typescript-eslint/no-unused-vars
+  23:11  warning  'gradedSubmissions' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  51:5   warning  'classData' is defined but never used                   @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/AIQuizGenerator.tsx
+  4:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/AddEventModal.tsx
+  5:20  warning  'Clock' is defined but never used      @typescript-eslint/no-unused-vars
+  5:38  warning  'AlignLeft' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/AssignmentCreatorModal.tsx
+    3:31   warning  'Suspense' is defined but never used                          @typescript-eslint/no-unused-vars
+    5:21   warning  'useSearchParams' is defined but never used                   @typescript-eslint/no-unused-vars
+    9:10   warning  'ArrowLeft' is defined but never used                         @typescript-eslint/no-unused-vars
+    9:51   warning  'Plus' is defined but never used                              @typescript-eslint/no-unused-vars
+    9:81   warning  'Settings' is defined but never used                          @typescript-eslint/no-unused-vars
+    9:146  warning  'Loader2' is defined but never used                           @typescript-eslint/no-unused-vars
+    9:155  warning  'Zap' is defined but never used                               @typescript-eslint/no-unused-vars
+   16:35   warning  'LayoutGroup' is defined but never used                       @typescript-eslint/no-unused-vars
+   27:11   warning  'router' is assigned a value but never used                   @typescript-eslint/no-unused-vars
+   34:12   warning  'aiParams' is assigned a value but never used                 @typescript-eslint/no-unused-vars
+   34:22   warning  'setAiParams' is assigned a value but never used              @typescript-eslint/no-unused-vars
+  150:11   warning  'handleRefineDescription' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/ClassCreatorModal.tsx
+  11:35  warning  'LayoutGroup' is defined but never used           @typescript-eslint/no-unused-vars
+  41:7   warning  'CLASS_ICONS' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  57:11  warning  'router' is assigned a value but never used       @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/ClassSelectionModal.tsx
+  3:35  warning  'GraduationCap' is defined but never used  @typescript-eslint/no-unused-vars
+  3:50  warning  'Filter' is defined but never used         @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/CreateClassModal.tsx
+   4:70   warning  'Palette' is defined but never used     @typescript-eslint/no-unused-vars
+   4:79   warning  'Layout' is defined but never used      @typescript-eslint/no-unused-vars
+   4:87   warning  'Users' is defined but never used       @typescript-eslint/no-unused-vars
+   4:94   warning  'BookOpen' is defined but never used    @typescript-eslint/no-unused-vars
+   4:114  warning  'ArrowRight' is defined but never used  @typescript-eslint/no-unused-vars
+  85:18   warning  'error' is defined but never used       @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/InClassAssignmentCreator.tsx
+   6:13  warning  'FileText' is defined but never used         @typescript-eslint/no-unused-vars
+   6:23  warning  'Calendar' is defined but never used         @typescript-eslint/no-unused-vars
+  23:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/JoinClassModal.tsx
+  16:62  warning  'userId' is defined but never used  @typescript-eslint/no-unused-vars
+  44:18  warning  'error' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/NotificationBell.tsx
+  4:16  warning  'Check' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/PeopleTabContent.tsx
+   2:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   6:18  warning  'Filter' is defined but never used                                                                     @typescript-eslint/no-unused-vars
+   6:26  warning  'MoreVertical' is defined but never used                                                               @typescript-eslint/no-unused-vars
+  37:20  warning  'setSortBy' is assigned a value but never used                                                         @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/ProgressTrackingChart.tsx
+  34:11  warning  'chartHeight' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/ResourcesTabContent.tsx
+   2:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   6:99  warning  'Filter' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+   8:10  warning  'fadeInUp' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+   9:57  warning  'getCurrentUserAction' is defined but never used                                                             @typescript-eslint/no-unused-vars
+  62:8   warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/RubricBuilder.tsx
+  79:35  warning  'index' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/ScheduleContent.tsx
+    4:114  warning  'setHours' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+    4:124  warning  'startOfDay' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+    6:49   warning  'CalendarIcon' is defined but never used                                                                      @typescript-eslint/no-unused-vars
+    6:78   warning  'Loader2' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+    6:97   warning  'Filter' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+    6:119  warning  'List' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+    6:125  warning  'Grid3X3' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+    6:134  warning  'ArrowRight' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+    6:146  warning  'LayoutGrid' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+   25:11   warning  'weekEnd' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+   44:8    warning  React Hook useEffect has a missing dependency: 'weekStart'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  205:49   warning  'dayIndex' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/ScheduleTabContent.tsx
+    2:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   63:14  warning  'e' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+  103:57  warning  'currentUser' is defined but never used                                                                @typescript-eslint/no-unused-vars
+  103:70  warning  'onUpdateClass' is defined but never used                                                              @typescript-eslint/no-unused-vars
+  104:25  warning  'setCurrentDate' is assigned a value but never used                                                    @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/StreamTabContent.tsx
+    2:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+    5:10  warning  'createPortal' is defined but never used                                                               @typescript-eslint/no-unused-vars
+    6:18  warning  'AnimatePresence' is defined but never used                                                            @typescript-eslint/no-unused-vars
+   10:64  warning  'Users' is defined but never used                                                                      @typescript-eslint/no-unused-vars
+   10:71  warning  'FileText' is defined but never used                                                                   @typescript-eslint/no-unused-vars
+   10:81  warning  'BookOpen' is defined but never used                                                                   @typescript-eslint/no-unused-vars
+   38:5   warning  'classData' is defined but never used                                                                  @typescript-eslint/no-unused-vars
+   40:5   warning  'myRole' is defined but never used                                                                     @typescript-eslint/no-unused-vars
+  130:11  warning  'pendingGrading' is assigned a value but never used                                                    @typescript-eslint/no-unused-vars
+  131:11  warning  'draftAssignments' is assigned a value but never used                                                  @typescript-eslint/no-unused-vars
+  133:11  warning  'upcomingAssignments' is assigned a value but never used                                               @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/StudentDashboard.tsx
+    2:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+    4:32  warning  'Clock' is defined but never used                                                                      @typescript-eslint/no-unused-vars
+    4:81  warning  'UserIcon' is defined but never used                                                                   @typescript-eslint/no-unused-vars
+   15:18  warning  'formatDistanceToNow' is defined but never used                                                        @typescript-eslint/no-unused-vars
+  165:92  warning  'idx' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/StudentOverviewTab.tsx
+   2:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  10:27  warning  'TrendingUp' is defined but never used                                                                 @typescript-eslint/no-unused-vars
+  11:15  warning  'FileText' is defined but never used                                                                   @typescript-eslint/no-unused-vars
+  12:19  warning  'Target' is defined but never used                                                                     @typescript-eslint/no-unused-vars
+  12:41  warning  'Flame' is defined but never used                                                                      @typescript-eslint/no-unused-vars
+  13:44  warning  'MoreHorizontal' is defined but never used                                                             @typescript-eslint/no-unused-vars
+  30:5   warning  'classData' is defined but never used                                                                  @typescript-eslint/no-unused-vars
+  75:11  warning  'otherDeadlines' is assigned a value but never used                                                    @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/TeacherClassOverview.tsx
+   2:1  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  28:5  warning  'classData' is defined but never used                                                                  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/TeacherMissions.tsx
+    2:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+    5:10  warning  'motion' is defined but never used                                                                     @typescript-eslint/no-unused-vars
+   19:10  warning  'useRouter' is defined but never used                                                                  @typescript-eslint/no-unused-vars
+  108:69  warning  'idx' is defined but never used                                                                        @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/WorksheetProgressDashboard.tsx
+   2:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   6:28  warning  'Users' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+   7:14  warning  'ChevronRight' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+   7:37  warning  'ImageIcon' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+  61:8   warning  React Hook useEffect has a missing dependency: 'loadProgress'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/WorksheetUploader.tsx
+  4:31  warning  'Image' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/features/WorksheetViewer.tsx
+   2:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   7:14  warning  'ImageIcon' is defined but never used                                                                  @typescript-eslint/no-unused-vars
+  87:18  warning  'error' is defined but never used                                                                      @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/onboarding/SelectMainClassModal.tsx
+   5:25  warning  'Star' is defined but never used   @typescript-eslint/no-unused-vars
+  81:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/skeletons/ClassPageSkeletons.tsx
+  1:10  warning  'BookOpen' is defined but never used    @typescript-eslint/no-unused-vars
+  1:20  warning  'Users' is defined but never used       @typescript-eslint/no-unused-vars
+  1:27  warning  'Calendar' is defined but never used    @typescript-eslint/no-unused-vars
+  1:37  warning  'Clock' is defined but never used       @typescript-eslint/no-unused-vars
+  1:44  warning  'TrendingUp' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ui/CameraCapture.tsx
+   4:10  warning  'Camera' is defined but never used                                                                  @typescript-eslint/no-unused-vars
+   4:39  warning  'Zap' is defined but never used                                                                     @typescript-eslint/no-unused-vars
+   5:10  warning  'cn' is defined but never used                                                                      @typescript-eslint/no-unused-vars
+  17:25  warning  'setIsAnalyzing' is assigned a value but never used                                                 @typescript-eslint/no-unused-vars
+  18:12  warning  'analysisResult' is assigned a value but never used                                                 @typescript-eslint/no-unused-vars
+  18:28  warning  'setAnalysisResult' is assigned a value but never used                                              @typescript-eslint/no-unused-vars
+  46:9   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ui/DraggableModal.tsx
+  13:42  warning  'onClose' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ui/RichTextEditor.tsx
+  4:38  warning  'LinkIcon' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ui/Toast.tsx
+  5:23  warning  'XCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ui/button.tsx
+  41:34  warning  'asChild' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/components/ui/dialog.tsx
+  4:10  warning  'X' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/hooks/useStreamFilters.ts
+  11:24  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  12:23  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/lib/actions.ts
+     2:1    warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+    16:83   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+    20:49   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+    60:28   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   120:59   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   169:118  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   305:26   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   352:26   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   577:54   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   911:31   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  1407:30   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  1454:134  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-unused-vars')
+  1482:55   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  1635:78   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-unused-vars')
+  1741:78   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  1835:59   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  1837:87   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2017:37   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2048:56   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2087:34   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2103:30   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2140:15   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-unused-vars')
+  2211:65   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2214:38   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2242:55   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2246:61   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2248:79   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2280:60   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2572:30   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  2573:34   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/lib/ai-service.ts
+  37:161  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/lib/analytics-actions.ts
+  151:39  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/lib/class-analytics.ts
+   82:62   warning  '_classData' is assigned a value but never used                                                        @typescript-eslint/no-unused-vars
+   92:84   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   95:54   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  153:25   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  154:5    warning  'assignments' is defined but never used                                                                @typescript-eslint/no-unused-vars
+  154:25   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  155:5    warning  'students' is defined but never used                                                                   @typescript-eslint/no-unused-vars
+  155:21   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  210:62   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  222:101  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  234:101  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  256:22   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  257:25   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  258:24   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  319:25   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  320:25   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  321:21   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  354:27   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  355:25   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  356:21   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  399:110  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/lib/data.ts
+    1:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   61:68  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  187:40  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  191:54  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/lib/schedule-actions.ts
+  36:82  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  51:40  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/lib/student-analytics.ts
+   72:81   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   75:108  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   77:113  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   93:112  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+   95:119  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  100:92   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  103:64   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  104:29   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  112:99   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  116:55   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  117:28   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  118:87   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  132:144  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  134:123  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/src/types/next-auth.d.ts
+  1:8  warning  'NextAuth' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 369 problems (0 errors, 369 warnings)
+  0 errors and 86 warnings potentially fixable with the `--fix` option.
+

@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { generateQuizAction, getHintAction, analyzeSubmissionAction } from "./ai-actions";
 
 export interface QuizQuestion {
     id: string;
@@ -14,174 +14,29 @@ export interface AIQuizRequest {
     questionCount: number;
 }
 
-// Initialize HuggingFace Router via OpenAI SDK
-// Note: In production, you should use a backend API route to hide the key.
-// For this demo, we use NEXT_PUBLIC_ variable.
-const client = new OpenAI({
-    baseURL: "https://router.huggingface.co/v1",
-    apiKey: process.env.NEXT_PUBLIC_HF_TOKEN || "",
-    dangerouslyAllowBrowser: true // Required for client-side usage
-});
-
 export const AIService = {
     generateQuiz: async (request: AIQuizRequest): Promise<QuizQuestion[]> => {
-        const apiKey = process.env.NEXT_PUBLIC_HF_TOKEN;
-
-        // Check if token is missing or is the placeholder value
-        if (!apiKey || apiKey === "your_huggingface_token_here") {
-            console.warn("Missing or invalid HuggingFace Token. Falling back to Mock Data.");
-            console.info("💡 Để sử dụng AI thật, hãy cập nhật NEXT_PUBLIC_HF_TOKEN trong .env.local");
-            return getMockData(request);
-        }
-
         try {
-            const prompt = `You are a helpful teacher assistant. Generate ${request.questionCount} multiple-choice questions about "${request.topic}" with difficulty "${request.difficulty}".
-Output strictly in this JSON format:
-[
-  {
-    "id": "unique_id",
-    "question": "Question text",
-    "options": ["A", "B", "C", "D"],
-    "correctAnswer": 0,
-    "explanation": "Short explanation why this is correct"
-  }
-]
-IMPORTANT: Return ONLY the JSON array. Do not include markdown formatting like \`\`\`json.
-Language: Vietnamese.`;
-
-            const completion = await client.chat.completions.create({
-                model: "Qwen/Qwen2.5-7B-Instruct",
-                messages: [
-                    {
-                        role: "user",
-                        content: prompt
-                    }
-                ],
-                temperature: 0.7,
-                max_tokens: 2000,
-            });
-
-            const text = completion.choices[0]?.message?.content || "";
-
-            // Clean up potential markdown formatting if the model ignores instructions
-            const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-
-            const questions = JSON.parse(cleanText);
-            return questions;
-
+            return await generateQuizAction(request);
         } catch (error) {
-            console.error("HuggingFace API Error:", error);
-            // Fallback to mock data on error
+            console.error("AI Service Quiz Error:", error);
             return getMockData(request);
         }
     },
 
-    // AI Tutor: Socratic Method
     getHint: async (question: string, context: string): Promise<string> => {
-        const apiKey = process.env.NEXT_PUBLIC_HF_TOKEN;
-        if (!apiKey || apiKey === "your_huggingface_token_here") {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return "Gợi ý (Mock): Hãy thử chia nhỏ vấn đề ra thành các bước đơn giản hơn. Bạn đang vướng mắc ở đâu?";
-        }
-
         try {
-            const prompt = `
-You are a helpful and encouraging tutor for a Vietnamese student.
-The student is asking for a hint on this question: "${question}".
-The student's current work/context is: "${context}".
-
-IMPORTANT:
-1. Do NOT give the answer directly.
-2. Use the Socratic method: ask a guiding question or point to a relevant concept.
-3. Be brief, encouraging, and use Vietnamese.
-4. If the context is empty, ask them what they have tried so far.
-            `;
-
-            const completion = await client.chat.completions.create({
-                model: "Qwen/Qwen2.5-7B-Instruct",
-                messages: [{ role: "user", content: prompt }],
-                temperature: 0.7,
-                max_tokens: 150,
-            });
-
-            return completion.choices[0]?.message?.content || "Không thể tạo gợi ý lúc này.";
+            return await getHintAction(question, context);
         } catch (error) {
-            console.error("AI Tutor Error:", error);
-            return "Xin lỗi, AI Tutor đang bận. Hãy thử lại sau.";
+            console.error("AI Service Hint Error:", error);
+            return "Không thể tạo gợi ý lúc này.";
         }
     },
 
     // AI Grader: Analyze submission and suggest score
-    analyzeSubmission: async (assignmentDescription: string, submissionContent: string): Promise<{ score: number, feedback: string, errorAnalysis?: any }> => {
-        if (!process.env.NEXT_PUBLIC_HF_TOKEN || process.env.NEXT_PUBLIC_HF_TOKEN === "hf_placeholder") {
-            console.log("Using mock AI Grader response");
-            return {
-                score: 85,
-                feedback: "Bài làm khá tốt. Tuy nhiên, phần giải thích lý thuyết còn hơi sơ sài. Cần chú ý hơn đến các điều kiện biên.",
-                errorAnalysis: {
-                    categories: {
-                        understanding: 30,
-                        calculation: 25,
-                        presentation: 15,
-                        logic: 10
-                    },
-                    mainIssues: [
-                        "Thiếu điều kiện xác định của phân thức",
-                        "Lỗi tính toán ở bước 3"
-                    ],
-                    suggestions: [
-                        "Ôn lại bài 'Điều kiện xác định của phân thức đại số'",
-                        "Cẩn thận hơn khi nhân đơn thức",
-                        "Trình bày rõ ràng từng bước giải",
-                        "Kiểm tra lại kết quả trước khi nộp bài"
-                    ]
-                }
-            };
-        }
-
-        const prompt = `
-        You are a strict but constructive teacher grading a student's assignment.
-        Assignment Description: "${assignmentDescription}"
-        Student Submission: "${submissionContent}"
-
-        Analyze the submission and provide a JSON response with the following structure:
-        {
-            "score": (number 0-100),
-            "feedback": (string, general feedback in Vietnamese),
-            "errorAnalysis": {
-                "errors": [
-                    {
-                        "point": (string, short summary of the error),
-                        "category": ("concept" | "calculation" | "presentation" | "other"),
-                        "explanation": (string, detailed explanation of why it is wrong in Vietnamese),
-                        "remedialAction": (string, what the student should review in Vietnamese)
-                    }
-                ],
-                "generalComment": (string, summary comment in Vietnamese)
-            }
-        }
-        
-        Return ONLY the JSON. Do not add markdown formatting.
-        `;
-
+    analyzeSubmission: async (assignmentDescription: string, submissionContent: string): Promise<{ score: number, feedback: string, errorAnalysis?: any }> => { // eslint-disable-line @typescript-eslint/no-explicit-any
         try {
-            const completion = await client.chat.completions.create({
-                model: "Qwen/Qwen2.5-7B-Instruct",
-                messages: [{ role: "user", content: prompt }],
-                temperature: 0.5,
-                max_tokens: 1000,
-            });
-
-            const content = completion.choices[0]?.message?.content || "{}";
-            // Clean up potential markdown code blocks
-            const cleanContent = content.replace(/```json/g, "").replace(/```/g, "").trim();
-
-            try {
-                return JSON.parse(cleanContent);
-            } catch (e) {
-                console.error("Failed to parse AI response", e);
-                return { score: 0, feedback: "Lỗi khi phân tích bài làm. Vui lòng thử lại.", errorAnalysis: undefined };
-            }
+            return await analyzeSubmissionAction(assignmentDescription, submissionContent);
         } catch (error) {
             console.error("AI Grader Error:", error);
             return { score: 0, feedback: "Lỗi kết nối với AI Grader.", errorAnalysis: undefined };

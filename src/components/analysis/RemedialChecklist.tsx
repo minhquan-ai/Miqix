@@ -17,6 +17,7 @@ export function RemedialChecklist({ submissionId, suggestions, mainIssues }: Rem
     useEffect(() => {
         const stored = localStorage.getItem(storageKey);
         if (stored) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setCompletedItems(new Set(JSON.parse(stored)));
         }
     }, [storageKey]);
@@ -87,8 +88,8 @@ export function RemedialChecklist({ submissionId, suggestions, mainIssues }: Rem
                             key={index}
                             onClick={() => toggleItem(index)}
                             className={`w-full text-left p-3 rounded-lg border transition-all hover:border-primary/50 ${isCompleted
-                                    ? 'bg-green-50 border-green-200'
-                                    : 'bg-card border-border'
+                                ? 'bg-green-50 border-green-200'
+                                : 'bg-card border-border'
                                 }`}
                         >
                             <div className="flex gap-3 items-start">

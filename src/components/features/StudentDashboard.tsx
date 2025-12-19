@@ -1,123 +1,113 @@
-import { BookOpen, Clock, Trophy, Star, Target, TrendingUp, Plus, LogOut, CheckCircle } from "lucide-react";
+"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { LogOut, Plus, Target, Clock, BookOpen, ChevronRight, Calendar, User as UserIcon, Sparkles, AlertCircle } from "lucide-react";
+import { logout } from "@/lib/auth-actions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useMemo, useEffect } from "react";
-import { DataService } from "@/lib/data";
-import { Assignment, Submission, User } from "@/types";
+import { useState, useEffect } from "react";
+import { User } from "@/types";
 
 import { NotificationBell } from "@/components/features/NotificationBell";
 import { JoinClassModal } from "@/components/features/JoinClassModal";
-import { SearchFilter } from "@/components/ui/SearchFilter";
+import { StudentAnalytics } from "@/lib/student-analytics";
+import { motion } from 'framer-motion';
+import { format, formatDistanceToNow, isToday, isTomorrow, isPast } from "date-fns";
+import { vi } from "date-fns/locale";
 
 interface StudentDashboardProps {
     user: User;
-    assignments: Assignment[];
-    submissions: Submission[]; // New prop for student's submissions
+    analytics: StudentAnalytics;
 }
 
-export function StudentDashboard({ user, assignments, submissions }: StudentDashboardProps) {
+export function StudentDashboard({ user, analytics }: StudentDashboardProps) {
     const router = useRouter();
-    const [searchQuery, setSearchQuery] = useState("");
-    const [filterStatus, setFilterStatus] = useState("all");
-    const [sortBy, setSortBy] = useState("dueDate");
+    const [isJoinClassModalOpen, setIsJoinClassModalOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-    const handleLogout = () => {
-        localStorage.removeItem('userRole');
+    const handleLogout = async () => {
+        await logout();
         router.push('/login');
     };
 
-    // Calculate real statistics
-    const submittedCount = submissions.filter(s => s.status === 'submitted' || s.status === 'graded').length;
-    const gradedCount = submissions.filter(s => s.status === 'graded').length;
-    const pendingGradingCount = submissions.filter(s => s.status === 'submitted').length;
-    const openAssignmentsCount = assignments.filter(a => a.status === 'open').length;
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMounted(true);
+    }, []);
 
-    // Calculate total XP earned from graded assignments
-    const earnedXP = submissions
-        .filter(s => s.status === 'graded')
-        .reduce((total, s) => {
-            const assignment = assignments.find(a => a.id === s.assignmentId);
-            return total + (assignment?.xpReward || 0);
-        }, 0);
+    if (!mounted) {
+        return <div className="p-8 text-center text-gray-500">Đang tải Dashboard...</div>;
+    }
 
-    // Filter, search, and sort assignments
-    const [isJoinClassModalOpen, setIsJoinClassModalOpen] = useState(false);
+    const pendingAssignments = Array.isArray(analytics.pendingAssignments) ? analytics.pendingAssignments : [];
+    const hasClasses = (analytics as any).totalClasses > 0 || pendingAssignments.length > 0;
+    const hasPendingWork = pendingAssignments.length > 0;
+    const urgentAssignments = pendingAssignments.filter((a: any) => a.urgent) || [];
+    const todayDate = format(new Date(), "EEEE, d 'tháng' M", { locale: vi });
 
-    const filteredAndSortedAssignments = useMemo(() => {
-        let result = [...assignments];
+    const formatDeadline = (dateStr: any) => {
+        const date = new Date(dateStr);
+        if (isToday(date)) return `Hôm nay ${format(date, 'HH:mm')}`;
+        if (isTomorrow(date)) return `Ngày mai ${format(date, 'HH:mm')}`;
+        if (isPast(date)) return 'Quá hạn';
+        return format(date, 'dd/MM');
+    };
 
-        // Apply search filter
-        if (searchQuery) {
-            result = result.filter(a =>
-                a.title.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-        }
-
-        // Apply status filter based on submission state
-        if (filterStatus !== "all") {
-            result = result.filter(a => {
-                const submission = submissions.find(s => s.assignmentId === a.id);
-
-                // "open" = assignments that are open AND not yet submitted by student
-                if (filterStatus === "open") {
-                    return a.status === "open" && !submission;
-                }
-                // "submitted" = assignments with submitted status (waiting for grading)
-                if (filterStatus === "submitted") {
-                    return submission?.status === "submitted";
-                }
-                // "graded" = assignments that have been graded
-                if (filterStatus === "graded") {
-                    return submission?.status === "graded";
-                }
-                return true;
-            });
-        }
-
-        // Apply sorting
-        result.sort((a, b) => {
-            const subA = submissions.find(s => s.assignmentId === a.id);
-            const subB = submissions.find(s => s.assignmentId === b.id);
-
-            if (sortBy === "dueDate") {
-                return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-            } else if (sortBy === "title") {
-                return a.title.localeCompare(b.title);
-            } else if (sortBy === "status") {
-                const statusOrder = { graded: 0, submitted: 1, open: 2 };
-                const statusA = subA?.status || "open";
-                const statusB = subB?.status || "open";
-                return (statusOrder[statusA as keyof typeof statusOrder] || 3) - (statusOrder[statusB as keyof typeof statusOrder] || 3);
-            } else if (sortBy === "score") {
-                return (subB?.score || 0) - (subA?.score || 0);
-            }
-            return 0;
-        });
-
-        return result;
-    }, [assignments, submissions, searchQuery, filterStatus, sortBy]);
-
-    return (
-        <div className="space-y-8">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Xin chào, {user.name}! 👋</h2>
-                    <p className="text-muted-foreground">Sẵn sàng cho buổi học hôm nay chưa?</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    {/* Removed inline JoinClassButton to avoid confusion, using Modal instead */}
+    // If student has no classes, show onboarding
+    if (!hasClasses) {
+        return (
+            <div className="min-h-[70vh] flex items-center justify-center">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center max-w-md mx-auto p-8"
+                >
+                    <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <Sparkles className="w-10 h-10 text-indigo-600" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                        Chào mừng, {user.name}! 👋
+                    </h1>
+                    <p className="text-gray-500 mb-8">
+                        Bạn chưa tham gia lớp học nào. Hãy nhập mã lớp từ giáo viên để bắt đầu hành trình học tập!
+                    </p>
                     <button
                         onClick={() => setIsJoinClassModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors mr-2"
+                        className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors inline-flex items-center gap-2"
                     >
-                        <Plus className="w-4 h-4" />
-                        <span>Tham gia lớp</span>
+                        <Plus className="w-5 h-5" />
+                        Tham gia lớp học
                     </button>
+
+                    <JoinClassModal
+                        isOpen={isJoinClassModalOpen}
+                        onClose={() => setIsJoinClassModalOpen(false)}
+                        onSuccess={() => {
+                            setIsJoinClassModalOpen(false);
+                            window.location.reload();
+                        }}
+                        userId={user.id}
+                    />
+                </motion.div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6">
+            {/* Header - Compact */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Xin chào, {user.name.split(' ').pop()}! 👋
+                    </h1>
+                    <p className="text-sm text-gray-500">{todayDate}</p>
+                </div>
+                <div className="flex items-center gap-3">
                     <NotificationBell userId={user.id} />
                     <button
                         onClick={handleLogout}
-                        className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Đăng xuất"
                     >
                         <LogOut className="w-5 h-5" />
@@ -125,167 +115,165 @@ export function StudentDashboard({ user, assignments, submissions }: StudentDash
                 </div>
             </div>
 
-            <div className="grid gap-8 lg:grid-cols-3">
-                {/* Main Content (Left - 2/3) */}
-                <div className="lg:col-span-2 space-y-8">
-
-                    {/* Stats Overview (Compact) */}
-                    <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
-                        <StatCard
-                            title="Đang mở"
-                            value={openAssignmentsCount.toString()}
-                            icon={<Clock className="w-4 h-4 text-orange-500" />}
-                            description="Bài tập"
-                        />
-                        <StatCard
-                            title="Đã xong"
-                            value={gradedCount.toString()}
-                            icon={<CheckCircle className="w-4 h-4 text-green-500" />}
-                            description="Bài tập"
-                        />
-                        <StatCard
-                            title="Chờ chấm"
-                            value={pendingGradingCount.toString()}
-                            icon={<BookOpen className="w-4 h-4 text-purple-500" />}
-                            description="Bài nộp"
-                        />
-                        <StatCard
-                            title="Điểm TB"
-                            value={gradedCount > 0 ? (submissions.reduce((acc, s) => acc + (s.score || 0), 0) / gradedCount).toFixed(1) : "--"}
-                            icon={<TrendingUp className="w-4 h-4 text-blue-500" />}
-                            description="Trung bình"
-                        />
-                    </div>
-
-                    {/* Assignments List */}
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-semibold flex items-center gap-2">
-                                <BookOpen className="w-5 h-5 text-primary" />
-                                Bài tập của bạn
-                            </h3>
-                        </div>
-
-                        {/* Search and Filter */}
-                        <SearchFilter
-                            onSearch={setSearchQuery}
-                            onFilterChange={setFilterStatus}
-                            onSortChange={setSortBy}
-                        />
-
-                        {/* Results Count */}
-                        {(searchQuery || filterStatus !== "all") && (
-                            <div className="text-sm text-muted-foreground mb-3">
-                                Hiển thị <span className="font-semibold text-foreground">{filteredAndSortedAssignments.length}</span> / {assignments.length} bài tập
-                            </div>
-                        )}
-
-                        <div className="space-y-3">
-                            {filteredAndSortedAssignments.length === 0 ? (
-                                <div className="text-center py-12 border-2 border-dashed border-border rounded-xl bg-muted/30">
-                                    <p className="text-muted-foreground">
-                                        {searchQuery || filterStatus !== "all"
-                                            ? "Không tìm thấy bài tập nào."
-                                            : "Không có bài tập nào."}
+            {/* Main Grid - Single Screen Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left: Priority Tasks */}
+                <div className="lg:col-span-2 space-y-4">
+                    {/* Urgent Alert */}
+                    {urgentAssignments.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-100 rounded-xl p-4"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <AlertCircle className="w-5 h-5 text-red-600" />
+                                </div>
+                                <div className="flex-1">
+                                    <p className="font-bold text-red-800">
+                                        {urgentAssignments.length} nhiệm vụ cần hoàn thành gấp!
+                                    </p>
+                                    <p className="text-sm text-red-600">
+                                        {urgentAssignments[0]?.title}
                                     </p>
                                 </div>
-                            ) : (
-                                filteredAndSortedAssignments.map((assignment) => {
-                                    const submission = submissions.find(s => s.assignmentId === assignment.id);
-                                    const isSubmitted = submission?.status === 'submitted';
-                                    const isGraded = submission?.status === 'graded';
-                                    const isOverdue = new Date(assignment.dueDate).getTime() < Date.now();
+                                <Link
+                                    href={`/dashboard/assignments/${urgentAssignments[0]?.id}`}
+                                    className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700"
+                                >
+                                    Làm ngay
+                                </Link>
+                            </div>
+                        </motion.div>
+                    )}
 
-                                    return (
-                                        <Link key={assignment.id} href={`/dashboard/assignments/${assignment.id}`} className="block group">
-                                            <div className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all">
-                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 
-                                                    ${isGraded ? 'bg-green-100 text-green-600' :
-                                                        isSubmitted ? 'bg-orange-100 text-orange-600' :
-                                                            isOverdue ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'
-                                                    }`}>
-                                                    {isGraded ? '✓' : isSubmitted ? '⏳' : isOverdue ? '!' : 'E'}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="font-semibold text-base group-hover:text-primary transition-colors truncate">{assignment.title}</h4>
-                                                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                                                        <span className="flex items-center gap-1">
-                                                            <Clock className="w-3 h-3" />
-                                                            {new Date(assignment.dueDate).toLocaleDateString('vi-VN')}
-                                                        </span>
-                                                        <span className="flex items-center gap-1 text-yellow-600 font-medium">
-                                                            +{assignment.xpReward} XP
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="text-right shrink-0">
-                                                    {isGraded ? (
-                                                        <div className="text-lg font-bold text-green-600">{submission.score}đ</div>
-                                                    ) : isSubmitted ? (
-                                                        <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-md font-medium">Đang chấm</span>
-                                                    ) : isOverdue ? (
-                                                        <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-md font-medium">Quá hạn</span>
-                                                    ) : (
-                                                        <button className="text-sm bg-primary/10 text-primary px-3 py-1.5 rounded-md font-medium group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                                                            Làm bài
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    );
-                                })
-                            )}
+                    {/* Pending Assignments - Compact List */}
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between">
+                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                <Target className="w-4 h-4 text-indigo-600" />
+                                Nhiệm vụ đang chờ
+                            </h3>
+                            <Link href="/dashboard/missions" className="text-sm text-indigo-600 hover:underline">
+                                Xem tất cả
+                            </Link>
+                        </div>
+
+                        {hasPendingWork ? (
+                            <div className="divide-y divide-gray-50">
+                                {analytics.pendingAssignments.slice(0, 4).map((assignment, idx) => (
+                                    <Link
+                                        key={assignment.id}
+                                        href={`/dashboard/assignments/${assignment.id}`}
+                                        className="flex items-center gap-4 px-5 py-3 hover:bg-gray-50 transition-colors group"
+                                    >
+                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${assignment.urgent ? 'bg-red-50 text-red-600' : 'bg-indigo-50 text-indigo-600'
+                                            }`}>
+                                            <BookOpen className="w-5 h-5" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium text-gray-900 truncate group-hover:text-indigo-600">
+                                                {assignment.title}
+                                            </p>
+                                            <p className="text-xs text-gray-500">{assignment.className}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className={`text-sm font-medium ${assignment.urgent ? 'text-red-600' : 'text-gray-500'
+                                                }`}>
+                                                {formatDeadline(assignment.dueDate)}
+                                            </p>
+                                        </div>
+                                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-indigo-600" />
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="px-5 py-8 text-center">
+                                <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                    <Sparkles className="w-6 h-6 text-green-600" />
+                                </div>
+                                <p className="font-medium text-gray-900">Tuyệt vời! 🎉</p>
+                                <p className="text-sm text-gray-500">Bạn đã hoàn thành tất cả nhiệm vụ</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Quick Stats - Inline */}
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+                            <p className="text-2xl font-bold text-indigo-600">{(analytics as any).totalClasses || 0}</p>
+                            <p className="text-xs text-gray-500">Lớp học</p>
+                        </div>
+                        <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+                            <p className="text-2xl font-bold text-green-600">{analytics.mySubmissionRate}%</p>
+                            <p className="text-xs text-gray-500">Tỉ lệ nộp</p>
+                        </div>
+                        <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+                            <p className="text-2xl font-bold text-amber-600">{analytics.pendingAssignments?.length || 0}</p>
+                            <p className="text-xs text-gray-500">Đang chờ</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Sidebar (Right - 1/3) */}
-                <div className="space-y-6">
-                    {/* Mini Profile / Gamification Summary */}
-                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
-
-                        <div className="flex items-center gap-4 mb-6 relative z-10">
-                            <div className="w-14 h-14 rounded-full border-2 border-white/30 overflow-hidden bg-white/10">
-                                <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-lg">{user.name}</h3>
-                                <div className="flex items-center gap-2 text-sm opacity-90">
-                                    <span className="bg-white/20 px-2 py-0.5 rounded text-xs font-medium">Level {user.level}</span>
-                                    <span>{user.xp?.toLocaleString()} XP</span>
+                {/* Right: Quick Actions */}
+                <div className="space-y-4">
+                    {/* Quick Actions Card */}
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+                        <h3 className="font-bold text-gray-900 mb-4">Truy cập nhanh</h3>
+                        <div className="space-y-2">
+                            <Link
+                                href="/dashboard/classes"
+                                className="flex items-center gap-3 p-3 rounded-lg hover:bg-indigo-50 transition-colors group"
+                            >
+                                <div className="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                    <BookOpen className="w-4 h-4 text-indigo-600" />
                                 </div>
-                            </div>
-                        </div>
+                                <span className="font-medium text-gray-700 group-hover:text-indigo-600">Lớp học của tôi</span>
+                            </Link>
 
-                        <div className="grid grid-cols-2 gap-3 mb-4 relative z-10">
-                            <div className="bg-white/10 rounded-lg p-3 text-center">
-                                <div className="text-2xl font-bold">{user.streak || 0} 🔥</div>
-                                <div className="text-xs opacity-75">Streak ngày</div>
-                            </div>
-                            <div className="bg-white/10 rounded-lg p-3 text-center">
-                                <div className="text-2xl font-bold">{user.badges?.length || 0} 🏅</div>
-                                <div className="text-xs opacity-75">Huy hiệu</div>
-                            </div>
-                        </div>
+                            <Link
+                                href="/dashboard/schedule"
+                                className="flex items-center gap-3 p-3 rounded-lg hover:bg-emerald-50 transition-colors group"
+                            >
+                                <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                    <Calendar className="w-4 h-4 text-emerald-600" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-emerald-600">Thời khóa biểu</span>
+                            </Link>
 
-                        <Link href="/dashboard/achievements" className="block relative z-10">
-                            <button className="w-full bg-white text-indigo-600 py-2 rounded-lg font-medium text-sm hover:bg-indigo-50 transition-colors">
-                                Xem chi tiết thành tích
+                            <Link
+                                href="/dashboard/missions"
+                                className="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-50 transition-colors group"
+                            >
+                                <div className="w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <Target className="w-4 h-4 text-purple-600" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-purple-600">Nhiệm vụ</span>
+                            </Link>
+
+                            <button
+                                onClick={() => setIsJoinClassModalOpen(true)}
+                                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-amber-50 transition-colors group"
+                            >
+                                <div className="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center">
+                                    <Plus className="w-4 h-4 text-amber-600" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-amber-600">Tham gia lớp mới</span>
                             </button>
-                        </Link>
+                        </div>
                     </div>
 
-                    {/* AI Tutor Notification */}
-                    <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-                        <h3 className="font-semibold mb-4 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                            AI Tutor nhắc nhở
-                        </h3>
-                        <div className="p-4 rounded-lg bg-blue-50 text-blue-900 text-sm border border-blue-100">
-                            <p className="font-medium mb-1">💡 Gợi ý học tập</p>
-                            <p className="opacity-90">Bạn đang làm rất tốt phần Hình học! Tuy nhiên, hãy ôn lại một chút về Đại số tuyến tính để chuẩn bị cho bài kiểm tra sắp tới nhé.</p>
+                    {/* My Classes Quick View */}
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-bold text-gray-900">Lớp của tôi</h3>
+                            <Link href="/dashboard/classes" className="text-xs text-indigo-600 hover:underline">
+                                Xem tất cả
+                            </Link>
+                        </div>
+                        <div className="text-center py-4 text-gray-500 text-sm">
+                            {(analytics as any).totalClasses || 0} lớp học
                         </div>
                     </div>
                 </div>
@@ -296,23 +284,10 @@ export function StudentDashboard({ user, assignments, submissions }: StudentDash
                 onClose={() => setIsJoinClassModalOpen(false)}
                 onSuccess={() => {
                     setIsJoinClassModalOpen(false);
-                    window.location.reload(); // Simple refresh to show new class data
+                    window.location.reload();
                 }}
                 userId={user.id}
             />
-        </div>
-    );
-}
-
-function StatCard({ title, value, icon, description }: { title: string, value: string, icon: React.ReactNode, description: string }) {
-    return (
-        <div className="bg-card p-6 rounded-xl border border-border shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-muted-foreground">{title}</span>
-                {icon}
-            </div>
-            <div className="text-2xl font-bold">{value}</div>
-            <p className="text-xs text-muted-foreground mt-1">{description}</p>
         </div>
     );
 }

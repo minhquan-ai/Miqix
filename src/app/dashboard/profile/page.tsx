@@ -6,9 +6,10 @@ import {
     Award, BookOpen, CheckCircle, Mail, Shield, User as UserIcon,
     MapPin, Link as LinkIcon, Calendar, Edit, Camera, Phone, Globe,
     Briefcase, GraduationCap, Star, Clock, ChevronRight, Settings,
-    LogOut, Trophy
+    LogOut
 } from "lucide-react";
 import { DataService } from "@/lib/data";
+import { getCurrentUserAction } from "@/lib/actions";
 import { User } from "@/types";
 import { motion } from "framer-motion";
 
@@ -21,7 +22,7 @@ export default function ProfilePage() {
     useEffect(() => {
         async function loadData() {
             try {
-                const currentUser = await DataService.getCurrentUser();
+                const currentUser = await getCurrentUserAction();
                 if (!currentUser) {
                     router.push('/login');
                     return;
@@ -51,9 +52,6 @@ export default function ProfilePage() {
         alert("Tính năng đổi ảnh bìa đang được cập nhật!");
     };
 
-    const navigateToAchievements = () => {
-        router.push('/dashboard/achievements');
-    };
 
     if (loading) return <div className="p-8 text-center">Đang tải...</div>;
     if (!user) return null;
@@ -200,26 +198,6 @@ export default function ProfilePage() {
 
                         {/* Right Column: Quick Links & Mini Stats */}
                         <div className="space-y-6">
-                            {/* Achievements Link Card */}
-                            <div
-                                onClick={navigateToAchievements}
-                                className="bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200 rounded-2xl p-6 shadow-sm cursor-pointer hover:shadow-md transition-all group relative overflow-hidden"
-                            >
-                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <Trophy className="w-20 h-20 text-yellow-600" />
-                                </div>
-                                <h3 className="font-bold text-lg text-yellow-900 mb-2 flex items-center gap-2">
-                                    <Award className="w-5 h-5" />
-                                    Thành tích
-                                </h3>
-                                <p className="text-sm text-yellow-800 mb-4 relative z-10">
-                                    Xem cấp độ, huy hiệu và hành trình học tập của bạn.
-                                </p>
-                                <div className="flex items-center gap-2 text-xs font-bold text-yellow-700 bg-yellow-100/50 px-3 py-1.5 rounded-lg w-fit group-hover:bg-yellow-100 transition-colors">
-                                    Level {user.level || 1} • {user.xp || 0} XP
-                                    <ChevronRight className="w-3 h-3" />
-                                </div>
-                            </div>
 
                             {/* Teacher Stats (Only for Teachers) */}
                             {user.role === 'teacher' && (
@@ -243,7 +221,7 @@ function TeacherStats({ user }: { user: User }) {
 
     useEffect(() => {
         async function loadStats() {
-            const classes = await DataService.getClasses(user.id);
+            const classes = await DataService.getClasses();
             const assignments = await DataService.getAssignments();
 
             // Parallel fetch for students
