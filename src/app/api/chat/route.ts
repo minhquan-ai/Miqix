@@ -3,9 +3,8 @@ import Groq from 'groq-sdk';
 
 // Initialize Groq Client
 // Note: SDK automatically searches for GROQ_API_KEY in process.env
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
-});
+// Initialize Groq Client
+// Note: SDK automatically searches for GROQ_API_KEY in process.env
 
 // Update to active model (Llama 3.3 70B Versatile is the current standard)
 // Update to active model as requested
@@ -35,6 +34,10 @@ export async function POST(request: Request) {
         const { message } = body;
 
         // 3. Call Groq API
+        const groq = new Groq({
+            apiKey: process.env.GROQ_API_KEY,
+        });
+
         const completion = await groq.chat.completions.create({
             messages: [
                 {
