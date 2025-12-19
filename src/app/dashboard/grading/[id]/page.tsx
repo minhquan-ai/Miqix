@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Bot, CheckCircle, Download, FileText, Save, Send, User } from "lucide-react";
-import { DataService } from "@/lib/data";
 import { AIService } from "@/lib/ai-service";
+import { getCurrentUserAction, getSubmissionByIdAction, getAssignmentByIdAction, updateSubmissionAction } from "@/lib/actions";
 import { Assignment, Submission, User as UserType } from "@/types";
 import { useToast } from "@/components/ui/Toast";
 import { downloadFile } from "@/lib/fileUtils";
@@ -30,14 +30,14 @@ export default function GradingPage() {
     useEffect(() => {
         async function loadData() {
             try {
-                const sub = await DataService.getSubmissionById(submissionId);
+                const sub = await getSubmissionByIdAction(submissionId);
                 if (sub) {
                     setSubmission(sub);
                     setScore(sub.score !== undefined ? sub.score : "");
                     setFeedback(sub.feedback || "");
                     setErrorAnalysis(sub.errorAnalysis || null);
 
-                    const assign = await DataService.getAssignmentById(sub.assignmentId);
+                    const assign = await getAssignmentByIdAction(sub.assignmentId);
                     if (assign) setAssignment(assign);
                 }
             } catch (error) {
@@ -54,7 +54,7 @@ export default function GradingPage() {
 
         setSaving(true);
         try {
-            await DataService.updateSubmission({
+            await updateSubmissionAction({
                 id: submission.id,
                 score: Number(score),
                 feedback,

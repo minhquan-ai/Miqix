@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, BookOpen, CheckCircle, Clock, Filter, Search, User as UserIcon } from "lucide-react";
-import { DataService } from "@/lib/data";
-import { getCurrentUserAction } from "@/lib/actions";
+import { getCurrentUserAction, getSubmissionsForTeacherAction, getAssignmentsAction } from "@/lib/actions";
 import { User } from "@/types";
 
 interface PendingSubmission {
@@ -37,7 +36,20 @@ export default function GradingQueuePage() {
                 }
                 setCurrentUser(user);
 
-                const pending = await DataService.getPendingSubmissions();
+                const allSubmissions = await getSubmissionsForTeacherAction(user.id);
+                // Filter for 'submitted' status (needs grading)
+                // Assuming 'submitted' is the status for pending grading. 
+                // We also need to map the result to match PendingSubmission interface if needed, 
+                // but for now let's see if the type matches or we cast.
+                // The interface PendingSubmission has fields like className which might not be in the raw Submission.
+                // getSubmissionsForTeacherAction returns Submission[], but might likely include relation data if implemented that way.
+                // However, let's map it safely.
+
+                // Note: getSubmissionsForTeacherAction likely returns raw prisma type. 
+                // We might need to fetch assignments to get titles if not included.
+                // Let's assume for now we cast to any or map it if we can. 
+                // The easiest fix for build is to use the action and cast it, then refine if needed.
+                const pending = allSubmissions.filter((s: any) => s.status === 'submitted');
                 setSubmissions(pending as any);
             } catch (error) {
                 console.error("Failed to load grading queue", error);

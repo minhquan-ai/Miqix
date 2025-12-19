@@ -17,7 +17,7 @@ export default function TodoListWidget() {
         const fetchTodos = async () => {
             try {
                 // In a real app, we'd get the user ID from context
-                const data = await DataService.getTodos("current-user");
+                const data = await DataService.getTodos();
                 setTodos(data);
             } catch (error) {
                 console.error("Failed to fetch todos", error);
@@ -50,7 +50,7 @@ export default function TodoListWidget() {
         setNewItem("");
 
         try {
-            await DataService.createTodo("current-user", newTodo.content);
+            await DataService.createTodo({ userId: "current-user", content: newTodo.content });
             // In real app, we'd replace the temp item with the real one from response
         } catch (error) {
             setTodos(previousTodos); // Revert on error
@@ -68,7 +68,10 @@ export default function TodoListWidget() {
         ));
 
         try {
-            await DataService.toggleTodo(id);
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                await DataService.updateTodo(id, { completed: !todo.completed });
+            }
         } catch (error) {
             setTodos(previousTodos);
         }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { UserPlus, Loader2, KeyRound } from "lucide-react";
-import { DataService } from "@/lib/data";
+import { joinClassAction } from "@/lib/actions";
 import { useToast } from "@/components/ui/Toast";
 import { useRouter } from "next/navigation";
 import { DraggableModal } from "@/components/ui/DraggableModal";
@@ -30,7 +30,7 @@ export function JoinClassModal({ isOpen, onClose, onSuccess, userId }: JoinClass
 
         setLoading(true);
         try {
-            const result = await DataService.joinClass(code);
+            const result = await joinClassAction({ classCode: code });
             if (result.success) {
                 showToast(result.message, "success");
                 onSuccess();

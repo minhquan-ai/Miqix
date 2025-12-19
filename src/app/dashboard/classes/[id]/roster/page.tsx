@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { DataService } from "@/lib/data";
-import { getCurrentUserAction } from "@/lib/actions";
+import { getCurrentUserAction, getPendingEnrollmentsAction, approveEnrollmentAction, rejectEnrollmentAction } from "@/lib/actions";
 import { Class, User } from "@/types";
 import { ArrowLeft, Search, UserPlus, Users, Clock, CheckCircle, XCircle, Trash2, Copy, MoreVertical } from "lucide-react";
 import Link from "next/link";
@@ -72,7 +72,7 @@ function RosterContent() {
             }
 
             const enrollments = await DataService.getClassMembers(classId);
-            const pending = await DataService.getPendingEnrollments(classId);
+            const pending = await getPendingEnrollmentsAction(classId);
 
             setMembers(enrollments as any);
             setPendingEnrollments(pending as any);
@@ -324,7 +324,7 @@ function RosterContent() {
                                                 <button
                                                     onClick={async () => {
                                                         try {
-                                                            const result = await DataService.approveEnrollment(enrollment.id);
+                                                            const result = await approveEnrollmentAction(enrollment.id);
                                                             if (result.success) {
                                                                 showToast(result.message, 'success');
                                                                 await loadData();
@@ -345,7 +345,7 @@ function RosterContent() {
                                                     onClick={async () => {
                                                         if (!confirm(`Bạn có chắc muốn từ chối ${enrollment.user.name}?`)) return;
                                                         try {
-                                                            const result = await DataService.rejectEnrollment(enrollment.id);
+                                                            const result = await rejectEnrollmentAction(enrollment.id);
                                                             if (result.success) {
                                                                 showToast(result.message, 'success');
                                                                 await loadData();

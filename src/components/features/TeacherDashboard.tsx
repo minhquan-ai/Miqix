@@ -5,7 +5,8 @@ import { LogOut, Calendar as CalendarIcon, FileText, CheckCircle, Users, BookOpe
 import { logout } from "@/lib/auth-actions";
 import { useRouter } from "next/navigation";
 import { Class, User } from "@/types";
-import { DataService } from "@/lib/data";
+import { getTeacherDashboardAnalyticsAction } from "@/lib/analytics-actions";
+import { getClassesAction } from "@/lib/actions";
 import { NotificationBell } from "@/components/features/NotificationBell";
 import { ClassCreatorModal } from "./ClassCreatorModal";
 import { AssignmentCreatorModal } from "./AssignmentCreatorModal";
@@ -39,18 +40,18 @@ export function TeacherDashboard({ user, analytics }: TeacherDashboardProps) {
     const totalStudents = classes.reduce((sum, cls) => sum + (cls.studentCount || 0), 0);
 
     const refreshData = async () => {
-        const analyticsData = await DataService.getTeacherDashboardAnalytics();
+        const analyticsData = await getTeacherDashboardAnalyticsAction();
         setDashboardAnalytics(analyticsData);
-        const teacherClasses = await DataService.getClasses();
+        const teacherClasses = await getClassesAction();
         setClasses(teacherClasses);
     };
 
     useEffect(() => {
         setMounted(true);
         const loadData = async () => {
-            const analyticsData = await DataService.getTeacherDashboardAnalytics();
+            const analyticsData = await getTeacherDashboardAnalyticsAction();
             setDashboardAnalytics(analyticsData);
-            const teacherClasses = await DataService.getClasses();
+            const teacherClasses = await getClassesAction();
             setClasses(teacherClasses);
             setLoading(false);
         };

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { DataService } from "@/lib/data";
 import { getCurrentUserAction } from "@/lib/actions";
+import { getStudentDashboardAnalyticsAction, getTeacherDashboardAnalyticsAction } from "@/lib/analytics-actions";
 import { User } from "@/types";
 import { StudentDashboard } from "@/components/features/StudentDashboard";
 import { TeacherDashboard } from "@/components/features/TeacherDashboard";
@@ -26,10 +27,10 @@ export default function DashboardPage() {
         if (!currentUser) return;
 
         if (currentUser.role === 'student') {
-          const analytics = await DataService.getStudentDashboardAnalytics();
-          setStudentAnalytics(analytics as any);
+          const analytics = await getStudentDashboardAnalyticsAction();
+          setStudentAnalytics(analytics);
         } else if (currentUser.role === 'teacher') {
-          const analytics = await DataService.getTeacherDashboardAnalytics();
+          const analytics = await getTeacherDashboardAnalyticsAction();
           setTeacherAnalytics(analytics);
         }
 

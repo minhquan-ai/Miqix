@@ -687,7 +687,7 @@ export async function togglePinClassAction(classId: string) {
     return { success: true, pinned: updated.isPinned };
 }
 
-export async function joinClassAction(data: { classCode: string }) {
+export async function joinClassAction(data: { classCode: string }): Promise<{ success: boolean; message: string; classId?: string; className?: string; status?: string }> {
     const session = await auth();
     if (!session?.user?.id) return { success: false, message: "Unauthorized" };
 

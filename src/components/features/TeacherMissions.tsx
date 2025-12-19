@@ -15,7 +15,8 @@ import {
     Filter,
     MoreVertical
 } from 'lucide-react';
-import { DataService } from '@/lib/data';
+import { useRouter } from "next/navigation";
+import { getTeacherDashboardAnalyticsAction } from "@/lib/analytics-actions";
 import { ClassAnalytics } from '@/lib/class-analytics';
 
 export default function TeacherMissions() {
@@ -24,7 +25,7 @@ export default function TeacherMissions() {
 
     useEffect(() => {
         const loadData = async () => {
-            const data = await DataService.getTeacherDashboardAnalytics();
+            const data = await getTeacherDashboardAnalyticsAction();
             setAnalytics(data);
             setLoading(false);
         };

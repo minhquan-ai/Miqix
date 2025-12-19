@@ -451,10 +451,11 @@ export const getEnhancedAtRiskStudents = (
         }
 
         // Check 4: Streak broken
-        if (studentSubs.length > 0 && (student.streak || 0) === 0) {
-            reasons.push("Không có streak");
-            riskScore += 1;
-        }
+        // Check 4: Streak broken (Commented out as streak is not yet implemented)
+        // if (studentSubs.length > 0 && (student.streak || 0) === 0) {
+        //     reasons.push("Không có streak");
+        //     riskScore += 1;
+        // }
 
         if (reasons.length > 0) {
             const riskLevel: 'low' | 'medium' | 'high' =

@@ -107,7 +107,7 @@ const AssignmentShelf: React.FC<AssignmentShelfProps> = ({ title, assignments, c
 
                                         <div className="pt-3 mt-1 border-t border-gray-50 flex items-center justify-between">
                                             <span className="text-xs font-bold text-gray-400">
-                                                {assignment.points} điểm
+                                                {assignment.maxScore} điểm
                                             </span>
                                             <div className="w-6 h-6 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 opacity-0 group-hover/card:opacity-100 transform translate-x-2 group-hover/card:translate-x-0 transition-all">
                                                 <ArrowRight className="w-3 h-3" />

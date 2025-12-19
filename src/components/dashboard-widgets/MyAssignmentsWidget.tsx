@@ -57,7 +57,7 @@ export default function MyAssignmentsWidget({ analytics, classId }: MyAssignment
                                                 <Clock className="w-3 h-3" />
                                                 {formatDueDate(assignment.dueDate)}
                                             </span>
-                                            <span>{assignment.points} điểm</span>
+                                            <span>{assignment.maxScore} điểm</span>
                                         </div>
                                     </div>
                                     {assignment.urgent && (

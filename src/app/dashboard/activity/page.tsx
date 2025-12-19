@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DataService } from "@/lib/data";
-import { getCurrentUserAction } from "@/lib/actions";
+import { getCurrentUserAction, getSubmissionsForTeacherAction, getAssignmentsAction } from "@/lib/actions";
 import { Assignment, Submission } from "@/types";
 import { ArrowLeft, Clock, FileText, CheckCircle } from "lucide-react";
 import Link from "next/link";
@@ -19,8 +18,8 @@ export default function ActivityPage() {
             const user = await getCurrentUserAction();
             if (user) {
                 const [subs, assigns] = await Promise.all([
-                    DataService.getSubmissionsForTeacher(user.id),
-                    DataService.getAssignments()
+                    getSubmissionsForTeacherAction(user.id),
+                    getAssignmentsAction()
                 ]);
                 setSubmissions(subs.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()));
                 setAssignments(assigns);

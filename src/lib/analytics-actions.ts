@@ -76,7 +76,7 @@ export async function getStudentDashboardAnalyticsAction(): Promise<StudentAnaly
             title: a.title,
             dueDate: a.dueDate,
             urgent: a.dueDate.getTime() - now.getTime() < 2 * 24 * 60 * 60 * 1000,
-            points: a.maxScore || 10,
+            maxScore: a.maxScore || 10,
             classId: a.assignmentClasses[0]?.classId || "",
             className: a.assignmentClasses[0]?.class?.name || "Lớp học",
             subject: a.assignmentClasses[0]?.class?.subject,
@@ -106,15 +106,12 @@ export async function getStudentDashboardAnalyticsAction(): Promise<StudentAnaly
         myAverageScore,
         mySubmissionRate,
         myAttendanceRate: 95, // TODO: Implement attendance
-        myRank: 1, // TODO: Implement ranking
-        totalStudents: 30, // Mock
-        percentile: 90, // Mock
+        // myRank, totalStudents, and percentile are not part of StudentAnalytics interface currently
         classAverageScore: 7.5, // Mock
         aboveAverage: myAverageScore >= 7.5,
         pendingAssignments,
         ungradedSubmissions,
-        perfectScoreCount: gradedSubmissions.filter(s => s.score === 10).length,
-        onTimeStreak: user.streak
+        // perfectScoreCount and onTimeStreak are also not part of interface
     };
 }
 
