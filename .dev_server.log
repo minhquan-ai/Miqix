@@ -2219,3 +2219,652 @@
  ✓ Compiled in 35ms
  GET /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 47ms (compile: 11ms, proxy.ts: 8ms, render: 28ms)
  GET /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 47ms (compile: 28ms, proxy.ts: 8ms, render: 11ms)
+ GET /dashboard 200 in 197ms (compile: 144ms, proxy.ts: 13ms, render: 41ms)
+ POST /dashboard 200 in 41ms (compile: 5ms, proxy.ts: 4ms, render: 32ms)
+ POST /dashboard 200 in 17ms (compile: 4ms, proxy.ts: 3ms, render: 10ms)
+ POST /dashboard 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard 200 in 19ms (compile: 8ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard 200 in 18ms (compile: 4ms, proxy.ts: 3ms, render: 11ms)
+ POST /dashboard 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 4
+    - ádsdas (teacherId: u2)
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard 200 in 18ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 4
+    - ádsdas (teacherId: u2)
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard 200 in 17ms (compile: 4ms, proxy.ts: 3ms, render: 11ms)
+ GET /dashboard/schedule 200 in 127ms (compile: 93ms, proxy.ts: 8ms, render: 26ms)
+ POST /dashboard/schedule 200 in 38ms (compile: 12ms, proxy.ts: 3ms, render: 24ms)
+ POST /dashboard/schedule 200 in 18ms (compile: 8ms, proxy.ts: 3ms, render: 7ms)
+ GET /dashboard/classes 200 in 135ms (compile: 97ms, proxy.ts: 7ms, render: 31ms)
+ POST /dashboard/classes 200 in 35ms (compile: 11ms, proxy.ts: 4ms, render: 20ms)
+ POST /dashboard/classes 200 in 16ms (compile: 3ms, proxy.ts: 4ms, render: 9ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 4
+    - ádsdas (teacherId: u2)
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 14ms (compile: 3ms, proxy.ts: 3ms, render: 8ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 4
+    - ádsdas (teacherId: u2)
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 34ms (compile: 8ms, proxy.ts: 3ms, render: 24ms)
+ GET /grid.svg 404 in 23ms (compile: 6ms, proxy.ts: 4ms, render: 14ms)
+ GET /dashboard/assignments 200 in 167ms (compile: 140ms, proxy.ts: 4ms, render: 23ms)
+ POST /dashboard/assignments 200 in 47ms (compile: 4ms, proxy.ts: 11ms, render: 31ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/assignments 200 in 14ms (compile: 3ms, proxy.ts: 8ms, render: 3ms)
+ POST /dashboard/assignments 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/classes 200 in 24ms (compile: 6ms, proxy.ts: 8ms, render: 10ms)
+ POST /dashboard/classes 200 in 20ms (compile: 4ms, proxy.ts: 9ms, render: 7ms)
+ POST /dashboard/classes 200 in 17ms (compile: 9ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 4
+    - ádsdas (teacherId: u2)
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 4
+    - ádsdas (teacherId: u2)
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 20ms (compile: 4ms, proxy.ts: 8ms, render: 9ms)
+Failed to create class: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at <unknown> (src/lib/actions.ts:602:41)
+    at async createClassAction (src/lib/actions.ts:602:26)
+  600 |         const requireApproval = Boolean(data.requireApproval);
+  601 |
+> 602 |         const newClass = await db.class.create({
+      |                                         ^
+  603 |             data: {
+  604 |                 name: data.name,
+  605 |                 subject: data.subject, {
+  code: 'P2023',
+  clientVersion: '5.10.2',
+  meta: [Object]
+}
+Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+Error stack: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at _n.handleRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async createClassAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:26)
+    at async executeActionAndPrepareForRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:4449)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:2264
+    at async handleAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:23622)
+    at async renderToHTMLOrFlightImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:40:41714)
+    at async doRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8093:28)
+    at async AppPageRouteModule.handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:42:63162)
+    at async handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8299:32)
+    at async handler (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8670:20)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1413:9)
+    at async DevServer.renderPageComponent (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1515:32)
+    at async DevServer.pipeImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/next-server.js:394:17)
+    at async DevServer.handleRequestImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:912:17)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:382:20
+    at async Span.traceAsyncFn (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:378:24)
+    at async invokeRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:436:24)
+    at async requestHandlerImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:484:13)
+    at async Server.requestListener (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /dashboard/classes 200 in 246ms (compile: 11ms, proxy.ts: 9ms, render: 226ms)
+Failed to create class: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at <unknown> (src/lib/actions.ts:602:41)
+    at async createClassAction (src/lib/actions.ts:602:26)
+  600 |         const requireApproval = Boolean(data.requireApproval);
+  601 |
+> 602 |         const newClass = await db.class.create({
+      |                                         ^
+  603 |             data: {
+  604 |                 name: data.name,
+  605 |                 subject: data.subject, {
+  code: 'P2023',
+  clientVersion: '5.10.2',
+  meta: [Object]
+}
+Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+Error stack: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at _n.handleRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async createClassAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:26)
+    at async executeActionAndPrepareForRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:4449)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:2264
+    at async handleAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:23622)
+    at async renderToHTMLOrFlightImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:40:41714)
+    at async doRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8093:28)
+    at async AppPageRouteModule.handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:42:63162)
+    at async handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8299:32)
+    at async handler (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8670:20)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1413:9)
+    at async DevServer.renderPageComponent (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1515:32)
+    at async DevServer.pipeImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/next-server.js:394:17)
+    at async DevServer.handleRequestImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:912:17)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:382:20
+    at async Span.traceAsyncFn (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:378:24)
+    at async invokeRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:436:24)
+    at async requestHandlerImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:484:13)
+    at async Server.requestListener (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /dashboard/classes 200 in 167ms (compile: 5ms, proxy.ts: 9ms, render: 153ms)
+Failed to create class: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at <unknown> (src/lib/actions.ts:602:41)
+    at async createClassAction (src/lib/actions.ts:602:26)
+  600 |         const requireApproval = Boolean(data.requireApproval);
+  601 |
+> 602 |         const newClass = await db.class.create({
+      |                                         ^
+  603 |             data: {
+  604 |                 name: data.name,
+  605 |                 subject: data.subject, {
+  code: 'P2023',
+  clientVersion: '5.10.2',
+  meta: [Object]
+}
+Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+Error stack: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at _n.handleRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async createClassAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:26)
+    at async executeActionAndPrepareForRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:4449)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:2264
+    at async handleAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:23622)
+    at async renderToHTMLOrFlightImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:40:41714)
+    at async doRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8093:28)
+    at async AppPageRouteModule.handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:42:63162)
+    at async handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8299:32)
+    at async handler (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8670:20)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1413:9)
+    at async DevServer.renderPageComponent (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1515:32)
+    at async DevServer.pipeImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/next-server.js:394:17)
+    at async DevServer.handleRequestImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:912:17)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:382:20
+    at async Span.traceAsyncFn (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:378:24)
+    at async invokeRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:436:24)
+    at async requestHandlerImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:484:13)
+    at async Server.requestListener (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /dashboard/classes 200 in 155ms (compile: 10ms, proxy.ts: 5ms, render: 140ms)
+Failed to create class: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at <unknown> (src/lib/actions.ts:602:41)
+    at async createClassAction (src/lib/actions.ts:602:26)
+  600 |         const requireApproval = Boolean(data.requireApproval);
+  601 |
+> 602 |         const newClass = await db.class.create({
+      |                                         ^
+  603 |             data: {
+  604 |                 name: data.name,
+  605 |                 subject: data.subject, {
+  code: 'P2023',
+  clientVersion: '5.10.2',
+  meta: [Object]
+}
+Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+Error stack: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at _n.handleRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async createClassAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:26)
+    at async executeActionAndPrepareForRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:4449)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:2264
+    at async handleAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:23622)
+    at async renderToHTMLOrFlightImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:40:41714)
+    at async doRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8093:28)
+    at async AppPageRouteModule.handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:42:63162)
+    at async handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8299:32)
+    at async handler (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8670:20)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1413:9)
+    at async DevServer.renderPageComponent (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1515:32)
+    at async DevServer.pipeImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/next-server.js:394:17)
+    at async DevServer.handleRequestImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:912:17)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:382:20
+    at async Span.traceAsyncFn (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:378:24)
+    at async invokeRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:436:24)
+    at async requestHandlerImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:484:13)
+    at async Server.requestListener (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /dashboard/classes 200 in 157ms (compile: 5ms, proxy.ts: 8ms, render: 145ms)
+Failed to create class: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at <unknown> (src/lib/actions.ts:602:41)
+    at async createClassAction (src/lib/actions.ts:602:26)
+  600 |         const requireApproval = Boolean(data.requireApproval);
+  601 |
+> 602 |         const newClass = await db.class.create({
+      |                                         ^
+  603 |             data: {
+  604 |                 name: data.name,
+  605 |                 subject: data.subject, {
+  code: 'P2023',
+  clientVersion: '5.10.2',
+  meta: [Object]
+}
+Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+Error stack: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at _n.handleRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async createClassAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:26)
+    at async executeActionAndPrepareForRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:4449)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:2264
+    at async handleAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:23622)
+    at async renderToHTMLOrFlightImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:40:41714)
+    at async doRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8093:28)
+    at async AppPageRouteModule.handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:42:63162)
+    at async handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8299:32)
+    at async handler (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8670:20)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1413:9)
+    at async DevServer.renderPageComponent (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1515:32)
+    at async DevServer.pipeImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/next-server.js:394:17)
+    at async DevServer.handleRequestImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:912:17)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:382:20
+    at async Span.traceAsyncFn (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:378:24)
+    at async invokeRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:436:24)
+    at async requestHandlerImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:484:13)
+    at async Server.requestListener (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /dashboard/classes 200 in 146ms (compile: 3ms, proxy.ts: 6ms, render: 137ms)
+Failed to create class: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at <unknown> (src/lib/actions.ts:602:41)
+    at async createClassAction (src/lib/actions.ts:602:26)
+  600 |         const requireApproval = Boolean(data.requireApproval);
+  601 |
+> 602 |         const newClass = await db.class.create({
+      |                                         ^
+  603 |             data: {
+  604 |                 name: data.name,
+  605 |                 subject: data.subject, {
+  code: 'P2023',
+  clientVersion: '5.10.2',
+  meta: [Object]
+}
+Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+Error stack: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at _n.handleRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async createClassAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:26)
+    at async executeActionAndPrepareForRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:4449)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:2264
+    at async handleAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:23622)
+    at async renderToHTMLOrFlightImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:40:41714)
+    at async doRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8093:28)
+    at async AppPageRouteModule.handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:42:63162)
+    at async handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8299:32)
+    at async handler (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8670:20)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1413:9)
+    at async DevServer.renderPageComponent (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1515:32)
+    at async DevServer.pipeImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/next-server.js:394:17)
+    at async DevServer.handleRequestImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:912:17)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:382:20
+    at async Span.traceAsyncFn (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:378:24)
+    at async invokeRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:436:24)
+    at async requestHandlerImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:484:13)
+    at async Server.requestListener (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /dashboard/classes 200 in 145ms (compile: 9ms, proxy.ts: 3ms, render: 132ms)
+Failed to create class: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at <unknown> (src/lib/actions.ts:602:41)
+    at async createClassAction (src/lib/actions.ts:602:26)
+  600 |         const requireApproval = Boolean(data.requireApproval);
+  601 |
+> 602 |         const newClass = await db.class.create({
+      |                                         ^
+  603 |             data: {
+  604 |                 name: data.name,
+  605 |                 subject: data.subject, {
+  code: 'P2023',
+  clientVersion: '5.10.2',
+  meta: [Object]
+}
+Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+Error stack: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at _n.handleRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async createClassAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:26)
+    at async executeActionAndPrepareForRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:4449)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:2264
+    at async handleAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:23622)
+    at async renderToHTMLOrFlightImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:40:41714)
+    at async doRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8093:28)
+    at async AppPageRouteModule.handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:42:63162)
+    at async handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8299:32)
+    at async handler (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8670:20)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1413:9)
+    at async DevServer.renderPageComponent (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1515:32)
+    at async DevServer.pipeImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/next-server.js:394:17)
+    at async DevServer.handleRequestImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:912:17)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:382:20
+    at async Span.traceAsyncFn (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:378:24)
+    at async invokeRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:436:24)
+    at async requestHandlerImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:484:13)
+    at async Server.requestListener (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /dashboard/classes 200 in 164ms (compile: 4ms, proxy.ts: 10ms, render: 150ms)
+Failed to create class: Error [PrismaClientKnownRequestError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at <unknown> (src/lib/actions.ts:602:41)
+    at async createClassAction (src/lib/actions.ts:602:26)
+  600 |         const requireApproval = Boolean(data.requireApproval);
+  601 |
+> 602 |         const newClass = await db.class.create({
+      |                                         ^
+  603 |             data: {
+  604 |                 name: data.name,
+  605 |                 subject: data.subject, {
+  code: 'P2023',
+  clientVersion: '5.10.2',
+  meta: [Object]
+}
+Error message: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+Error stack: PrismaClientKnownRequestError: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create()` invocation in
+/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:168
+
+  1032 const classType = data.classType || 'NORMAL';
+  1033 const classRole = data.role || (classType === 'NORMAL' ? 'main' : 'extra');
+  1034 const requireApproval = Boolean(data.requireApproval);
+→ 1035 const newClass = await __TURBOPACK__imported__module__$5b$project$5d2f$ergonix$2f$src$2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["db"].class.create(
+Inconsistent column data: Conversion failed: Value 5000000000 does not fit in an INT column, try migrating the 'tuitionFee' column type to BIGINT
+    at _n.handleRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async createClassAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/[root-of-the-server]__575c1cc0._.js:1035:26)
+    at async executeActionAndPrepareForRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:4449)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:35:2264
+    at async handleAction (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:34:23622)
+    at async renderToHTMLOrFlightImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:40:41714)
+    at async doRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8093:28)
+    at async AppPageRouteModule.handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js:42:63162)
+    at async handleResponse (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8299:32)
+    at async handler (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/.next/dev/server/chunks/ssr/82756_next_dist_45adade1._.js:8670:20)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1413:9)
+    at async DevServer.renderPageComponent (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1465:24)
+    at async DevServer.renderToResponseImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1515:32)
+    at async DevServer.pipeImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:1021:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/next-server.js:394:17)
+    at async DevServer.handleRequestImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/base-server.js:912:17)
+    at async /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:382:20
+    at async Span.traceAsyncFn (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/dev/next-dev-server.js:378:24)
+    at async invokeRender (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:436:24)
+    at async requestHandlerImpl (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/router-server.js:484:13)
+    at async Server.requestListener (/Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /dashboard/classes 200 in 177ms (compile: 4ms, proxy.ts: 7ms, render: 166ms)
+ POST /api/seed 405 in 115ms (compile: 108ms, proxy.ts: 2ms, render: 5ms)
