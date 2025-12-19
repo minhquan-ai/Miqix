@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DataService } from "@/lib/data";
+import { getCurrentUserAction } from "@/lib/actions";
 import { Assignment, Submission } from "@/types";
 import { ArrowLeft, Clock, FileText, CheckCircle } from "lucide-react";
 import Link from "next/link";
@@ -15,11 +16,11 @@ export default function ActivityPage() {
 
     useEffect(() => {
         async function loadData() {
-            const user = await DataService.getCurrentUser();
+            const user = await getCurrentUserAction();
             if (user) {
                 const [subs, assigns] = await Promise.all([
                     DataService.getSubmissionsForTeacher(user.id),
-                    DataService.getAssignments(user.id)
+                    DataService.getAssignments()
                 ]);
                 setSubmissions(subs.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()));
                 setAssignments(assigns);

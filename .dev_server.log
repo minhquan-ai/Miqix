@@ -1,0 +1,2186 @@
+
+> ergonix@0.1.0 dev
+> next dev -H 0.0.0.0
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /Users/minhquan/.gemini/antigravity/playground/perihelion-planetary/ergonix/package-lock.json
+
+   ▲ Next.js 16.0.3 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://0.0.0.0:3000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+ ✓ Ready in 575ms
+ GET /dashboard 200 in 1935ms (compile: 1730ms, proxy.ts: 57ms, render: 148ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 2.8s (compile: 2.6s, proxy.ts: 57ms, render: 123ms)
+ POST /dashboard 200 in 695ms (compile: 1942µs, proxy.ts: 7ms, render: 686ms)
+ POST /dashboard 200 in 27ms (compile: 3ms, proxy.ts: 11ms, render: 13ms)
+ POST /dashboard 200 in 19ms (compile: 3ms, proxy.ts: 9ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 17ms (compile: 4ms, proxy.ts: 4ms, render: 9ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 2ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 1977µs, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 2ms, proxy.ts: 5ms, render: 5ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 3ms, proxy.ts: 4ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 8ms (compile: 2ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 8ms (compile: 1737µs, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 7ms (compile: 1516µs, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard 200 in 49ms (compile: 4ms, proxy.ts: 13ms, render: 32ms)
+ POST /dashboard 200 in 14ms (compile: 2ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard 200 in 11ms (compile: 1796µs, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard 200 in 11ms (compile: 1366µs, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard 200 in 25ms (compile: 2ms, proxy.ts: 3ms, render: 19ms)
+ POST /dashboard 200 in 14ms (compile: 1698µs, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard 200 in 14ms (compile: 1616µs, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard 200 in 13ms (compile: 2ms, proxy.ts: 3ms, render: 7ms)
+ GET /dashboard/classes 200 in 307ms (compile: 282ms, proxy.ts: 9ms, render: 16ms)
+ POST /dashboard/classes 200 in 14ms (compile: 1431µs, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard/classes 200 in 10ms (compile: 1288µs, proxy.ts: 4ms, render: 5ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 11ms (compile: 1590µs, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 15ms (compile: 1744µs, proxy.ts: 3ms, render: 11ms)
+ GET /grid.svg 404 in 180ms (compile: 145ms, proxy.ts: 4ms, render: 31ms)
+ GET /dashboard/schedule 200 in 296ms (compile: 281ms, proxy.ts: 5ms, render: 10ms)
+ POST /dashboard/schedule 200 in 13ms (compile: 1495µs, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/schedule 200 in 12ms (compile: 1720µs, proxy.ts: 4ms, render: 6ms)
+ GET /dashboard 200 in 24ms (compile: 2ms, proxy.ts: 12ms, render: 10ms)
+ POST /dashboard 200 in 14ms (compile: 2ms, proxy.ts: 5ms, render: 6ms)
+ POST /dashboard 200 in 11ms (compile: 1416µs, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard/assignments 200 in 328ms (compile: 309ms, proxy.ts: 8ms, render: 11ms)
+ POST /dashboard/assignments 200 in 12ms (compile: 1655µs, proxy.ts: 5ms, render: 6ms)
+ POST /dashboard/assignments 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/assignments 200 in 7ms (compile: 1437µs, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/assignments 200 in 6ms (compile: 1296µs, proxy.ts: 3ms, render: 2ms)
+ POST /dashboard/assignments 200 in 21ms (compile: 3ms, proxy.ts: 9ms, render: 9ms)
+ ✓ Compiled in 79ms
+ GET /grid.svg 404 in 30ms (compile: 8ms, proxy.ts: 5ms, render: 17ms)
+ GET /dashboard/assignments 200 in 203ms (compile: 79ms, proxy.ts: 7ms, render: 117ms)
+ GET /dashboard 200 in 198ms (compile: 61ms, proxy.ts: 115ms, render: 22ms)
+ GET /grid.svg 404 in 34ms (compile: 8ms, proxy.ts: 7ms, render: 19ms)
+ POST /dashboard/assignments 200 in 40ms (compile: 1977µs, proxy.ts: 6ms, render: 32ms)
+ ✓ Compiled in 77ms
+ GET /dashboard/assignments 200 in 205ms (compile: 65ms, proxy.ts: 18ms, render: 122ms)
+ GET /dashboard 200 in 205ms (compile: 163ms, proxy.ts: 18ms, render: 24ms)
+ GET /dashboard/assignments 200 in 32ms (compile: 2ms, proxy.ts: 5ms, render: 25ms)
+ GET /dashboard 200 in 31ms (compile: 2ms, proxy.ts: 15ms, render: 14ms)
+ GET /grid.svg 404 in 64ms (compile: 32ms, proxy.ts: 16ms, render: 16ms)
+ POST /dashboard/assignments 200 in 62ms (compile: 2ms, proxy.ts: 15ms, render: 45ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 1578µs, proxy.ts: 4ms, render: 7ms)
+ ✓ Compiled in 70ms
+ GET /dashboard/assignments 200 in 168ms (compile: 55ms, proxy.ts: 5ms, render: 108ms)
+ GET /dashboard 200 in 167ms (compile: 133ms, proxy.ts: 4ms, render: 30ms)
+ GET /dashboard 200 in 29ms (compile: 2ms, proxy.ts: 5ms, render: 22ms)
+ GET /dashboard/assignments 200 in 25ms (compile: 1454µs, proxy.ts: 13ms, render: 10ms)
+ POST /dashboard/assignments 200 in 30ms (compile: 1393µs, proxy.ts: 3ms, render: 25ms)
+ ✓ Compiled in 110ms
+ GET /dashboard/assignments 200 in 221ms (compile: 88ms, proxy.ts: 8ms, render: 125ms)
+ GET /dashboard 200 in 220ms (compile: 176ms, proxy.ts: 21ms, render: 23ms)
+ GET /dashboard/assignments 200 in 33ms (compile: 3ms, proxy.ts: 6ms, render: 23ms)
+ GET /dashboard 200 in 29ms (compile: 5ms, proxy.ts: 15ms, render: 9ms)
+ POST /dashboard/assignments 200 in 51ms (compile: 6ms, proxy.ts: 6ms, render: 39ms)
+ ✓ Compiled in 154ms
+ GET /dashboard/assignments 200 in 300ms (compile: 236ms, proxy.ts: 17ms, render: 48ms)
+ GET /dashboard 200 in 292ms (compile: 140ms, proxy.ts: 14ms, render: 138ms)
+ GET /dashboard/assignments 200 in 199ms (compile: 6ms, proxy.ts: 15ms, render: 177ms)
+ GET /dashboard 200 in 199ms (compile: 108ms, proxy.ts: 15ms, render: 76ms)
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/lib/ai-service.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/lib/ai-service.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/lib/ai-service.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 30ms
+ GET /dashboard 200 in 288ms (compile: 75ms, proxy.ts: 20ms, render: 194ms)
+ GET /dashboard/assignments 200 in 285ms (compile: 149ms, proxy.ts: 17ms, render: 119ms)
+ GET /dashboard 200 in 325ms (compile: 177ms, proxy.ts: 13ms, render: 135ms)
+ GET /dashboard/assignments 200 in 156ms (compile: 4ms, proxy.ts: 98ms, render: 54ms)
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/features/AssignmentCreatorModal.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/features/AssignmentCreatorModal.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 56ms
+ GET /dashboard 200 in 347ms (compile: 70ms, proxy.ts: 11ms, render: 265ms)
+ GET /dashboard/assignments 200 in 345ms (compile: 228ms, proxy.ts: 8ms, render: 109ms)
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/features/AIQuizGenerator.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/features/AIQuizGenerator.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 56ms
+ GET /dashboard 200 in 341ms (compile: 74ms, proxy.ts: 10ms, render: 257ms)
+ GET /dashboard/assignments 200 in 340ms (compile: 225ms, proxy.ts: 7ms, render: 107ms)
+ GET /dashboard/assignments 200 in 53ms (compile: 10ms, proxy.ts: 10ms, render: 33ms)
+ ✓ Compiled in 94ms
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/lib/groq-service.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /dashboard/assignments 200 in 202ms (compile: 79ms, proxy.ts: 10ms, render: 113ms)
+ GET /dashboard 200 in 202ms (compile: 169ms, proxy.ts: 10ms, render: 23ms)
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/lib/groq-service.ts changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /dashboard 200 in 134ms (compile: 96ms, proxy.ts: 30ms, render: 9ms)
+ GET /dashboard/assignments 200 in 203ms (compile: 6ms, proxy.ts: 27ms, render: 170ms)
+ GET /dashboard 200 in 203ms (compile: 4ms, proxy.ts: 35ms, render: 164ms)
+ GET /dashboard/assignments 200 in 199ms (compile: 12ms, proxy.ts: 121ms, render: 67ms)
+ POST /dashboard/assignments 200 in 43ms (compile: 2ms, proxy.ts: 5ms, render: 36ms)
+ POST /dashboard 200 in 46ms (compile: 2ms, proxy.ts: 8ms, render: 35ms)
+ POST /dashboard/assignments 200 in 20ms (compile: 2ms, proxy.ts: 11ms, render: 7ms)
+ POST /dashboard 200 in 14ms (compile: 1977µs, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/assignments 200 in 21ms (compile: 1773µs, proxy.ts: 4ms, render: 15ms)
+ POST /dashboard 200 in 17ms (compile: 5ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/assignments 200 in 8ms (compile: 1217µs, proxy.ts: 3ms, render: 3ms)
+ GET /grid.svg 404 in 22ms (compile: 6ms, proxy.ts: 3ms, render: 13ms)
+ ✓ Compiled in 73ms
+ GET /dashboard/assignments 200 in 190ms (compile: 68ms, proxy.ts: 5ms, render: 118ms)
+ GET /dashboard 200 in 190ms (compile: 163ms, proxy.ts: 5ms, render: 23ms)
+ GET /dashboard/assignments 200 in 126ms (compile: 6ms, proxy.ts: 4ms, render: 116ms)
+ GET /dashboard 200 in 84ms (compile: 7ms, proxy.ts: 18ms, render: 59ms)
+ GET /dashboard 200 in 26ms (compile: 6ms, proxy.ts: 10ms, render: 10ms)
+ GET /dashboard 200 in 19ms (compile: 4ms, proxy.ts: 7ms, render: 8ms)
+ GET /dashboard 200 in 21ms (compile: 6ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard/assignments 200 in 45ms (compile: 7ms, proxy.ts: 4ms, render: 34ms)
+ POST /dashboard/assignments 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/assignments 200 in 15ms (compile: 4ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard/assignments 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ GET /grid.svg 404 in 17ms (compile: 1513µs, proxy.ts: 3ms, render: 13ms)
+ GET /dashboard/assignments 200 in 274ms (compile: 154ms, proxy.ts: 12ms, render: 108ms)
+ GET /dashboard 200 in 296ms (compile: 72ms, proxy.ts: 29ms, render: 196ms)
+ GET /dashboard/assignments 200 in 279ms (compile: 81ms, proxy.ts: 106ms, render: 91ms)
+ GET /dashboard 200 in 24ms (compile: 4ms, proxy.ts: 8ms, render: 12ms)
+ POST /dashboard/assignments 200 in 39ms (compile: 4ms, proxy.ts: 5ms, render: 30ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/assignments 200 in 16ms (compile: 4ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard/assignments 200 in 11ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+ GET /grid.svg 404 in 17ms (compile: 1581µs, proxy.ts: 3ms, render: 12ms)
+ GET /dashboard 200 in 191ms (compile: 88ms, proxy.ts: 4ms, render: 98ms)
+ GET /dashboard/assignments 200 in 194ms (compile: 168ms, proxy.ts: 4ms, render: 22ms)
+ GET /dashboard/assignments 200 in 93ms (compile: 7ms, proxy.ts: 3ms, render: 83ms)
+ GET /dashboard 200 in 29ms (compile: 8ms, proxy.ts: 10ms, render: 12ms)
+ GET /dashboard 200 in 22ms (compile: 7ms, proxy.ts: 6ms, render: 9ms)
+ GET /dashboard 200 in 22ms (compile: 4ms, proxy.ts: 5ms, render: 12ms)
+ GET /dashboard 200 in 23ms (compile: 3ms, proxy.ts: 3ms, render: 17ms)
+ POST /dashboard/assignments 200 in 55ms (compile: 6ms, proxy.ts: 6ms, render: 43ms)
+ POST /dashboard/assignments 200 in 30ms (compile: 6ms, proxy.ts: 4ms, render: 19ms)
+ POST /dashboard/assignments 200 in 16ms (compile: 6ms, proxy.ts: 5ms, render: 5ms)
+ POST /dashboard/assignments 200 in 12ms (compile: 5ms, proxy.ts: 4ms, render: 3ms)
+ GET /grid.svg 404 in 15ms (compile: 1836µs, proxy.ts: 3ms, render: 10ms)
+ ✓ Compiled in 39ms
+ GET /dashboard/assignments 200 in 252ms (compile: 63ms, proxy.ts: 9ms, render: 179ms)
+ GET /dashboard 200 in 252ms (compile: 152ms, proxy.ts: 11ms, render: 89ms)
+ GET /dashboard/assignments 200 in 254ms (compile: 177ms, proxy.ts: 9ms, render: 67ms)
+ GET /dashboard 200 in 37ms (compile: 10ms, proxy.ts: 12ms, render: 15ms)
+ GET /dashboard 200 in 32ms (compile: 6ms, proxy.ts: 9ms, render: 16ms)
+ GET /dashboard 200 in 39ms (compile: 7ms, proxy.ts: 7ms, render: 25ms)
+ POST /dashboard/assignments 200 in 66ms (compile: 7ms, proxy.ts: 8ms, render: 52ms)
+ GET /dashboard 200 in 60ms (compile: 5ms, proxy.ts: 45ms, render: 10ms)
+ POST /dashboard/assignments 200 in 17ms (compile: 6ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/assignments 200 in 18ms (compile: 4ms, proxy.ts: 4ms, render: 10ms)
+ POST /dashboard/assignments 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ GET /grid.svg 404 in 17ms (compile: 1763µs, proxy.ts: 3ms, render: 12ms)
+ GET /dashboard 200 in 174ms (compile: 147ms, proxy.ts: 4ms, render: 23ms)
+ GET /dashboard/assignments 200 in 175ms (compile: 63ms, proxy.ts: 4ms, render: 108ms)
+ GET /dashboard/assignments 200 in 86ms (compile: 6ms, proxy.ts: 4ms, render: 75ms)
+ GET /dashboard 200 in 24ms (compile: 6ms, proxy.ts: 7ms, render: 10ms)
+ GET /dashboard 200 in 21ms (compile: 4ms, proxy.ts: 6ms, render: 12ms)
+ GET /dashboard 200 in 17ms (compile: 3ms, proxy.ts: 4ms, render: 9ms)
+ GET /dashboard 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/assignments 200 in 42ms (compile: 4ms, proxy.ts: 7ms, render: 31ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 4ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/assignments 200 in 23ms (compile: 6ms, proxy.ts: 8ms, render: 9ms)
+ POST /dashboard/assignments 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ GET /grid.svg 404 in 19ms (compile: 1681µs, proxy.ts: 4ms, render: 13ms)
+ POST /dashboard/assignments 200 in 35ms (compile: 12ms, proxy.ts: 14ms, render: 9ms)
+ ✓ Compiled in 61ms
+ GET /dashboard/assignments 200 in 118ms (compile: 77ms, proxy.ts: 7ms, render: 33ms)
+ GET /dashboard 200 in 207ms (compile: 68ms, proxy.ts: 114ms, render: 26ms)
+ GET /dashboard/assignments 200 in 27ms (compile: 7ms, proxy.ts: 4ms, render: 16ms)
+ GET /grid.svg 404 in 36ms (compile: 12ms, proxy.ts: 7ms, render: 16ms)
+ GET /dashboard 200 in 36ms (compile: 5ms, proxy.ts: 7ms, render: 24ms)
+ POST /dashboard/assignments 200 in 40ms (compile: 4ms, proxy.ts: 6ms, render: 30ms)
+ ✓ Compiled in 73ms
+ GET /grid.svg 404 in 42ms (compile: 10ms, proxy.ts: 8ms, render: 24ms)
+ GET /dashboard/classes 200 in 159ms (compile: 123ms, proxy.ts: 8ms, render: 28ms)
+ POST /dashboard/classes 200 in 38ms (compile: 4ms, proxy.ts: 5ms, render: 30ms)
+ POST /dashboard/classes 200 in 15ms (compile: 6ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard/schedule 200 in 119ms (compile: 88ms, proxy.ts: 8ms, render: 24ms)
+ POST /dashboard/schedule 200 in 41ms (compile: 8ms, proxy.ts: 3ms, render: 30ms)
+ POST /dashboard/schedule 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 8ms)
+ GET /dashboard 200 in 117ms (compile: 90ms, proxy.ts: 5ms, render: 22ms)
+ POST /dashboard 200 in 43ms (compile: 4ms, proxy.ts: 9ms, render: 30ms)
+ POST /dashboard 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard/schedule 200 in 29ms (compile: 6ms, proxy.ts: 13ms, render: 10ms)
+ POST /dashboard/schedule 200 in 19ms (compile: 7ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/schedule 200 in 16ms (compile: 4ms, proxy.ts: 2ms, render: 10ms)
+ GET /dashboard 200 in 20ms (compile: 6ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard 200 in 22ms (compile: 7ms, proxy.ts: 7ms, render: 8ms)
+ POST /dashboard 200 in 16ms (compile: 3ms, proxy.ts: 3ms, render: 10ms)
+ POST /dashboard 200 in 36ms (compile: 13ms, proxy.ts: 11ms, render: 12ms)
+ GET /dashboard/missions 200 in 263ms (compile: 229ms, proxy.ts: 12ms, render: 23ms)
+ GET /grid.svg 404 in 32ms (compile: 2ms, proxy.ts: 4ms, render: 27ms)
+ POST /dashboard/missions 200 in 21ms (compile: 7ms, proxy.ts: 7ms, render: 7ms)
+ POST /dashboard/missions 200 in 14ms (compile: 5ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Nguyễn Uyên',
+  email: 'student.c_10a1.0@school.edu',
+  id: 's_c_10a1_0',
+  role: 'student'
+}
+  User from DB: { role: 'student' }
+ POST /dashboard/missions 200 in 18ms (compile: 5ms, proxy.ts: 3ms, render: 10ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Nguyễn Uyên',
+  email: 'student.c_10a1.0@school.edu',
+  id: 's_c_10a1_0',
+  role: 'student'
+}
+  User from DB: { role: 'student' }
+ POST /dashboard/missions 200 in 16ms (compile: 3ms, proxy.ts: 3ms, render: 10ms)
+ ✓ Compiled in 108ms
+ GET /dashboard 200 in 210ms (compile: 83ms, proxy.ts: 5ms, render: 122ms)
+ GET /grid.svg 404 in 46ms (compile: 18ms, proxy.ts: 11ms, render: 17ms)
+ POST /dashboard 200 in 46ms (compile: 5ms, proxy.ts: 5ms, render: 36ms)
+ POST /dashboard 200 in 20ms (compile: 6ms, proxy.ts: 4ms, render: 11ms)
+ POST /dashboard 200 in 16ms (compile: 4ms, proxy.ts: 4ms, render: 9ms)
+ GET /dashboard/assignments 200 in 95ms (compile: 71ms, proxy.ts: 4ms, render: 21ms)
+ POST /dashboard/assignments 200 in 54ms (compile: 14ms, proxy.ts: 4ms, render: 37ms)
+ POST /dashboard/assignments 200 in 18ms (compile: 5ms, proxy.ts: 5ms, render: 8ms)
+ POST /dashboard/assignments 200 in 11ms (compile: 3ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/assignments 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/classes 200 in 18ms (compile: 5ms, proxy.ts: 3ms, render: 10ms)
+ POST /dashboard/classes 200 in 17ms (compile: 4ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard/classes 200 in 16ms (compile: 6ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Nguyễn Uyên',
+  email: 'student.c_10a1.0@school.edu',
+  id: 's_c_10a1_0',
+  role: 'student'
+}
+  User from DB: { role: 'student' }
+ POST /dashboard/classes 200 in 14ms (compile: 3ms, proxy.ts: 3ms, render: 8ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Nguyễn Uyên',
+  email: 'student.c_10a1.0@school.edu',
+  id: 's_c_10a1_0',
+  role: 'student'
+}
+  User from DB: { role: 'student' }
+ POST /dashboard/classes 200 in 14ms (compile: 3ms, proxy.ts: 3ms, render: 7ms)
+ GET /dashboard 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard/schedule 200 in 27ms (compile: 8ms, proxy.ts: 12ms, render: 7ms)
+ POST /dashboard/schedule 200 in 19ms (compile: 7ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard/schedule 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/schedule 200 in 28ms (compile: 8ms, proxy.ts: 11ms, render: 9ms)
+ POST /dashboard/schedule 200 in 27ms (compile: 7ms, proxy.ts: 7ms, render: 12ms)
+ POST /dashboard/schedule 200 in 26ms (compile: 5ms, proxy.ts: 9ms, render: 12ms)
+ POST /dashboard/schedule 200 in 25ms (compile: 8ms, proxy.ts: 8ms, render: 9ms)
+ POST /dashboard/schedule 200 in 27ms (compile: 5ms, proxy.ts: 10ms, render: 12ms)
+ POST /dashboard/schedule 200 in 24ms (compile: 4ms, proxy.ts: 11ms, render: 9ms)
+ POST /dashboard/schedule 200 in 27ms (compile: 9ms, proxy.ts: 9ms, render: 9ms)
+ GET /dashboard/schedule 200 in 29ms (compile: 8ms, proxy.ts: 9ms, render: 13ms)
+ GET /dashboard 200 in 22ms (compile: 6ms, proxy.ts: 8ms, render: 8ms)
+ POST /dashboard 200 in 20ms (compile: 8ms, proxy.ts: 4ms, render: 9ms)
+ POST /dashboard 200 in 18ms (compile: 5ms, proxy.ts: 3ms, render: 10ms)
+ POST /dashboard 200 in 26ms (compile: 7ms, proxy.ts: 8ms, render: 12ms)
+ ✓ Compiled in 39ms
+ GET /dashboard 200 in 217ms (compile: 106ms, proxy.ts: 3ms, render: 107ms)
+ POST /dashboard 200 in 38ms (compile: 8ms, proxy.ts: 4ms, render: 26ms)
+ POST /dashboard 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard 200 in 16ms (compile: 3ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard 200 in 24ms (compile: 7ms, proxy.ts: 8ms, render: 9ms)
+ POST /dashboard 200 in 29ms (compile: 9ms, proxy.ts: 11ms, render: 8ms)
+ POST /dashboard 200 in 25ms (compile: 5ms, proxy.ts: 9ms, render: 12ms)
+ POST /dashboard 200 in 25ms (compile: 6ms, proxy.ts: 11ms, render: 8ms)
+ POST /dashboard 200 in 27ms (compile: 9ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 28ms (compile: 6ms, proxy.ts: 9ms, render: 13ms)
+ POST /dashboard 200 in 23ms (compile: 6ms, proxy.ts: 10ms, render: 8ms)
+ POST /dashboard 200 in 21ms (compile: 7ms, proxy.ts: 7ms, render: 8ms)
+ POST /dashboard 200 in 18ms (compile: 4ms, proxy.ts: 4ms, render: 10ms)
+ POST /dashboard 200 in 23ms (compile: 5ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 27ms (compile: 10ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 26ms (compile: 7ms, proxy.ts: 11ms, render: 9ms)
+ POST /dashboard 200 in 26ms (compile: 7ms, proxy.ts: 12ms, render: 7ms)
+ POST /dashboard 200 in 30ms (compile: 11ms, proxy.ts: 12ms, render: 8ms)
+ POST /dashboard 200 in 22ms (compile: 6ms, proxy.ts: 7ms, render: 8ms)
+ POST /dashboard 200 in 15ms (compile: 4ms, proxy.ts: 6ms, render: 5ms)
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 62ms
+ ⨯ ReferenceError: AnimatePresence is not defined
+    at ToastProvider (src/components/ui/Toast.tsx:40:18)
+  38 |             {children}
+  39 |             <div className="fixed bottom-6 right-6 z-[10001] flex flex-col gap-3 pointer-events-none">
+> 40 |                 <AnimatePresence mode="multiple">
+     |                  ^
+  41 |                     {toasts.map((toast) => (
+  42 |                         <motion.div
+  43 |                             key={toast.id} {
+  digest: '3867644742'
+}
+ ⨯ ReferenceError: AnimatePresence is not defined
+    at ToastProvider (src/components/ui/Toast.tsx:40:18)
+  38 |             {children}
+  39 |             <div className="fixed bottom-6 right-6 z-[10001] flex flex-col gap-3 pointer-events-none">
+> 40 |                 <AnimatePresence mode="multiple">
+     |                  ^
+  41 |                     {toasts.map((toast) => (
+  42 |                         <motion.div
+  43 |                             key={toast.id} {
+  digest: '3867644742'
+}
+ GET /dashboard 500 in 249ms (compile: 89ms, proxy.ts: 5ms, render: 156ms)
+ GET /dashboard 500 in 73ms (compile: 12ms, proxy.ts: 7ms, render: 54ms)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /dashboard 200 in 239ms (compile: 89ms, proxy.ts: 5ms, render: 145ms)
+ GET /dashboard 200 in 250ms (compile: 124ms, proxy.ts: 8ms, render: 117ms)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 0ms
+ GET /dashboard 200 in 44ms (compile: 7ms, proxy.ts: 10ms, render: 26ms)
+ POST /dashboard 200 in 36ms (compile: 5ms, proxy.ts: 9ms, render: 23ms)
+ POST /dashboard 200 in 23ms (compile: 4ms, proxy.ts: 3ms, render: 17ms)
+ POST /dashboard 200 in 29ms (compile: 4ms, proxy.ts: 9ms, render: 17ms)
+ POST /dashboard 200 in 28ms (compile: 8ms, proxy.ts: 4ms, render: 16ms)
+ POST /dashboard 200 in 18ms (compile: 5ms, proxy.ts: 4ms, render: 9ms)
+ POST /dashboard 200 in 11ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 26ms
+ GET /dashboard 200 in 168ms (compile: 77ms, proxy.ts: 6ms, render: 85ms)
+ GET /dashboard 200 in 38ms (compile: 8ms, proxy.ts: 4ms, render: 25ms)
+ POST /dashboard 200 in 46ms (compile: 5ms, proxy.ts: 8ms, render: 32ms)
+ POST /dashboard 200 in 43ms (compile: 23ms, proxy.ts: 7ms, render: 13ms)
+ POST /dashboard 200 in 23ms (compile: 5ms, proxy.ts: 3ms, render: 15ms)
+ POST /dashboard 200 in 24ms (compile: 12ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard 200 in 23ms (compile: 4ms, proxy.ts: 4ms, render: 14ms)
+ POST /dashboard 200 in 21ms (compile: 11ms, proxy.ts: 4ms, render: 7ms)
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 63ms
+ GET /dashboard 200 in 166ms (compile: 67ms, proxy.ts: 9ms, render: 90ms)
+ GET /dashboard 200 in 166ms (compile: 7ms, proxy.ts: 132ms, render: 27ms)
+ POST /dashboard 200 in 53ms (compile: 5ms, proxy.ts: 12ms, render: 36ms)
+ POST /dashboard 200 in 49ms (compile: 5ms, proxy.ts: 32ms, render: 12ms)
+ POST /dashboard 200 in 27ms (compile: 4ms, proxy.ts: 6ms, render: 17ms)
+ POST /dashboard 200 in 26ms (compile: 4ms, proxy.ts: 13ms, render: 9ms)
+ POST /dashboard 200 in 25ms (compile: 7ms, proxy.ts: 6ms, render: 13ms)
+ POST /dashboard 200 in 23ms (compile: 5ms, proxy.ts: 12ms, render: 7ms)
+ ✓ Compiled in 101ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /dashboard 200 in 160ms (compile: 66ms, proxy.ts: 7ms, render: 87ms)
+ GET /dashboard 200 in 57ms (compile: 8ms, proxy.ts: 6ms, render: 44ms)
+ GET /dashboard 200 in 58ms (compile: 21ms, proxy.ts: 6ms, render: 31ms)
+ POST /dashboard 200 in 64ms (compile: 9ms, proxy.ts: 14ms, render: 41ms)
+ POST /dashboard 200 in 60ms (compile: 38ms, proxy.ts: 10ms, render: 11ms)
+ POST /dashboard 200 in 40ms (compile: 8ms, proxy.ts: 12ms, render: 20ms)
+ POST /dashboard 200 in 33ms (compile: 18ms, proxy.ts: 6ms, render: 9ms)
+ POST /dashboard 200 in 39ms (compile: 4ms, proxy.ts: 21ms, render: 14ms)
+ POST /dashboard 200 in 40ms (compile: 9ms, proxy.ts: 20ms, render: 11ms)
+ GET /dashboard/schedule 200 in 123ms (compile: 95ms, proxy.ts: 6ms, render: 21ms)
+ POST /dashboard/schedule 200 in 30ms (compile: 4ms, proxy.ts: 3ms, render: 24ms)
+ POST /dashboard/schedule 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ GET /dashboard 200 in 24ms (compile: 9ms, proxy.ts: 8ms, render: 8ms)
+ POST /dashboard 200 in 18ms (compile: 4ms, proxy.ts: 4ms, render: 10ms)
+ POST /dashboard 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard 200 in 27ms (compile: 11ms, proxy.ts: 9ms, render: 8ms)
+ GET /dashboard/classes 200 in 112ms (compile: 86ms, proxy.ts: 7ms, render: 20ms)
+ POST /dashboard/classes 200 in 33ms (compile: 4ms, proxy.ts: 8ms, render: 21ms)
+ POST /dashboard/classes 200 in 12ms (compile: 3ms, proxy.ts: 2ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 19ms (compile: 4ms, proxy.ts: 3ms, render: 13ms)
+ GET /grid.svg 404 in 102ms (compile: 54ms, proxy.ts: 4ms, render: 43ms)
+ GET /dashboard/schedule 200 in 31ms (compile: 6ms, proxy.ts: 9ms, render: 16ms)
+ POST /dashboard/schedule 200 in 17ms (compile: 5ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/schedule 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard/classes 200 in 32ms (compile: 9ms, proxy.ts: 8ms, render: 15ms)
+ POST /dashboard/classes 200 in 16ms (compile: 5ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard/classes 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 19ms (compile: 5ms, proxy.ts: 6ms, render: 8ms)
+ GET /dashboard/schedule 200 in 30ms (compile: 10ms, proxy.ts: 10ms, render: 10ms)
+ POST /dashboard/schedule 200 in 17ms (compile: 4ms, proxy.ts: 4ms, render: 10ms)
+ POST /dashboard/schedule 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+ GET /dashboard/classes 200 in 26ms (compile: 9ms, proxy.ts: 8ms, render: 9ms)
+ POST /dashboard/classes 200 in 20ms (compile: 5ms, proxy.ts: 5ms, render: 10ms)
+ POST /dashboard/classes 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 19ms (compile: 4ms, proxy.ts: 3ms, render: 12ms)
+ GET /dashboard/schedule 200 in 28ms (compile: 7ms, proxy.ts: 9ms, render: 12ms)
+ POST /dashboard/schedule 200 in 20ms (compile: 7ms, proxy.ts: 5ms, render: 8ms)
+ POST /dashboard/schedule 200 in 16ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+ GET /dashboard/classes 200 in 19ms (compile: 6ms, proxy.ts: 4ms, render: 9ms)
+ POST /dashboard/classes 200 in 20ms (compile: 8ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard/classes 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 8ms, proxy.ts: 2ms, render: 6ms)
+ GET /dashboard/assignments 200 in 117ms (compile: 83ms, proxy.ts: 10ms, render: 23ms)
+ POST /dashboard/assignments 200 in 37ms (compile: 5ms, proxy.ts: 5ms, render: 27ms)
+ POST /dashboard/assignments 200 in 22ms (compile: 5ms, proxy.ts: 5ms, render: 11ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 3ms, proxy.ts: 5ms, render: 5ms)
+ POST /dashboard/assignments 200 in 11ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/assignments 200 in 24ms (compile: 7ms, proxy.ts: 10ms, render: 7ms)
+ GET /dashboard 200 in 24ms (compile: 10ms, proxy.ts: 7ms, render: 8ms)
+ POST /dashboard 200 in 19ms (compile: 7ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard 200 in 26ms (compile: 7ms, proxy.ts: 11ms, render: 9ms)
+ POST /dashboard 200 in 29ms (compile: 10ms, proxy.ts: 11ms, render: 8ms)
+ POST /dashboard 200 in 20ms (compile: 4ms, proxy.ts: 7ms, render: 8ms)
+ POST /dashboard 200 in 25ms (compile: 5ms, proxy.ts: 13ms, render: 7ms)
+ POST /dashboard 200 in 26ms (compile: 10ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 20ms (compile: 4ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 34ms (compile: 15ms, proxy.ts: 10ms, render: 9ms)
+ POST /dashboard 200 in 20ms (compile: 8ms, proxy.ts: 6ms, render: 6ms)
+ POST /dashboard 200 in 27ms (compile: 10ms, proxy.ts: 8ms, render: 9ms)
+ POST /dashboard 200 in 28ms (compile: 8ms, proxy.ts: 11ms, render: 8ms)
+ POST /dashboard 200 in 29ms (compile: 8ms, proxy.ts: 12ms, render: 10ms)
+ POST /dashboard 200 in 25ms (compile: 7ms, proxy.ts: 10ms, render: 7ms)
+ POST /dashboard 200 in 25ms (compile: 8ms, proxy.ts: 10ms, render: 7ms)
+ POST /dashboard 200 in 27ms (compile: 8ms, proxy.ts: 11ms, render: 7ms)
+ POST /dashboard 200 in 28ms (compile: 5ms, proxy.ts: 11ms, render: 12ms)
+ POST /dashboard 200 in 19ms (compile: 4ms, proxy.ts: 10ms, render: 5ms)
+ POST /dashboard 200 in 24ms (compile: 8ms, proxy.ts: 9ms, render: 7ms)
+ POST /dashboard 200 in 23ms (compile: 5ms, proxy.ts: 9ms, render: 10ms)
+ POST /dashboard 200 in 20ms (compile: 4ms, proxy.ts: 9ms, render: 7ms)
+ POST /dashboard 200 in 20ms (compile: 7ms, proxy.ts: 8ms, render: 5ms)
+ POST /dashboard 200 in 21ms (compile: 6ms, proxy.ts: 7ms, render: 9ms)
+ POST /dashboard 200 in 22ms (compile: 5ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 24ms (compile: 8ms, proxy.ts: 9ms, render: 7ms)
+ POST /dashboard 200 in 25ms (compile: 7ms, proxy.ts: 10ms, render: 7ms)
+ POST /dashboard 200 in 20ms (compile: 5ms, proxy.ts: 9ms, render: 6ms)
+ POST /dashboard 200 in 22ms (compile: 8ms, proxy.ts: 7ms, render: 7ms)
+ POST /dashboard 200 in 15ms (compile: 4ms, proxy.ts: 5ms, render: 6ms)
+ POST /dashboard 200 in 21ms (compile: 3ms, proxy.ts: 11ms, render: 6ms)
+ POST /dashboard 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard 200 in 19ms (compile: 4ms, proxy.ts: 7ms, render: 7ms)
+ POST /dashboard 200 in 21ms (compile: 4ms, proxy.ts: 11ms, render: 7ms)
+ POST /dashboard 200 in 19ms (compile: 8ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard 200 in 16ms (compile: 5ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard 200 in 22ms (compile: 9ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard 200 in 25ms (compile: 9ms, proxy.ts: 10ms, render: 7ms)
+ POST /dashboard 200 in 19ms (compile: 4ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard 200 in 26ms (compile: 9ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard 200 in 14ms (compile: 4ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard 200 in 20ms (compile: 7ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard 200 in 18ms (compile: 4ms, proxy.ts: 4ms, render: 10ms)
+ POST /dashboard 200 in 17ms (compile: 5ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard 200 in 17ms (compile: 6ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard 200 in 21ms (compile: 6ms, proxy.ts: 5ms, render: 10ms)
+ POST /dashboard 200 in 19ms (compile: 6ms, proxy.ts: 5ms, render: 8ms)
+ POST /dashboard 200 in 19ms (compile: 8ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard 200 in 22ms (compile: 7ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard 200 in 20ms (compile: 4ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 22ms (compile: 7ms, proxy.ts: 7ms, render: 7ms)
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload when ./ergonix/src/components/ui/Toast.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 61ms
+ GET /dashboard 200 in 176ms (compile: 70ms, proxy.ts: 9ms, render: 97ms)
+ GET /dashboard 200 in 42ms (compile: 9ms, proxy.ts: 5ms, render: 28ms)
+ POST /dashboard 200 in 36ms (compile: 5ms, proxy.ts: 4ms, render: 27ms)
+ POST /dashboard 200 in 24ms (compile: 6ms, proxy.ts: 7ms, render: 11ms)
+ POST /dashboard 200 in 16ms (compile: 4ms, proxy.ts: 5ms, render: 6ms)
+ POST /dashboard 200 in 28ms (compile: 7ms, proxy.ts: 3ms, render: 17ms)
+ POST /dashboard 200 in 20ms (compile: 4ms, proxy.ts: 4ms, render: 12ms)
+ POST /dashboard 200 in 16ms (compile: 3ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard 200 in 27ms (compile: 10ms, proxy.ts: 10ms, render: 8ms)
+ POST /dashboard 200 in 27ms (compile: 10ms, proxy.ts: 8ms, render: 9ms)
+ POST /dashboard 200 in 32ms (compile: 12ms, proxy.ts: 11ms, render: 10ms)
+ POST /dashboard 200 in 28ms (compile: 11ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 24ms (compile: 9ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard 200 in 29ms (compile: 9ms, proxy.ts: 13ms, render: 7ms)
+ POST /dashboard 200 in 23ms (compile: 7ms, proxy.ts: 9ms, render: 7ms)
+ POST /dashboard 200 in 24ms (compile: 7ms, proxy.ts: 10ms, render: 7ms)
+ POST /dashboard 200 in 23ms (compile: 6ms, proxy.ts: 8ms, render: 8ms)
+ POST /dashboard 200 in 23ms (compile: 7ms, proxy.ts: 9ms, render: 7ms)
+ POST /dashboard 200 in 19ms (compile: 6ms, proxy.ts: 8ms, render: 5ms)
+ POST /dashboard 200 in 23ms (compile: 9ms, proxy.ts: 7ms, render: 7ms)
+ POST /dashboard 200 in 21ms (compile: 5ms, proxy.ts: 8ms, render: 8ms)
+ POST /dashboard 200 in 15ms (compile: 6ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard 200 in 26ms (compile: 10ms, proxy.ts: 9ms, render: 6ms)
+ POST /dashboard 200 in 22ms (compile: 4ms, proxy.ts: 8ms, render: 10ms)
+ POST /dashboard 200 in 19ms (compile: 6ms, proxy.ts: 7ms, render: 6ms)
+ POST /dashboard 200 in 24ms (compile: 8ms, proxy.ts: 8ms, render: 8ms)
+ POST /dashboard 200 in 24ms (compile: 4ms, proxy.ts: 11ms, render: 10ms)
+ POST /dashboard 200 in 16ms (compile: 4ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard 200 in 21ms (compile: 8ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard 200 in 22ms (compile: 5ms, proxy.ts: 9ms, render: 8ms)
+ POST /dashboard 200 in 25ms (compile: 6ms, proxy.ts: 12ms, render: 7ms)
+ POST /dashboard 200 in 23ms (compile: 7ms, proxy.ts: 8ms, render: 8ms)
+ POST /dashboard 200 in 14ms (compile: 3ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard 200 in 21ms (compile: 5ms, proxy.ts: 10ms, render: 6ms)
+ POST /dashboard 200 in 19ms (compile: 8ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard 200 in 17ms (compile: 4ms, proxy.ts: 5ms, render: 8ms)
+ POST /dashboard 200 in 25ms (compile: 10ms, proxy.ts: 7ms, render: 8ms)
+ POST /dashboard 200 in 22ms (compile: 8ms, proxy.ts: 7ms, render: 7ms)
+ POST /dashboard 200 in 18ms (compile: 5ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard 200 in 23ms (compile: 8ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard 200 in 22ms (compile: 5ms, proxy.ts: 9ms, render: 9ms)
+ POST /dashboard 200 in 19ms (compile: 5ms, proxy.ts: 8ms, render: 6ms)
+ POST /dashboard 200 in 25ms (compile: 10ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard 200 in 22ms (compile: 4ms, proxy.ts: 7ms, render: 11ms)
+ POST /dashboard 200 in 18ms (compile: 5ms, proxy.ts: 7ms, render: 7ms)
+ POST /dashboard 200 in 23ms (compile: 8ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard 200 in 25ms (compile: 7ms, proxy.ts: 8ms, render: 11ms)
+ POST /dashboard 200 in 19ms (compile: 4ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard 200 in 22ms (compile: 8ms, proxy.ts: 8ms, render: 6ms)
+ POST /dashboard 200 in 20ms (compile: 6ms, proxy.ts: 8ms, render: 7ms)
+ GET /dashboard/schedule 200 in 113ms (compile: 78ms, proxy.ts: 9ms, render: 26ms)
+ POST /dashboard/schedule 200 in 41ms (compile: 13ms, proxy.ts: 4ms, render: 25ms)
+ POST /dashboard/schedule 200 in 26ms (compile: 14ms, proxy.ts: 4ms, render: 8ms)
+ GET /dashboard/teacher-missions 200 in 255ms (compile: 236ms, proxy.ts: 7ms, render: 12ms)
+ GET /grid.svg 404 in 91ms (compile: 47ms, proxy.ts: 6ms, render: 39ms)
+ POST /dashboard/teacher-missions 200 in 94ms (compile: 4ms, proxy.ts: 5ms, render: 86ms)
+ POST /dashboard/teacher-missions 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/teacher-missions 200 in 12ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/teacher-missions 200 in 16ms (compile: 3ms, proxy.ts: 3ms, render: 10ms)
+ POST /dashboard/teacher-missions 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/teacher-missions 200 in 15ms (compile: 6ms, proxy.ts: 3ms, render: 7ms)
+ GET /dashboard/assignments?create=true 200 in 96ms (compile: 70ms, proxy.ts: 9ms, render: 17ms)
+ POST /dashboard/assignments?create=true 200 in 26ms (compile: 3ms, proxy.ts: 3ms, render: 20ms)
+ POST /dashboard/assignments?create=true 200 in 14ms (compile: 3ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/assignments?create=true 200 in 11ms (compile: 4ms, proxy.ts: 4ms, render: 3ms)
+ POST /dashboard/assignments?create=true 200 in 13ms (compile: 3ms, proxy.ts: 7ms, render: 3ms)
+ GET /dashboard/teacher-missions 200 in 24ms (compile: 9ms, proxy.ts: 7ms, render: 8ms)
+ POST /dashboard/teacher-missions 200 in 16ms (compile: 5ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/teacher-missions 200 in 16ms (compile: 4ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard/teacher-missions 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/teacher-missions 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/teacher-missions 200 in 12ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/teacher-missions 200 in 15ms (compile: 4ms, proxy.ts: 2ms, render: 8ms)
+ GET /dashboard/assignments 200 in 21ms (compile: 5ms, proxy.ts: 7ms, render: 8ms)
+ POST /dashboard/assignments 200 in 21ms (compile: 7ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard/assignments 200 in 17ms (compile: 5ms, proxy.ts: 2ms, render: 10ms)
+ POST /dashboard/assignments 200 in 10ms (compile: 3ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 4ms)
+ GET /dashboard 200 in 24ms (compile: 6ms, proxy.ts: 8ms, render: 11ms)
+ POST /dashboard 200 in 15ms (compile: 4ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard/schedule 200 in 26ms (compile: 6ms, proxy.ts: 7ms, render: 14ms)
+ POST /dashboard/schedule 200 in 17ms (compile: 5ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard/schedule 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard/classes 200 in 112ms (compile: 80ms, proxy.ts: 9ms, render: 23ms)
+ POST /dashboard/classes 200 in 32ms (compile: 7ms, proxy.ts: 4ms, render: 21ms)
+ POST /dashboard/classes 200 in 11ms (compile: 3ms, proxy.ts: 2ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 15ms (compile: 6ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 16ms (compile: 4ms, proxy.ts: 3ms, render: 10ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 129ms (compile: 99ms, proxy.ts: 7ms, render: 23ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 36ms (compile: 6ms, proxy.ts: 7ms, render: 23ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 6ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 4ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 4ms, proxy.ts: 5ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7?tab=stream 200 in 32ms (compile: 9ms, proxy.ts: 9ms, render: 14ms)
+ GET /dashboard/schedule 200 in 23ms (compile: 8ms, proxy.ts: 6ms, render: 9ms)
+ POST /dashboard/schedule 200 in 22ms (compile: 10ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard/schedule 200 in 25ms (compile: 12ms, proxy.ts: 5ms, render: 8ms)
+ GET /dashboard 200 in 33ms (compile: 14ms, proxy.ts: 11ms, render: 8ms)
+ POST /dashboard 200 in 20ms (compile: 8ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ GET /dashboard/classes 200 in 26ms (compile: 6ms, proxy.ts: 9ms, render: 11ms)
+ POST /dashboard/classes 200 in 22ms (compile: 7ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard/classes 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 6ms, proxy.ts: 3ms, render: 9ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 7ms, proxy.ts: 3ms, render: 8ms)
+ GET /dashboard/assignments 200 in 27ms (compile: 12ms, proxy.ts: 7ms, render: 9ms)
+ POST /dashboard/assignments 200 in 17ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/assignments 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/classes 200 in 26ms (compile: 5ms, proxy.ts: 12ms, render: 9ms)
+ POST /dashboard/classes 200 in 18ms (compile: 8ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/classes 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 4ms, proxy.ts: 7ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 8ms, proxy.ts: 3ms, render: 7ms)
+ GET /dashboard/assignments 200 in 26ms (compile: 6ms, proxy.ts: 7ms, render: 13ms)
+ POST /dashboard/assignments 200 in 14ms (compile: 5ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/assignments 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/assignments 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/assignments 200 in 14ms (compile: 4ms, proxy.ts: 7ms, render: 3ms)
+ GET /dashboard/schedule 200 in 28ms (compile: 10ms, proxy.ts: 9ms, render: 9ms)
+ POST /dashboard/schedule 200 in 16ms (compile: 5ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/schedule 200 in 17ms (compile: 4ms, proxy.ts: 6ms, render: 8ms)
+ GET /dashboard/classes 200 in 28ms (compile: 11ms, proxy.ts: 8ms, render: 8ms)
+ POST /dashboard/classes 200 in 19ms (compile: 5ms, proxy.ts: 5ms, render: 9ms)
+ POST /dashboard/classes 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 30ms (compile: 8ms, proxy.ts: 13ms, render: 10ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 20ms (compile: 9ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 4ms, proxy.ts: 4ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 4ms, proxy.ts: 6ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 8ms (compile: 3ms, proxy.ts: 3ms, render: 2ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/classes 200 in 28ms (compile: 6ms, proxy.ts: 7ms, render: 15ms)
+ POST /dashboard/classes 200 in 17ms (compile: 5ms, proxy.ts: 5ms, render: 8ms)
+ POST /dashboard/classes 200 in 17ms (compile: 8ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 4ms, proxy.ts: 6ms, render: 7ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 32ms (compile: 13ms, proxy.ts: 10ms, render: 9ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 18ms (compile: 5ms, proxy.ts: 4ms, render: 9ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 4ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 3ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 4ms, proxy.ts: 2ms, render: 5ms)
+ ✓ Compiled in 64ms
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 98ms (compile: 71ms, proxy.ts: 3ms, render: 24ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 8ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 9ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 6ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 6ms, proxy.ts: 2ms, render: 6ms)
+ ✓ Compiled in 64ms
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 111ms (compile: 85ms, proxy.ts: 3ms, render: 22ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 15ms (compile: 8ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 15ms (compile: 6ms, proxy.ts: 6ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 8ms, proxy.ts: 4ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ ✓ Compiled in 33ms
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 107ms (compile: 64ms, proxy.ts: 3ms, render: 40ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 19ms (compile: 8ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 15ms (compile: 7ms, proxy.ts: 4ms, render: 4ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 22ms (compile: 10ms, proxy.ts: 5ms, render: 8ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 18ms (compile: 7ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 116ms (compile: 7ms, proxy.ts: 106ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 4ms, proxy.ts: 3ms, render: 4ms)
+ ✓ Compiled in 26ms
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 91ms (compile: 62ms, proxy.ts: 3ms, render: 25ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ ✓ Compiled in 31ms
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 111ms (compile: 79ms, proxy.ts: 6ms, render: 25ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 19ms (compile: 10ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 4ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 4ms, proxy.ts: 5ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 6ms, proxy.ts: 3ms, render: 4ms)
+ ✓ Compiled in 65ms
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 87ms (compile: 61ms, proxy.ts: 4ms, render: 22ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 20ms (compile: 4ms, proxy.ts: 7ms, render: 9ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 16ms (compile: 6ms, proxy.ts: 7ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 7ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 189ms (compile: 18ms, proxy.ts: 14ms, render: 158ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 184ms (compile: 26ms, proxy.ts: 5ms, render: 152ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 20ms (compile: 5ms, proxy.ts: 9ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 19ms (compile: 8ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 5ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 8ms, proxy.ts: 3ms, render: 2ms)
+ ✓ Compiled in 29ms
+ ✓ Compiled in 37ms
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 236ms (compile: 97ms, proxy.ts: 11ms, render: 129ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 243ms (compile: 121ms, proxy.ts: 7ms, render: 114ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 23ms (compile: 8ms, proxy.ts: 4ms, render: 11ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 18ms (compile: 6ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 23ms (compile: 12ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 15ms (compile: 7ms, proxy.ts: 5ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 5ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard 200 in 148ms (compile: 5ms, proxy.ts: 4ms, render: 139ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 153ms (compile: 87ms, proxy.ts: 5ms, render: 60ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 157ms (compile: 11ms, proxy.ts: 26ms, render: 120ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 42ms (compile: 7ms, proxy.ts: 5ms, render: 30ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 17ms (compile: 5ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 18ms (compile: 4ms, proxy.ts: 7ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 15ms (compile: 8ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 5ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/classes 200 in 32ms (compile: 8ms, proxy.ts: 14ms, render: 10ms)
+ POST /dashboard/classes 200 in 18ms (compile: 8ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/classes 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 13ms (compile: 3ms, proxy.ts: 2ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 6ms, proxy.ts: 3ms, render: 9ms)
+ GET /grid.svg 404 in 25ms (compile: 10ms, proxy.ts: 4ms, render: 11ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 33ms (compile: 12ms, proxy.ts: 8ms, render: 13ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 26ms (compile: 12ms, proxy.ts: 4ms, render: 10ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 22ms (compile: 9ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 16ms (compile: 8ms, proxy.ts: 5ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 15ms (compile: 7ms, proxy.ts: 5ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 4ms, proxy.ts: 4ms, render: 5ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 6ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 3ms, proxy.ts: 5ms, render: 5ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 15ms (compile: 9ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ GET /dashboard/classes 200 in 29ms (compile: 12ms, proxy.ts: 8ms, render: 9ms)
+ POST /dashboard/classes 200 in 19ms (compile: 6ms, proxy.ts: 5ms, render: 9ms)
+ POST /dashboard/classes 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 2
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 4ms, proxy.ts: 3ms, render: 11ms)
+ POST /dashboard/classes 200 in 34ms (compile: 7ms, proxy.ts: 9ms, render: 19ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 19ms (compile: 7ms, proxy.ts: 5ms, render: 7ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 32ms (compile: 8ms, proxy.ts: 6ms, render: 18ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 31ms (compile: 9ms, proxy.ts: 9ms, render: 12ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 22ms (compile: 9ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 19ms (compile: 6ms, proxy.ts: 4ms, render: 10ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 7ms, proxy.ts: 6ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/classes 200 in 26ms (compile: 11ms, proxy.ts: 7ms, render: 9ms)
+ POST /dashboard/classes 200 in 17ms (compile: 5ms, proxy.ts: 4ms, render: 9ms)
+ POST /dashboard/classes 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 4ms, proxy.ts: 3ms, render: 11ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 34ms (compile: 11ms, proxy.ts: 11ms, render: 12ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 21ms (compile: 9ms, proxy.ts: 6ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 4ms, proxy.ts: 6ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 4ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 3ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ GET /dashboard/classes 200 in 28ms (compile: 6ms, proxy.ts: 10ms, render: 12ms)
+ POST /dashboard/classes 200 in 16ms (compile: 5ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/classes 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 14ms (compile: 3ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 4ms, proxy.ts: 6ms, render: 9ms)
+ ✓ Compiled in 62ms
+ GET /grid.svg 404 in 24ms (compile: 7ms, proxy.ts: 3ms, render: 14ms)
+ ✓ Compiled in 55ms
+ GET /dashboard/classes 200 in 65ms (compile: 13ms, proxy.ts: 3ms, render: 48ms)
+ GET /dashboard/classes 200 in 21ms (compile: 6ms, proxy.ts: 3ms, render: 13ms)
+ POST /dashboard/classes 200 in 17ms (compile: 7ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/classes 200 in 16ms (compile: 9ms, proxy.ts: 3ms, render: 4ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes 200 in 19ms (compile: 8ms, proxy.ts: 3ms, render: 8ms)
+ GET /grid.svg 404 in 19ms (compile: 3ms, proxy.ts: 4ms, render: 12ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 136ms (compile: 105ms, proxy.ts: 8ms, render: 23ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 40ms (compile: 7ms, proxy.ts: 7ms, render: 25ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 4ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 5ms, proxy.ts: 6ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ ✓ Compiled in 71ms
+ GET /grid.svg 404 in 27ms (compile: 8ms, proxy.ts: 3ms, render: 16ms)
+ GET /dashboard/classes 200 in 41ms (compile: 18ms, proxy.ts: 10ms, render: 13ms)
+ POST /dashboard/classes 200 in 34ms (compile: 16ms, proxy.ts: 9ms, render: 9ms)
+ POST /dashboard/classes 200 in 19ms (compile: 8ms, proxy.ts: 4ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 6ms, proxy.ts: 5ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 21ms (compile: 8ms, proxy.ts: 3ms, render: 10ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 134ms (compile: 93ms, proxy.ts: 8ms, render: 33ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 38ms (compile: 7ms, proxy.ts: 4ms, render: 27ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 6ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 10ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 18ms (compile: 11ms, proxy.ts: 4ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 66ms (compile: 6ms, proxy.ts: 3ms, render: 56ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 9ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 2ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 3ms, proxy.ts: 2ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 158ms (compile: 18ms, proxy.ts: 10ms, render: 129ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 20ms (compile: 9ms, proxy.ts: 5ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 19ms (compile: 8ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 7ms, proxy.ts: 4ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 4ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 8ms, proxy.ts: 3ms, render: 2ms)
+ GET /grid.svg 404 in 18ms (compile: 2ms, proxy.ts: 3ms, render: 13ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 31ms (compile: 13ms, proxy.ts: 8ms, render: 10ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 5ms, proxy.ts: 4ms, render: 8ms)
+ GET /dashboard/classes 200 in 28ms (compile: 8ms, proxy.ts: 9ms, render: 11ms)
+ POST /dashboard/classes 200 in 16ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard/classes 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 14ms (compile: 3ms, proxy.ts: 3ms, render: 8ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 15ms (compile: 3ms, proxy.ts: 3ms, render: 9ms)
+ GET /dashboard/assignments 200 in 25ms (compile: 11ms, proxy.ts: 3ms, render: 11ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/assignments 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/assignments 200 in 11ms (compile: 3ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/assignments 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/assignments 200 in 24ms (compile: 10ms, proxy.ts: 8ms, render: 7ms)
+ GET /dashboard/teacher-missions 200 in 34ms (compile: 13ms, proxy.ts: 7ms, render: 14ms)
+ POST /dashboard/teacher-missions 200 in 16ms (compile: 5ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/teacher-missions 200 in 15ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/teacher-missions 200 in 12ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/teacher-missions 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/teacher-missions 200 in 12ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/teacher-missions 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 7ms)
+ GET /dashboard/assignments 200 in 19ms (compile: 4ms, proxy.ts: 8ms, render: 7ms)
+ POST /dashboard/assignments 200 in 19ms (compile: 8ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/assignments 200 in 12ms (compile: 3ms, proxy.ts: 6ms, render: 3ms)
+ POST /dashboard/assignments 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard 200 in 21ms (compile: 7ms, proxy.ts: 6ms, render: 8ms)
+ POST /dashboard 200 in 16ms (compile: 6ms, proxy.ts: 5ms, render: 6ms)
+ POST /dashboard 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ ✓ Compiled in 69ms
+ GET /dashboard/schedule 200 in 38ms (compile: 17ms, proxy.ts: 8ms, render: 13ms)
+ POST /dashboard/schedule 200 in 20ms (compile: 10ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/schedule 200 in 26ms (compile: 12ms, proxy.ts: 5ms, render: 10ms)
+ GET /dashboard/classes 200 in 37ms (compile: 15ms, proxy.ts: 11ms, render: 12ms)
+ POST /dashboard/classes 200 in 20ms (compile: 8ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/classes 200 in 17ms (compile: 8ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 20ms (compile: 6ms, proxy.ts: 3ms, render: 12ms)
+ GET /grid.svg 404 in 29ms (compile: 10ms, proxy.ts: 7ms, render: 12ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 138ms (compile: 95ms, proxy.ts: 11ms, render: 32ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 32ms (compile: 9ms, proxy.ts: 3ms, render: 19ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 8ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 4ms, proxy.ts: 2ms, render: 5ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 11ms (compile: 4ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 11ms (compile: 3ms, proxy.ts: 2ms, render: 5ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ ✓ Compiled in 44ms
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 229ms (compile: 68ms, proxy.ts: 10ms, render: 152ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 227ms (compile: 9ms, proxy.ts: 83ms, render: 134ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 64ms (compile: 10ms, proxy.ts: 15ms, render: 40ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 7ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 18ms (compile: 8ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 4ms, proxy.ts: 6ms, render: 3ms)
+ ✓ Compiled in 64ms
+ GET /grid.svg 404 in 31ms (compile: 10ms, proxy.ts: 3ms, render: 18ms)
+ GET /dashboard/classes 200 in 46ms (compile: 22ms, proxy.ts: 12ms, render: 12ms)
+ POST /dashboard/classes 200 in 25ms (compile: 12ms, proxy.ts: 7ms, render: 5ms)
+ POST /dashboard/classes 200 in 15ms (compile: 6ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 15ms (compile: 6ms, proxy.ts: 2ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 17ms (compile: 5ms, proxy.ts: 3ms, render: 9ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 123ms (compile: 92ms, proxy.ts: 10ms, render: 21ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 28ms (compile: 4ms, proxy.ts: 3ms, render: 21ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 3ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/schedule 200 in 32ms (compile: 14ms, proxy.ts: 9ms, render: 9ms)
+ POST /dashboard/schedule 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/schedule 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 8ms)
+ GET /dashboard/classes 200 in 28ms (compile: 6ms, proxy.ts: 9ms, render: 14ms)
+ POST /dashboard/classes 200 in 15ms (compile: 4ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/classes 200 in 17ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 4ms, proxy.ts: 6ms, render: 8ms)
+ GET /dashboard/schedule 200 in 27ms (compile: 10ms, proxy.ts: 8ms, render: 9ms)
+ POST /dashboard/schedule 200 in 20ms (compile: 5ms, proxy.ts: 5ms, render: 11ms)
+ POST /dashboard/schedule 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ GET /dashboard/classes 200 in 22ms (compile: 9ms, proxy.ts: 6ms, render: 7ms)
+ POST /dashboard/classes 200 in 17ms (compile: 4ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/classes 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 7ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 3ms, proxy.ts: 3ms, render: 12ms)
+ GET /dashboard/schedule 200 in 21ms (compile: 6ms, proxy.ts: 4ms, render: 10ms)
+ POST /dashboard/schedule 200 in 19ms (compile: 8ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/schedule 200 in 18ms (compile: 3ms, proxy.ts: 3ms, render: 11ms)
+ GET /dashboard/classes 200 in 20ms (compile: 5ms, proxy.ts: 7ms, render: 9ms)
+ POST /dashboard/classes 200 in 19ms (compile: 7ms, proxy.ts: 6ms, render: 5ms)
+ POST /dashboard/classes 200 in 16ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 18ms (compile: 7ms, proxy.ts: 3ms, render: 8ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 31ms (compile: 8ms, proxy.ts: 8ms, render: 15ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 5ms, proxy.ts: 4ms, render: 7ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 8ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 11ms (compile: 6ms, proxy.ts: 2ms, render: 2ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 11ms (compile: 5ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 31ms (compile: 14ms, proxy.ts: 9ms, render: 8ms)
+ ✓ Compiled in 28ms
+ ✓ Compiled in 41ms
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 124ms (compile: 98ms, proxy.ts: 3ms, render: 23ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 8ms, proxy.ts: 5ms, render: 2ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 11ms (compile: 6ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 5ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 6ms, proxy.ts: 2ms, render: 3ms)
+ ✓ Compiled in 70ms
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 207ms (compile: 75ms, proxy.ts: 3ms, render: 129ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 49ms (compile: 7ms, proxy.ts: 5ms, render: 38ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 45ms (compile: 15ms, proxy.ts: 6ms, render: 23ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 28ms (compile: 15ms, proxy.ts: 5ms, render: 8ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 51ms (compile: 40ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 11ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 11ms (compile: 5ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ ✓ Compiled in 37ms
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 173ms (compile: 79ms, proxy.ts: 3ms, render: 91ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 25ms (compile: 8ms, proxy.ts: 3ms, render: 15ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 29ms (compile: 4ms, proxy.ts: 4ms, render: 21ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 4ms, proxy.ts: 6ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 3ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ ✓ Compiled in 31ms
+ ✓ Compiled in 303ms
+ GET /dashboard 200 in 374ms (compile: 301ms, proxy.ts: 15ms, render: 58ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 377ms (compile: 182ms, proxy.ts: 17ms, render: 178ms)
+ GET /dashboard 200 in 226ms (compile: 7ms, proxy.ts: 16ms, render: 203ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 231ms (compile: 103ms, proxy.ts: 15ms, render: 112ms)
+ POST /dashboard 200 in 44ms (compile: 9ms, proxy.ts: 3ms, render: 32ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 47ms (compile: 6ms, proxy.ts: 7ms, render: 33ms)
+ POST /dashboard 200 in 43ms (compile: 4ms, proxy.ts: 27ms, render: 12ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 27ms (compile: 6ms, proxy.ts: 4ms, render: 17ms)
+ POST /dashboard 200 in 25ms (compile: 8ms, proxy.ts: 10ms, render: 8ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 19ms (compile: 4ms, proxy.ts: 5ms, render: 10ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 4ms, proxy.ts: 5ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 6ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ ✓ Compiled in 306ms
+ GET /dashboard 200 in 516ms (compile: 244ms, proxy.ts: 14ms, render: 258ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 520ms (compile: 141ms, proxy.ts: 17ms, render: 361ms)
+ GET /dashboard 200 in 467ms (compile: 247ms, proxy.ts: 3ms, render: 218ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 450ms (compile: 23ms, proxy.ts: 314ms, render: 114ms)
+ POST /dashboard 200 in 52ms (compile: 5ms, proxy.ts: 8ms, render: 39ms)
+ POST /dashboard 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard 200 in 45ms (compile: 4ms, proxy.ts: 10ms, render: 30ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 42ms (compile: 15ms, proxy.ts: 5ms, render: 22ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 18ms (compile: 4ms, proxy.ts: 5ms, render: 9ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 4ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 6ms, proxy.ts: 7ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 7ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 2ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 8ms, proxy.ts: 4ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 9ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ ✓ Compiled in 402ms
+ GET /dashboard 200 in 513ms (compile: 324ms, proxy.ts: 11ms, render: 179ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 527ms (compile: 242ms, proxy.ts: 10ms, render: 274ms)
+ GET /dashboard 200 in 417ms (compile: 311ms, proxy.ts: 6ms, render: 100ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 426ms (compile: 16ms, proxy.ts: 360ms, render: 50ms)
+ POST /dashboard 200 in 44ms (compile: 4ms, proxy.ts: 5ms, render: 34ms)
+ POST /dashboard 200 in 20ms (compile: 5ms, proxy.ts: 3ms, render: 12ms)
+ POST /dashboard 200 in 18ms (compile: 5ms, proxy.ts: 3ms, render: 10ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 40ms (compile: 9ms, proxy.ts: 6ms, render: 25ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 18ms (compile: 4ms, proxy.ts: 3ms, render: 11ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 5ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 4ms, proxy.ts: 6ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 7ms, proxy.ts: 4ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 3ms, proxy.ts: 4ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 29ms (compile: 14ms, proxy.ts: 8ms, render: 7ms)
+ GET /join?code=NMSKLO 404 in 45ms (compile: 13ms, proxy.ts: 9ms, render: 23ms)
+ GET /join?code=NMSKLO 404 in 47ms (compile: 8ms, proxy.ts: 12ms, render: 27ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 189ms (compile: 89ms, proxy.ts: 58ms, render: 42ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 26ms (compile: 8ms, proxy.ts: 4ms, render: 14ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 5ms, proxy.ts: 3ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 305ms (compile: 224ms, proxy.ts: 58ms, render: 23ms)
+ GET /join?code=NMSKLO 200 in 252ms (compile: 237ms, proxy.ts: 5ms, render: 10ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 63ms (compile: 9ms, proxy.ts: 4ms, render: 51ms)
+ GET /join?code=NMSKLO 200 in 48ms (compile: 4ms, proxy.ts: 6ms, render: 38ms)
+ GET /join?code=NMSKLO 200 in 47ms (compile: 3ms, proxy.ts: 18ms, render: 26ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 64ms (compile: 18ms, proxy.ts: 18ms, render: 27ms)
+ GET /join?code=NMSKLO 200 in 39ms (compile: 5ms, proxy.ts: 20ms, render: 15ms)
+ GET /join?code=NMSKLO 200 in 46ms (compile: 5ms, proxy.ts: 17ms, render: 24ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 44ms (compile: 18ms, proxy.ts: 4ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 55ms (compile: 7ms, proxy.ts: 27ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 4ms, proxy.ts: 15ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 3ms, proxy.ts: 16ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 56ms (compile: 18ms, proxy.ts: 17ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 4ms, proxy.ts: 24ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 29ms (compile: 4ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 44ms (compile: 18ms, proxy.ts: 4ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 43ms (compile: 7ms, proxy.ts: 24ms, render: 11ms)
+ GET /join?code=NMSKLO 200 in 43ms (compile: 3ms, proxy.ts: 6ms, render: 33ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 3ms, proxy.ts: 16ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 45ms (compile: 16ms, proxy.ts: 17ms, render: 11ms)
+ GET /join?code=NMSKLO 200 in 21ms (compile: 4ms, proxy.ts: 3ms, render: 14ms)
+ GET /join?code=NMSKLO 200 in 31ms (compile: 5ms, proxy.ts: 4ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 43ms (compile: 18ms, proxy.ts: 4ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 7ms, proxy.ts: 26ms, render: 8ms)
+ GET /join?code=NMSKLO 200 in 35ms (compile: 3ms, proxy.ts: 4ms, render: 28ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 44ms (compile: 5ms, proxy.ts: 15ms, render: 23ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 4ms, proxy.ts: 19ms, render: 19ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 6ms, proxy.ts: 16ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 29ms (compile: 4ms, proxy.ts: 4ms, render: 20ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 42ms (compile: 17ms, proxy.ts: 4ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 39ms (compile: 7ms, proxy.ts: 23ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 4ms, proxy.ts: 5ms, render: 31ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 41ms (compile: 4ms, proxy.ts: 16ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 39ms (compile: 15ms, proxy.ts: 15ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 20ms (compile: 8ms, proxy.ts: 3ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 5ms, proxy.ts: 14ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 53ms (compile: 17ms, proxy.ts: 14ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 7ms, proxy.ts: 25ms, render: 8ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 3ms, proxy.ts: 14ms, render: 14ms)
+ GET /join?code=NMSKLO 200 in 31ms (compile: 5ms, proxy.ts: 5ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 45ms (compile: 18ms, proxy.ts: 4ms, render: 23ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 8ms, proxy.ts: 26ms, render: 8ms)
+ GET /join?code=NMSKLO 200 in 23ms (compile: 4ms, proxy.ts: 4ms, render: 15ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 4ms, proxy.ts: 5ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 50ms (compile: 19ms, proxy.ts: 5ms, render: 27ms)
+ GET /join?code=NMSKLO 200 in 48ms (compile: 4ms, proxy.ts: 24ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 61ms (compile: 8ms, proxy.ts: 21ms, render: 32ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 63ms (compile: 25ms, proxy.ts: 8ms, render: 30ms)
+ GET /join?code=NMSKLO 200 in 58ms (compile: 11ms, proxy.ts: 37ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 46ms (compile: 7ms, proxy.ts: 20ms, render: 19ms)
+ GET /join?code=NMSKLO 200 in 45ms (compile: 8ms, proxy.ts: 6ms, render: 31ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 65ms (compile: 28ms, proxy.ts: 6ms, render: 31ms)
+ GET /join?code=NMSKLO 200 in 61ms (compile: 10ms, proxy.ts: 38ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 46ms (compile: 9ms, proxy.ts: 6ms, render: 30ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 63ms (compile: 6ms, proxy.ts: 27ms, render: 30ms)
+ GET /join?code=NMSKLO 200 in 62ms (compile: 11ms, proxy.ts: 37ms, render: 14ms)
+ GET /join?code=NMSKLO 200 in 89ms (compile: 6ms, proxy.ts: 7ms, render: 77ms)
+ GET /join?code=NMSKLO 200 in 88ms (compile: 4ms, proxy.ts: 57ms, render: 26ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 104ms (compile: 19ms, proxy.ts: 57ms, render: 28ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 4ms, proxy.ts: 20ms, render: 15ms)
+ GET /join?code=NMSKLO 200 in 43ms (compile: 4ms, proxy.ts: 18ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 42ms (compile: 17ms, proxy.ts: 4ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 33ms (compile: 4ms, proxy.ts: 16ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 27ms (compile: 4ms, proxy.ts: 4ms, render: 19ms)
+ GET /join?code=NMSKLO 200 in 37ms (compile: 3ms, proxy.ts: 14ms, render: 20ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 40ms (compile: 16ms, proxy.ts: 15ms, render: 8ms)
+ GET /join?code=NMSKLO 200 in 30ms (compile: 4ms, proxy.ts: 15ms, render: 12ms)
+ GET /join?code=NMSKLO 200 in 29ms (compile: 4ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 29ms (compile: 17ms, proxy.ts: 4ms, render: 8ms)
+ GET /join?code=NMSKLO 200 in 31ms (compile: 7ms, proxy.ts: 15ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 38ms (compile: 4ms, proxy.ts: 3ms, render: 30ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 40ms (compile: 16ms, proxy.ts: 3ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 37ms (compile: 6ms, proxy.ts: 22ms, render: 8ms)
+ GET /join?code=NMSKLO 200 in 20ms (compile: 7ms, proxy.ts: 3ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 30ms (compile: 4ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 41ms (compile: 17ms, proxy.ts: 4ms, render: 19ms)
+ GET /join?code=NMSKLO 200 in 30ms (compile: 6ms, proxy.ts: 13ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 31ms (compile: 3ms, proxy.ts: 4ms, render: 23ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 40ms (compile: 16ms, proxy.ts: 4ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 28ms (compile: 4ms, proxy.ts: 15ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 33ms (compile: 7ms, proxy.ts: 4ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 44ms (compile: 17ms, proxy.ts: 5ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 4ms, proxy.ts: 17ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 4ms, proxy.ts: 16ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 47ms (compile: 17ms, proxy.ts: 8ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 3ms, proxy.ts: 17ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 3ms, proxy.ts: 16ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 40ms (compile: 7ms, proxy.ts: 12ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 16ms, proxy.ts: 8ms, render: 19ms)
+ GET /join?code=NMSKLO 200 in 38ms (compile: 4ms, proxy.ts: 22ms, render: 12ms)
+ GET /join?code=NMSKLO 200 in 27ms (compile: 3ms, proxy.ts: 4ms, render: 20ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 38ms (compile: 16ms, proxy.ts: 3ms, render: 19ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 3ms, proxy.ts: 15ms, render: 14ms)
+ GET /join?code=NMSKLO 200 in 39ms (compile: 4ms, proxy.ts: 5ms, render: 30ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 41ms (compile: 15ms, proxy.ts: 6ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 38ms (compile: 6ms, proxy.ts: 23ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 18ms (compile: 3ms, proxy.ts: 3ms, render: 12ms)
+ GET /join?code=NMSKLO 200 in 27ms (compile: 4ms, proxy.ts: 3ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 40ms (compile: 16ms, proxy.ts: 4ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 3ms, proxy.ts: 16ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 29ms (compile: 4ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 43ms (compile: 16ms, proxy.ts: 4ms, render: 23ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 8ms, proxy.ts: 12ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 45ms (compile: 4ms, proxy.ts: 16ms, render: 25ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 43ms (compile: 18ms, proxy.ts: 5ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 30ms (compile: 4ms, proxy.ts: 17ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 33ms (compile: 7ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 41ms (compile: 16ms, proxy.ts: 4ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 4ms, proxy.ts: 16ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 4ms, proxy.ts: 16ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 43ms (compile: 7ms, proxy.ts: 17ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 38ms (compile: 4ms, proxy.ts: 16ms, render: 18ms)
+ GET /join?code=NMSKLO 200 in 26ms (compile: 3ms, proxy.ts: 13ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 31ms (compile: 8ms, proxy.ts: 4ms, render: 19ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 44ms (compile: 19ms, proxy.ts: 4ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 39ms (compile: 3ms, proxy.ts: 23ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 43ms (compile: 3ms, proxy.ts: 5ms, render: 35ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 7ms, proxy.ts: 12ms, render: 23ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 43ms (compile: 21ms, proxy.ts: 13ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 19ms (compile: 4ms, proxy.ts: 3ms, render: 12ms)
+ GET /join?code=NMSKLO 200 in 28ms (compile: 4ms, proxy.ts: 4ms, render: 20ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 29ms (compile: 16ms, proxy.ts: 4ms, render: 8ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 4ms, proxy.ts: 15ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 29ms (compile: 4ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 41ms (compile: 15ms, proxy.ts: 4ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 7ms, proxy.ts: 13ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 3ms, proxy.ts: 15ms, render: 14ms)
+ GET /join?code=NMSKLO 200 in 28ms (compile: 4ms, proxy.ts: 4ms, render: 20ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 29ms (compile: 17ms, proxy.ts: 4ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 31ms (compile: 4ms, proxy.ts: 15ms, render: 12ms)
+ GET /join?code=NMSKLO 200 in 30ms (compile: 4ms, proxy.ts: 3ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 43ms (compile: 18ms, proxy.ts: 3ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 7ms, proxy.ts: 25ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 4ms, proxy.ts: 5ms, render: 33ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 4ms, proxy.ts: 16ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 53ms (compile: 17ms, proxy.ts: 16ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 33ms (compile: 6ms, proxy.ts: 16ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 27ms (compile: 3ms, proxy.ts: 4ms, render: 20ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 42ms (compile: 16ms, proxy.ts: 4ms, render: 23ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 7ms, proxy.ts: 12ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 44ms (compile: 7ms, proxy.ts: 16ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 41ms (compile: 16ms, proxy.ts: 4ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 28ms (compile: 3ms, proxy.ts: 15ms, render: 9ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 8ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 46ms (compile: 21ms, proxy.ts: 4ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 4ms, proxy.ts: 24ms, render: 12ms)
+ GET /join?code=NMSKLO 200 in 29ms (compile: 3ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 41ms (compile: 16ms, proxy.ts: 3ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 31ms (compile: 4ms, proxy.ts: 16ms, render: 11ms)
+ GET /join?code=NMSKLO 200 in 19ms (compile: 4ms, proxy.ts: 3ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 4ms, proxy.ts: 7ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 53ms (compile: 17ms, proxy.ts: 15ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 39ms (compile: 3ms, proxy.ts: 23ms, render: 12ms)
+ GET /join?code=NMSKLO 200 in 30ms (compile: 4ms, proxy.ts: 4ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 44ms (compile: 19ms, proxy.ts: 4ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 40ms (compile: 7ms, proxy.ts: 25ms, render: 7ms)
+ GET /join?code=NMSKLO 200 in 20ms (compile: 4ms, proxy.ts: 3ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 4ms, proxy.ts: 16ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 43ms (compile: 18ms, proxy.ts: 4ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 33ms (compile: 4ms, proxy.ts: 16ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 39ms (compile: 4ms, proxy.ts: 16ms, render: 20ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 40ms (compile: 16ms, proxy.ts: 4ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 28ms (compile: 6ms, proxy.ts: 12ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 33ms (compile: 4ms, proxy.ts: 4ms, render: 25ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 42ms (compile: 16ms, proxy.ts: 4ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 3ms, proxy.ts: 16ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 29ms (compile: 7ms, proxy.ts: 12ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 43ms (compile: 4ms, proxy.ts: 4ms, render: 36ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 57ms (compile: 31ms, proxy.ts: 16ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 41ms (compile: 8ms, proxy.ts: 22ms, render: 12ms)
+ GET /join?code=NMSKLO 200 in 46ms (compile: 11ms, proxy.ts: 5ms, render: 30ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 57ms (compile: 27ms, proxy.ts: 5ms, render: 24ms)
+ GET /join?code=NMSKLO 200 in 55ms (compile: 4ms, proxy.ts: 39ms, render: 12ms)
+ GET /join?code=NMSKLO 200 in 44ms (compile: 8ms, proxy.ts: 6ms, render: 31ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 4ms, proxy.ts: 17ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 50ms (compile: 16ms, proxy.ts: 17ms, render: 17ms)
+ GET /join?code=NMSKLO 200 in 34ms (compile: 10ms, proxy.ts: 3ms, render: 21ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 8ms, proxy.ts: 13ms, render: 22ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 52ms (compile: 17ms, proxy.ts: 13ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 29ms (compile: 3ms, proxy.ts: 16ms, render: 10ms)
+ GET /join?code=NMSKLO 200 in 34ms (compile: 8ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 48ms (compile: 22ms, proxy.ts: 4ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 42ms (compile: 4ms, proxy.ts: 25ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 46ms (compile: 4ms, proxy.ts: 5ms, render: 37ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 46ms (compile: 9ms, proxy.ts: 14ms, render: 22ms)
+ GET /join?code=NMSKLO 200 in 55ms (compile: 8ms, proxy.ts: 27ms, render: 20ms)
+ GET /join?code=NMSKLO 200 in 32ms (compile: 4ms, proxy.ts: 15ms, render: 13ms)
+ GET /join?code=NMSKLO 200 in 30ms (compile: 5ms, proxy.ts: 4ms, render: 21ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 50ms (compile: 18ms, proxy.ts: 4ms, render: 28ms)
+ GET /join?code=NMSKLO 200 in 48ms (compile: 4ms, proxy.ts: 24ms, render: 20ms)
+ POST /join?code=NMSKLO 200 in 75ms (compile: 7ms, proxy.ts: 8ms, render: 61ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 84ms (compile: 43ms, proxy.ts: 8ms, render: 34ms)
+ POST /join?code=NMSKLO 200 in 51ms (compile: 6ms, proxy.ts: 33ms, render: 11ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 50ms (compile: 17ms, proxy.ts: 7ms, render: 27ms)
+ POST /join?code=NMSKLO 200 in 36ms (compile: 4ms, proxy.ts: 18ms, render: 14ms)
+ POST /join?code=NMSKLO 200 in 60ms (compile: 9ms, proxy.ts: 7ms, render: 44ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 36ms (compile: 13ms, proxy.ts: 10ms, render: 13ms)
+ POST /join?code=NMSKLO 200 in 20ms (compile: 9ms, proxy.ts: 3ms, render: 8ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 28ms (compile: 7ms, proxy.ts: 4ms, render: 18ms)
+ POST /join?code=NMSKLO 200 in 51ms (compile: 5ms, proxy.ts: 21ms, render: 26ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 31ms (compile: 13ms, proxy.ts: 10ms, render: 9ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 25ms (compile: 6ms, proxy.ts: 5ms, render: 13ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 23ms (compile: 5ms, proxy.ts: 4ms, render: 15ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 28ms (compile: 4ms, proxy.ts: 4ms, render: 20ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 29ms (compile: 14ms, proxy.ts: 6ms, render: 9ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 20ms (compile: 6ms, proxy.ts: 7ms, render: 8ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 4ms, proxy.ts: 7ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 8ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 4ms, proxy.ts: 5ms, render: 9ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 9ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 14ms (compile: 5ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 4ms, proxy.ts: 2ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 8ms, proxy.ts: 3ms, render: 2ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 11ms (compile: 5ms, proxy.ts: 2ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 11ms (compile: 5ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 8ms, proxy.ts: 3ms, render: 4ms)
+ ✓ Compiled in 32ms
+ POST /join?code=NMSKLO 200 in 86ms (compile: 62ms, proxy.ts: 3ms, render: 21ms)
+ POST /join?code=NMSKLO 200 in 21ms (compile: 8ms, proxy.ts: 3ms, render: 11ms)
+ GET /join?code=NMSKLO 200 in 120ms (compile: 17ms, proxy.ts: 25ms, render: 78ms)
+ POST /join?code=NMSKLO 200 in 24ms (compile: 7ms, proxy.ts: 4ms, render: 13ms)
+ POST /join?code=NMSKLO 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+ POST /join?code=NMSKLO 200 in 34ms (compile: 11ms, proxy.ts: 10ms, render: 13ms)
+ POST /join?code=NMSKLO 200 in 26ms (compile: 12ms, proxy.ts: 6ms, render: 9ms)
+ POST /join?code=NMSKLO 200 in 47ms (compile: 26ms, proxy.ts: 13ms, render: 8ms)
+ POST /join?code=NMSKLO 200 in 22ms (compile: 9ms, proxy.ts: 6ms, render: 7ms)
+ POST /join?code=NMSKLO 200 in 48ms (compile: 23ms, proxy.ts: 13ms, render: 12ms)
+ POST /join?code=NMSKLO 200 in 18ms (compile: 8ms, proxy.ts: 4ms, render: 7ms)
+ POST /join?code=NMSKLO 200 in 25ms (compile: 10ms, proxy.ts: 6ms, render: 9ms)
+ POST /join?code=NMSKLO 200 in 24ms (compile: 8ms, proxy.ts: 4ms, render: 11ms)
+ POST /join?code=NMSKLO 200 in 27ms (compile: 9ms, proxy.ts: 9ms, render: 8ms)
+ POST /join?code=NMSKLO 200 in 22ms (compile: 10ms, proxy.ts: 5ms, render: 8ms)
+ POST /join?code=NMSKLO 200 in 28ms (compile: 10ms, proxy.ts: 10ms, render: 8ms)
+ POST /join?code=NMSKLO 200 in 21ms (compile: 6ms, proxy.ts: 4ms, render: 12ms)
+ POST /join?code=NMSKLO 200 in 24ms (compile: 5ms, proxy.ts: 10ms, render: 8ms)
+ POST /join?code=NMSKLO 200 in 21ms (compile: 9ms, proxy.ts: 4ms, render: 8ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 95ms (compile: 10ms, proxy.ts: 6ms, render: 78ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 16ms (compile: 4ms, proxy.ts: 3ms, render: 9ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 4ms, proxy.ts: 4ms, render: 5ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 7ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 5ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ ✓ Compiled in 218ms
+ GET /join?code=NMSKLO 200 in 145ms (compile: 82ms, proxy.ts: 15ms, render: 48ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 448ms (compile: 264ms, proxy.ts: 15ms, render: 169ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 445ms (compile: 236ms, proxy.ts: 13ms, render: 197ms)
+ POST /join?code=NMSKLO 200 in 317ms (compile: 12ms, proxy.ts: 132ms, render: 172ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 338ms (compile: 39ms, proxy.ts: 133ms, render: 166ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 230ms (compile: 26ms, proxy.ts: 146ms, render: 58ms)
+ POST /join?code=NMSKLO 200 in 44ms (compile: 5ms, proxy.ts: 21ms, render: 18ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 40ms (compile: 12ms, proxy.ts: 6ms, render: 21ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 20ms (compile: 5ms, proxy.ts: 5ms, render: 11ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 22ms (compile: 5ms, proxy.ts: 4ms, render: 13ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 23ms (compile: 5ms, proxy.ts: 9ms, render: 10ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 22ms (compile: 10ms, proxy.ts: 5ms, render: 7ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 20ms (compile: 5ms, proxy.ts: 4ms, render: 11ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 12ms (compile: 4ms, proxy.ts: 4ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 19ms (compile: 11ms, proxy.ts: 4ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 25ms (compile: 10ms, proxy.ts: 12ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 24ms (compile: 5ms, proxy.ts: 14ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 5ms, proxy.ts: 8ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 25ms (compile: 9ms, proxy.ts: 10ms, render: 7ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 5ms, proxy.ts: 4ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 17ms (compile: 10ms, proxy.ts: 4ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 23ms (compile: 9ms, proxy.ts: 10ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 21ms (compile: 4ms, proxy.ts: 13ms, render: 4ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 19ms (compile: 8ms, proxy.ts: 9ms, render: 3ms)
+ POST /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ ✓ Compiled in 29ms
+ ✓ Compiled in 27ms
+ GET /join?code=NMSKLO 200 in 173ms (compile: 100ms, proxy.ts: 6ms, render: 67ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 178ms (compile: 134ms, proxy.ts: 7ms, render: 36ms)
+ GET /dashboard/classes/cmjce1eyw00014v0py8xym6i4 200 in 174ms (compile: 151ms, proxy.ts: 6ms, render: 17ms)
+ POST /join?code=NMSKLO 200 in 40ms (compile: 8ms, proxy.ts: 3ms, render: 29ms)
+ POST /join?code=NMSKLO 200 in 17ms (compile: 6ms, proxy.ts: 4ms, render: 7ms)
+ POST /join?code=NMSKLO 200 in 23ms (compile: 12ms, proxy.ts: 5ms, render: 7ms)
+ POST /join?code=NMSKLO 200 in 21ms (compile: 5ms, proxy.ts: 4ms, render: 12ms)
+ POST /join?code=NMSKLO 200 in 29ms (compile: 6ms, proxy.ts: 8ms, render: 15ms)
+ POST /join?code=NMSKLO 200 in 34ms (compile: 19ms, proxy.ts: 3ms, render: 12ms)
+ GET /dashboard/classes 200 in 135ms (compile: 100ms, proxy.ts: 15ms, render: 21ms)
+ POST /dashboard/classes 200 in 30ms (compile: 7ms, proxy.ts: 3ms, render: 19ms)
+ POST /dashboard/classes 200 in 14ms (compile: 3ms, proxy.ts: 2ms, render: 8ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 13ms (compile: 3ms, proxy.ts: 3ms, render: 7ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 19ms (compile: 7ms, proxy.ts: 3ms, render: 9ms)
+ GET /grid.svg 404 in 70ms (compile: 28ms, proxy.ts: 4ms, render: 38ms)
+ GET /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 34ms (compile: 9ms, proxy.ts: 8ms, render: 18ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 16ms (compile: 5ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 18ms (compile: 4ms, proxy.ts: 7ms, render: 7ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 15ms (compile: 8ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 4ms, proxy.ts: 7ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 11ms (compile: 6ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 12ms (compile: 4ms, proxy.ts: 2ms, render: 6ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 10ms (compile: 3ms, proxy.ts: 3ms, render: 4ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 13ms (compile: 4ms, proxy.ts: 7ms, render: 3ms)
+ POST /dashboard/classes/cmjbu4rub000p97hbwp2chej7 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 4ms)
+ GET /dashboard/classes 200 in 29ms (compile: 6ms, proxy.ts: 9ms, render: 15ms)
+ POST /dashboard/classes 200 in 16ms (compile: 6ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/classes 200 in 18ms (compile: 8ms, proxy.ts: 4ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 15ms (compile: 4ms, proxy.ts: 3ms, render: 8ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 19ms (compile: 4ms, proxy.ts: 7ms, render: 8ms)
+ GET /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 29ms (compile: 13ms, proxy.ts: 8ms, render: 8ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 18ms (compile: 4ms, proxy.ts: 4ms, render: 10ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 11ms (compile: 4ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 9ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 13ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 14ms (compile: 4ms, proxy.ts: 7ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 9ms (compile: 3ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 12ms (compile: 7ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 13ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 12ms (compile: 5ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjbtv41d000l97hbhkf7lt4m 200 in 13ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ GET /dashboard/classes 200 in 32ms (compile: 6ms, proxy.ts: 11ms, render: 15ms)
+ POST /dashboard/classes 200 in 17ms (compile: 5ms, proxy.ts: 4ms, render: 8ms)
+ POST /dashboard/classes 200 in 17ms (compile: 8ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 12ms (compile: 3ms, proxy.ts: 3ms, render: 6ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 3
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 19ms (compile: 4ms, proxy.ts: 8ms, render: 8ms)
+ POST /dashboard/classes 200 in 37ms (compile: 11ms, proxy.ts: 9ms, render: 17ms)
+🔍 getClassesAction DEBUG:
+  Session: {
+  name: 'Cô Giáo Hạnh',
+  email: 'hanh@school.edu',
+  id: 'u2',
+  role: 'teacher'
+}
+  User from DB: { role: 'teacher' }
+  👨‍🏫 Querying as teacher, userId: u2
+  📚 Found classes: 4
+    - ádsdas (teacherId: u2)
+    - z (teacherId: u2)
+    - 11/1 (teacherId: u2)
+    - 11/1 (teacherId: u2)
+ POST /dashboard/classes 200 in 19ms (compile: 4ms, proxy.ts: 4ms, render: 11ms)
+ GET /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 28ms (compile: 8ms, proxy.ts: 7ms, render: 12ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 21ms (compile: 5ms, proxy.ts: 9ms, render: 7ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 18ms (compile: 8ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 13ms (compile: 4ms, proxy.ts: 6ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 12ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 13ms (compile: 8ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 13ms (compile: 8ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 13ms (compile: 7ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 14ms (compile: 9ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 32ms (compile: 8ms, proxy.ts: 17ms, render: 7ms)
+ GET /join?code=JP71I8 200 in 68ms (compile: 12ms, proxy.ts: 12ms, render: 43ms)
+ POST /join?code=JP71I8 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ POST /join?code=JP71I8 200 in 22ms (compile: 3ms, proxy.ts: 7ms, render: 12ms)
+ POST /join?code=JP71I8 200 in 16ms (compile: 7ms, proxy.ts: 3ms, render: 6ms)
+ POST /join?code=JP71I8 200 in 15ms (compile: 3ms, proxy.ts: 3ms, render: 9ms)
+ POST /join?code=JP71I8 200 in 28ms (compile: 7ms, proxy.ts: 10ms, render: 10ms)
+ POST /join?code=JP71I8 200 in 21ms (compile: 9ms, proxy.ts: 4ms, render: 8ms)
+ GET /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 41ms (compile: 11ms, proxy.ts: 8ms, render: 22ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 24ms (compile: 5ms, proxy.ts: 8ms, render: 10ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 14ms (compile: 4ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 15ms (compile: 8ms, proxy.ts: 3ms, render: 5ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 16ms (compile: 8ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 13ms (compile: 4ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 16ms (compile: 4ms, proxy.ts: 6ms, render: 6ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 15ms (compile: 9ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 14ms (compile: 4ms, proxy.ts: 4ms, render: 6ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 9ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 14ms (compile: 8ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 10ms (compile: 4ms, proxy.ts: 3ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 13ms (compile: 4ms, proxy.ts: 7ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 17ms (compile: 8ms, proxy.ts: 3ms, render: 6ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 12ms (compile: 3ms, proxy.ts: 2ms, render: 6ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 13ms (compile: 4ms, proxy.ts: 6ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 13ms (compile: 8ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 9ms (compile: 4ms, proxy.ts: 2ms, render: 3ms)
+ POST /dashboard/classes/cmjcfmoo500074v0petfvzpyk 200 in 14ms (compile: 4ms, proxy.ts: 7ms, render: 4ms)

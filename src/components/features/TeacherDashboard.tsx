@@ -1,312 +1,304 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { LogOut, Plus, Search, Users, BookOpen, CheckCircle, TrendingUp, Bell, Clock, FileText, Target } from "lucide-react";
-import Link from "next/link";
+import { LogOut, Calendar as CalendarIcon, FileText, CheckCircle, Users, BookOpen, BrainCircuit, GraduationCap } from "lucide-react";
+import { logout } from "@/lib/auth-actions";
 import { useRouter } from "next/navigation";
-import { Assignment, Class, Submission, User } from "@/types";
+import { Class, User } from "@/types";
 import { DataService } from "@/lib/data";
-import { ClassCard } from "./ClassCard";
 import { NotificationBell } from "@/components/features/NotificationBell";
-import { CreateClassModal } from "@/components/features/CreateClassModal";
+import { ClassCreatorModal } from "./ClassCreatorModal";
+import { AssignmentCreatorModal } from "./AssignmentCreatorModal";
+import { useToast } from "@/components/ui/Toast";
+import QuickAccessGrid, { QuickAccessItem } from "@/components/dashboard/QuickAccessGrid";
+import AtRiskWidget from "@/components/dashboard-widgets/AtRiskWidget";
+import UpcomingWidget from "@/components/dashboard-widgets/UpcomingWidget";
+import { ClassAnalytics } from "@/lib/class-analytics";
+import { motion } from "framer-motion";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
 interface TeacherDashboardProps {
     user: User;
-    assignments: Assignment[];
-    submissions: Submission[];
+    analytics: ClassAnalytics;
 }
 
-export function TeacherDashboard({ user, assignments, submissions }: TeacherDashboardProps) {
+export function TeacherDashboard({ user, analytics }: TeacherDashboardProps) {
     const router = useRouter();
     const [classes, setClasses] = useState<Class[]>([]);
     const [loading, setLoading] = useState(true);
-    const [students, setStudents] = useState<User[]>([]);
+    const [dashboardAnalytics, setDashboardAnalytics] = useState<ClassAnalytics>(analytics);
+    const [showClassModal, setShowClassModal] = useState(false);
+    const [showAssignmentModal, setShowAssignmentModal] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-    const [isCreateClassModalOpen, setIsCreateClassModalOpen] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { showToast } = useToast();
+
+    // -- Derived Stats for "Hub" --
+    const totalStudents = classes.reduce((sum, cls) => sum + (cls.studentCount || 0), 0);
+
+    const refreshData = async () => {
+        const analyticsData = await DataService.getTeacherDashboardAnalytics();
+        setDashboardAnalytics(analyticsData);
+        const teacherClasses = await DataService.getClasses();
+        setClasses(teacherClasses);
+    };
 
     useEffect(() => {
-        async function loadData() {
-            const teacherClasses = await DataService.getClasses(user.id);
+        setMounted(true);
+        const loadData = async () => {
+            const analyticsData = await DataService.getTeacherDashboardAnalytics();
+            setDashboardAnalytics(analyticsData);
+            const teacherClasses = await DataService.getClasses();
             setClasses(teacherClasses);
-
-            // Load all students for global stats in parallel
-            const studentsPromises = teacherClasses.map(cls => DataService.getClassMembers(cls.id));
-            const studentsArrays = await Promise.all(studentsPromises);
-            const allStudents = studentsArrays.flat();
-
-            setStudents(allStudents);
             setLoading(false);
-        }
+        };
         loadData();
     }, [user.id]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('userRole');
+    const handleLogout = async () => {
+        await logout();
         router.push('/login');
     };
 
-    // --- Global Stats Calculation ---
-    const totalStudents = students.length;
-    const activeAssignments = assignments.filter(a => a.status === 'open').length;
-    const pendingGrading = submissions.filter(s => s.status === 'submitted').length;
-
-    const gradedSubmissions = submissions.filter(s => s.status === 'graded' && s.score !== undefined);
-    const globalAverageScore = gradedSubmissions.length > 0
-        ? gradedSubmissions.reduce((a, b) => a + b.score!, 0) / gradedSubmissions.length
-        : 0;
-
-    // --- Recent Activity ---
-    const recentSubmissions = [...submissions]
-        .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
-        .slice(0, 5);
-
-    // Helper to calculate class stats (reused)
-    const getClassStats = (classId: string) => {
-        const classAssignments = assignments.filter(a => a.classIds.includes(classId));
-        const activeCount = classAssignments.filter(a => a.status === 'open').length;
-
-        const classSubmissions = submissions.filter(s => {
-            const assignment = assignments.find(a => a.id === s.assignmentId);
-            return assignment?.classIds.includes(classId);
-        });
-
-        const graded = classSubmissions.filter(s => s.status === 'graded' && s.score !== undefined);
-        const avg = graded.length > 0
-            ? graded.reduce((a, b) => a + b.score!, 0) / graded.length
-            : 0;
-
-        return { activeAssignments: activeCount, averageScore: avg };
+    const container = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
     };
 
+    const item = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0 }
+    };
+
+    // Helper to get time of day greeting - CLIENT SIDE ONLY
+    const getGreeting = () => {
+        if (!mounted) return "Xin chào"; // Default server greeting
+        const hour = new Date().getHours();
+        if (hour < 12) return "Chào buổi sáng";
+        if (hour < 18) return "Chào buổi chiều";
+        return "Chào buổi tối";
+    };
+
+    const todayDate = mounted ? format(new Date(), "EEEE, d 'tháng' M", { locale: vi }) : "Hôm nay";
+
+    // Define "Hub" Items
+    const hubItems: QuickAccessItem[] = [
+        {
+            id: 'grading',
+            label: 'Cần chấm điểm',
+            icon: CheckCircle,
+            href: '/dashboard/teacher-missions?status=needs_grading',
+            badge: dashboardAnalytics.ungradedCount > 0 ? dashboardAnalytics.ungradedCount : undefined,
+            color: 'orange',
+            description: 'Bài tập đang chờ xử lý'
+        },
+        {
+            id: 'assignments',
+            label: 'Quản lý Bài tập',
+            icon: FileText,
+            href: '/dashboard/assignments',
+            color: 'indigo',
+            description: 'Tạo và giao bài mới'
+        },
+        {
+            id: 'students',
+            label: 'Học sinh',
+            icon: Users,
+            href: '/dashboard/classes', // Ideally a dedicated students page, but classes works for now
+            badge: dashboardAnalytics.atRiskStudents.length > 0 ? `${dashboardAnalytics.atRiskStudents.length}!` : undefined,
+            color: 'blue',
+            description: `${totalStudents} học sinh đang quản lý`
+        },
+        {
+            id: 'resources',
+            label: 'Kho Học liệu',
+            icon: BookOpen,
+            href: '/dashboard/resources', // Future Feature
+            color: 'emerald',
+            description: 'Tài liệu và đề thi'
+        },
+    ];
+
     return (
-        <div className="space-y-8">
-            {/* 1. Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Xin chào, {user.name}! 👋</h2>
-                    <p className="text-muted-foreground">Đây là tổng quan hoạt động giảng dạy của bạn hôm nay.</p>
+        <div className="space-y-8 pb-10">
+            {/* 1. Hero Section - The "Control Tower" Header */}
+            <motion.div variants={item} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-5 w-full md:w-auto">
+                    {/* Avatar */}
+                    <div className="w-16 h-16 rounded-full border-4 border-indigo-50 overflow-hidden shadow-sm flex-shrink-0">
+                        <img
+                            src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
+                            alt={user.name}
+                            className="w-full h-full object-cover bg-gray-100"
+                        />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            {getGreeting()}, Thầy/Cô {user.name.split(' ').pop()}
+                        </h1>
+                        <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
+                            <span className="flex items-center gap-1.5 bg-gray-100 px-2.5 py-1 rounded-md font-medium">
+                                <CalendarIcon className="w-3.5 h-3.5" />
+                                {todayDate}
+                            </span>
+                            <span className="hidden md:inline">•</span>
+                            <span className="text-indigo-600 font-medium">Hôm nay có 3 tiết dạy (Sáng)</span>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex items-center gap-3">
+
+                {/* Top Actions */}
+                <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                    <button
+                        onClick={() => setShowAssignmentModal(true)}
+                        className="px-4 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all font-semibold text-sm shadow-sm flex items-center gap-2"
+                    >
+                        <FileText className="w-4 h-4" />
+                        <span>Tạo bài tập</span>
+                    </button>
                     <NotificationBell userId={user.id} />
                     <button
                         onClick={handleLogout}
-                        className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
+                        className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-100"
                         title="Đăng xuất"
                     >
                         <LogOut className="w-5 h-5" />
                     </button>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* 2. Stats Overview Grid */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <StatCard
-                    title="Tổng học sinh"
-                    value={totalStudents.toString()}
-                    icon={<Users className="w-4 h-4 text-blue-500" />}
-                    trend="+5 tuần này"
-                />
-                <StatCard
-                    title="Bài tập đang mở"
-                    value={activeAssignments.toString()}
-                    icon={<BookOpen className="w-4 h-4 text-orange-500" />}
-                    description="Đang chờ nộp"
-                />
-                <StatCard
-                    title="Cần chấm điểm"
-                    value={pendingGrading.toString()}
-                    icon={<CheckCircle className="w-4 h-4 text-green-500" />}
-                    description="Bài nộp mới"
-                    highlight={pendingGrading > 0}
-                />
-                <StatCard
-                    title="Điểm trung bình"
-                    value={globalAverageScore.toFixed(1)}
-                    icon={<TrendingUp className="w-4 h-4 text-purple-500" />}
-                    description="Trên tất cả các lớp"
-                />
-            </div>
-
-            <div className="grid gap-8 lg:grid-cols-3">
-                {/* 3. Main Content (Left - 2/3) */}
-                <div className="lg:col-span-2 space-y-8">
-                    {/* Class Overview Section */}
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xl font-semibold flex items-center gap-2">
-                                <Users className="w-5 h-5 text-primary" />
-                                Lớp học của bạn
+            {loading ? (
+                <div className="text-center py-20 text-muted-foreground">Đang tải dữ liệu trung tâm...</div>
+            ) : (
+                <motion.div
+                    variants={container}
+                    initial="hidden"
+                    animate="show"
+                    className="space-y-8"
+                >
+                    {/* 2. The Hub - Quick Access Grid */}
+                    <section>
+                        <div className="flex items-center justify-between mb-4 px-1">
+                            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                <Zap className="w-5 h-5 text-amber-500" />
+                                Truy cập nhanh
                             </h3>
-                            <Link href="/dashboard/classes">
-                                <button className="text-sm text-primary hover:underline">Xem tất cả</button>
-                            </Link>
+                            <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded-lg">
+                                Dashboard v2.0
+                            </span>
                         </div>
+                        <QuickAccessGrid items={hubItems} />
+                    </section>
 
-                        {loading ? (
-                            <div className="text-center py-12">Đang tải danh sách lớp...</div>
-                        ) : classes.length === 0 ? (
-                            <div className="text-center py-12 border-2 border-dashed border-border rounded-xl bg-muted/30">
-                                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Users className="w-8 h-8 text-muted-foreground" />
+                    {/* 3. The Pulse - Performance & Timeline Split */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Left Main: Performance Overview + "Invisible AI" */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                        <GraduationCap className="w-5 h-5 text-indigo-600" />
+                                        Hiệu suất lớp học
+                                    </h3>
+                                    <span className={`text-sm font-bold px-3 py-1 rounded-full ${dashboardAnalytics.scoreTrend === 'up' ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-600'
+                                        }`}>
+                                        {dashboardAnalytics.scoreTrend === 'up' ? '↗ Tăng trưởng' : '→ Ổn định'}
+                                    </span>
                                 </div>
-                                <h3 className="text-lg font-semibold mb-2">Chưa có lớp học nào</h3>
-                                <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-                                    Bắt đầu bằng cách tạo lớp học đầu tiên để quản lý học sinh và bài tập.
-                                </p>
-                                <Link href="/dashboard/classes/create">
-                                    <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
-                                        <Plus className="w-4 h-4" />
-                                        Tạo lớp ngay
-                                    </button>
-                                </Link>
-                            </div>
-                        ) : (
-                            <div className="grid gap-6 md:grid-cols-2">
-                                {classes.slice(0, 4).map(cls => {
-                                    const stats = getClassStats(cls.id);
-                                    return (
-                                        <ClassCard
-                                            key={cls.id}
-                                            classData={cls}
-                                            activeAssignments={stats.activeAssignments}
-                                            averageScore={stats.averageScore}
-                                        />
-                                    );
-                                })}
 
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Quick Actions / Features */}
-                    <div>
-                        <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                            <Target className="w-5 h-5 text-primary" />
-                            Tính năng & Công cụ
-                        </h3>
-                        <div className="grid gap-4 md:grid-cols-3">
-                            <Link href="/dashboard/teacher-missions">
-                                <div className="bg-card p-4 rounded-xl border border-border hover:border-primary transition-colors cursor-pointer h-full">
-                                    <div className="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center mb-3">
-                                        <Target className="w-5 h-5" />
-                                    </div>
-                                    <h4 className="font-semibold mb-1">Nhiệm vụ giáo viên</h4>
-                                    <p className="text-xs text-muted-foreground">Quản lý nhiệm vụ giảng dạy và hành chính.</p>
-                                </div>
-                            </Link>
-                            <Link href="/dashboard/assignments/create">
-                                <div className="bg-card p-4 rounded-xl border border-border hover:border-primary transition-colors cursor-pointer h-full">
-                                    <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mb-3">
-                                        <FileText className="w-5 h-5" />
-                                    </div>
-                                    <h4 className="font-semibold mb-1">Tạo bài tập mới</h4>
-                                    <p className="text-xs text-muted-foreground">Giao bài tập, dự án hoặc bài kiểm tra.</p>
-                                </div>
-                            </Link>
-                            <div className="bg-card p-4 rounded-xl border border-border hover:border-primary transition-colors cursor-pointer h-full opacity-70">
-                                <div className="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center mb-3">
-                                    <TrendingUp className="w-5 h-5" />
-                                </div>
-                                <h4 className="font-semibold mb-1">Báo cáo tổng hợp</h4>
-                                <p className="text-xs text-muted-foreground">Sắp ra mắt: Phân tích sâu toàn hệ thống.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 4. Sidebar (Right - 1/3) */}
-                <div className="space-y-6">
-                    {/* Recent Activity Feed */}
-                    <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-                        <h3 className="font-semibold mb-4 flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-primary" />
-                            Hoạt động gần đây
-                        </h3>
-                        <div className="space-y-4">
-                            {recentSubmissions.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">Chưa có hoạt động nào.</p>
-                            ) : (
-                                recentSubmissions.map(sub => {
-                                    const assignment = assignments.find(a => a.id === sub.assignmentId);
-                                    return (
-                                        <Link
-                                            href={`/dashboard/grading/${sub.id}`}
-                                            key={sub.id}
-                                            className="flex gap-3 items-start pb-3 border-b border-border last:border-0 last:pb-0 hover:bg-muted/50 p-2 rounded-lg transition-colors -mx-2"
-                                        >
-                                            <div className="w-2 h-2 mt-2 rounded-full bg-blue-500 shrink-0" />
-                                            <div>
-                                                <p className="text-sm font-medium">
-                                                    {sub.studentName || 'Học sinh'} <span className="font-normal text-muted-foreground">đã nộp bài</span>
-                                                </p>
-                                                <p className="text-xs text-primary mt-0.5 line-clamp-1">
-                                                    {assignment?.title || 'Bài tập'}
-                                                </p>
-                                                <p className="text-[10px] text-muted-foreground mt-1">
-                                                    {new Date(sub.submittedAt).toLocaleString('vi-VN')}
-                                                </p>
+                                {/* Simple Bar Chart Visualization */}
+                                <div className="space-y-4 mb-6">
+                                    <div className="flex items-end gap-2 h-32 items-end justify-between px-4 pb-2 border-b border-gray-100">
+                                        {[6.5, 7.2, 7.0, 7.5, 7.8, dashboardAnalytics.averageScore].map((score, i) => (
+                                            <div key={i} className="w-full relative group">
+                                                <div
+                                                    className="w-full min-w-[20px] bg-indigo-100 rounded-t-lg hover:bg-indigo-200 transition-all relative"
+                                                    style={{ height: `${(score / 10) * 100}%` }}
+                                                >
+                                                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        {score.toFixed(1)}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </Link>
-                                    );
-                                })
+                                        ))}
+                                    </div>
+                                    <div className="flex justify-between text-xs text-gray-400 px-4">
+                                        <span>Tuần 1</span>
+                                        <span>Tuần 2</span>
+                                        <span>Tuần 3</span>
+                                        <span>Tuần 4</span>
+                                        <span>Tuần 5</span>
+                                        <span className="font-bold text-indigo-600">Hiện tại</span>
+                                    </div>
+                                </div>
+
+                                {/* "Invisible AI" Insight Box */}
+                                <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-white rounded-xl p-4 border border-indigo-100/50 flex gap-4">
+                                    <div className="p-2 bg-white rounded-lg shadow-sm text-indigo-600 h-fit">
+                                        <BrainCircuit className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-sm font-bold text-indigo-900 mb-1">AI Phân tích</h4>
+                                        <p className="text-sm text-indigo-800/80 leading-relaxed">
+                                            Điểm trung bình có xu hướng tăng nhẹ so với tuần trước.
+                                            Tuy nhiên, lớp <strong>10A2</strong> có tỉ lệ nộp bài thấp (65%).
+                                            Thầy nên nhắc nhở trước bài kiểm tra sắp tới.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Classes Quick List */}
+                            {classes.length > 0 && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {classes.slice(0, 4).map(cls => (
+                                        <div key={cls.id} className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-between hover:border-indigo-200 transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/classes/${cls.id}`)}>
+                                            <div>
+                                                <div className="font-bold text-gray-900">{cls.name}</div>
+                                                <div className="text-xs text-gray-500">{cls.studentCount || 0} học sinh • {cls.code}</div>
+                                            </div>
+                                            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                                                <Users className="w-4 h-4" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
-                        <Link href="/dashboard/activity">
-                            <button className="w-full mt-4 text-xs text-center text-muted-foreground hover:text-primary transition-colors">
-                                Xem tất cả hoạt động
-                            </button>
-                        </Link>
-                    </div>
 
-                    {/* System Status / Quick Info */}
-                    <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-xl p-6">
-                        <h3 className="font-semibold mb-2 text-primary">Mẹo giảng dạy</h3>
-                        <p className="text-sm text-muted-foreground mb-4">
-                            Sử dụng tính năng "Đính kèm file" để cung cấp tài liệu tham khảo cho học sinh giúp cải thiện chất lượng bài làm.
-                        </p>
-                        <button
-                            onClick={() => setIsCreateClassModalOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                        >
-                            <Plus className="w-4 h-4" />
-                            <span>Tạo lớp học</span>
-                        </button>
+                        {/* Right Sidebar: Timeline & Alerts */}
+                        <div className="space-y-6">
+                            {/* Students At Risk */}
+                            {dashboardAnalytics.atRiskStudents.length > 0 && (
+                                <AtRiskWidget students={dashboardAnalytics.atRiskStudents} classId="all" />
+                            )}
+
+                            {/* Upcoming Timeline */}
+                            <UpcomingWidget deadlines={dashboardAnalytics.upcomingDeadlines} classId="all" />
+                        </div>
                     </div>
-                </div>
-            </div>
+                </motion.div>
+            )}
 
             {/* Modals */}
-            <CreateClassModal
-                isOpen={isCreateClassModalOpen}
-                onClose={() => setIsCreateClassModalOpen(false)}
-                onSuccess={() => {
-                    // Refresh data
-                    const loadData = async () => {
-                        const [classesData, studentsData] = await Promise.all([
-                            DataService.getClasses(user.id),
-                            DataService.getStudents(user.id)
-                        ]);
-                        setClasses(classesData);
-                        setStudents(studentsData);
-                    };
-                    loadData();
-                }}
-                userId={user.id}
+            <ClassCreatorModal
+                isOpen={showClassModal}
+                onClose={() => setShowClassModal(false)}
+                onSuccess={refreshData}
+            />
+            <AssignmentCreatorModal
+                isOpen={showAssignmentModal}
+                onClose={() => setShowAssignmentModal(false)}
+                onSuccess={refreshData}
             />
         </div>
     );
 }
 
-function StatCard({ title, value, icon, description, trend, highlight }: { title: string, value: string, icon: React.ReactNode, description?: string, trend?: string, highlight?: boolean }) {
-    return (
-        <div className={`bg-card p-6 rounded-xl border shadow-sm ${highlight ? 'border-orange-200 bg-orange-50/50' : 'border-border'}`}>
-            <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-muted-foreground">{title}</span>
-                {icon}
-            </div>
-            <div className="flex items-baseline gap-2">
-                <div className="text-2xl font-bold">{value}</div>
-                {trend && <span className="text-xs text-green-600 font-medium">{trend}</span>}
-            </div>
-            {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
-        </div>
-    );
-}
+// Helper icon
+import { Zap } from "lucide-react";

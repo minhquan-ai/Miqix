@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Bell, Lock, LogOut, Moon, Shield, Smartphone, Database, RefreshCw } from "lucide-react";
+import { logout } from "@/lib/auth-actions";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
 
@@ -26,9 +27,8 @@ export default function SettingsPage() {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('userRole');
-        router.push('/login');
+    const handleLogout = async () => {
+        await logout();
     };
 
     return (

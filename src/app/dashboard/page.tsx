@@ -2,49 +2,35 @@
 
 import { useEffect, useState } from "react";
 import { DataService } from "@/lib/data";
-import { Assignment, Submission, User } from "@/types";
+import { getCurrentUserAction } from "@/lib/actions";
+import { User } from "@/types";
 import { StudentDashboard } from "@/components/features/StudentDashboard";
 import { TeacherDashboard } from "@/components/features/TeacherDashboard";
-
 import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { StudentAnalytics } from "@/lib/student-analytics";
+import { ClassAnalytics } from "@/lib/class-analytics";
+
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [studentAnalytics, setStudentAnalytics] = useState<StudentAnalytics | null>(null);
+  const [teacherAnalytics, setTeacherAnalytics] = useState<ClassAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const currentUser = await DataService.getCurrentUser();
+        const currentUser = await getCurrentUserAction();
         setUser(currentUser);
 
-        // Load assignments based on role
-        const classId = currentUser.role === 'student' ? currentUser.classId : undefined;
-        const classAssignments = await DataService.getAssignments(classId);
-        setAssignments(classAssignments);
+        if (!currentUser) return;
 
-        // Load student's submissions if student role
         if (currentUser.role === 'student') {
-          const allSubmissions: Submission[] = [];
-          for (const assignment of classAssignments) {
-            const submission = await DataService.getStudentSubmission(assignment.id, currentUser.id);
-            if (submission) {
-              allSubmissions.push(submission);
-            }
-          }
-          setSubmissions(allSubmissions);
+          const analytics = await DataService.getStudentDashboardAnalytics();
+          setStudentAnalytics(analytics as any);
         } else if (currentUser.role === 'teacher') {
-          // For teacher, load ALL submissions for these assignments to calculate stats
-          const allSubmissions: Submission[] = [];
-          for (const assignment of classAssignments) {
-            const assignmentSubmissions = await DataService.getSubmissionsByAssignmentId(assignment.id);
-            allSubmissions.push(...assignmentSubmissions);
-          }
-          setSubmissions(allSubmissions);
-
-
+          const analytics = await DataService.getTeacherDashboardAnalytics();
+          setTeacherAnalytics(analytics);
         }
 
       } catch (error) {
@@ -64,10 +50,12 @@ export default function DashboardPage() {
 
   return (
     <>
-      {user.role === 'teacher' ? (
-        <TeacherDashboard user={user} assignments={assignments} submissions={submissions} />
+      {user.role === 'teacher' && teacherAnalytics ? (
+        <TeacherDashboard user={user} analytics={teacherAnalytics} />
+      ) : user.role === 'student' && studentAnalytics ? (
+        <StudentDashboard user={user} analytics={studentAnalytics} />
       ) : (
-        <StudentDashboard user={user} assignments={assignments} submissions={submissions} />
+        <div className="text-center py-20">Không thể tải dữ liệu bảng điều khiển.</div>
       )}
     </>
   );

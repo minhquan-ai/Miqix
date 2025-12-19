@@ -1,33 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, ArrowRight, Loader2, GraduationCap } from "lucide-react";
-import { DataService } from "@/lib/data";
+import { Mail, Lock, ArrowRight, Loader2, GraduationCap, AlertCircle } from "lucide-react";
+import { authenticate } from "@/lib/auth-actions";
 
 export default function LoginPage() {
-    const router = useRouter();
+    const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-
-        try {
-            // Simulate login based on email
-            // In a real app, this would be handled by the backend
-            const role = email.includes("teacher") ? "teacher" : "student";
-            await DataService.login(role);
-            router.push("/dashboard");
-        } catch (error) {
-            console.error("Login failed", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-muted/20 p-4">
@@ -40,13 +22,14 @@ export default function LoginPage() {
                     <p className="text-muted-foreground mt-2">Chào mừng bạn quay trở lại với Ergonix</p>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form action={formAction} className="space-y-4">
                     <div className="space-y-2">
                         <label className="text-sm font-medium" htmlFor="email">Email</label>
                         <div className="relative">
                             <Mail className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
                             <input
                                 id="email"
+                                name="email"
                                 type="email"
                                 placeholder="name@example.com"
                                 className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -65,6 +48,7 @@ export default function LoginPage() {
                             <Lock className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
                             <input
                                 id="password"
+                                name="password"
                                 type="password"
                                 className="w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                 value={password}
@@ -74,13 +58,20 @@ export default function LoginPage() {
                         </div>
                     </div>
 
+                    {errorMessage && (
+                        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                            <AlertCircle className="w-4 h-4" />
+                            <p>{errorMessage}</p>
+                        </div>
+                    )}
+
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={isPending}
                         className="w-full bg-primary text-primary-foreground py-2 rounded-md font-medium hover:bg-primary/90 transition-colors mt-2 flex items-center justify-center gap-2"
                     >
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Đăng nhập"}
-                        {!loading && <ArrowRight className="w-4 h-4" />}
+                        {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Đăng nhập"}
+                        {!isPending && <ArrowRight className="w-4 h-4" />}
                     </button>
                 </form>
 
@@ -96,19 +87,19 @@ export default function LoginPage() {
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             type="button"
-                            onClick={() => { setEmail("student@ergonix.com"); setPassword("123456"); }}
+                            onClick={() => { setEmail("student.c_10a1.0@school.edu"); setPassword("123456"); }}
                             className="flex flex-col items-center justify-center p-3 rounded-lg border border-border bg-secondary/50 hover:bg-secondary hover:border-primary/50 transition-all"
                         >
                             <span className="text-sm font-bold text-secondary-foreground">Học sinh</span>
-                            <span className="text-[10px] text-muted-foreground">student@ergonix.com</span>
+                            <span className="text-[10px] text-muted-foreground w-full truncate px-1">student.c_10a1.0@school.edu</span>
                         </button>
                         <button
                             type="button"
-                            onClick={() => { setEmail("teacher@ergonix.com"); setPassword("123456"); }}
+                            onClick={() => { setEmail("hanh@school.edu"); setPassword("123456"); }}
                             className="flex flex-col items-center justify-center p-3 rounded-lg border border-border bg-indigo-50 hover:bg-indigo-100 hover:border-indigo-200 transition-all"
                         >
                             <span className="text-sm font-bold text-indigo-700">Giáo viên</span>
-                            <span className="text-[10px] text-indigo-600/80">teacher@ergonix.com</span>
+                            <span className="text-[10px] text-indigo-600/80 w-full truncate px-1">hanh@school.edu</span>
                         </button>
                     </div>
                 </div>

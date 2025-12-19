@@ -33,7 +33,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 
     async function loadNotifications() {
         try {
-            const data = await DataService.getNotifications(userId);
+            const data = await DataService.getNotifications();
             setNotifications(data);
             setUnreadCount(data.filter(n => !n.isRead).length);
         } catch (error) {
@@ -43,10 +43,17 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 
     const handleNotificationClick = async (notification: Notification) => {
         if (!notification.isRead) {
-            await DataService.markNotificationAsRead(notification.id);
-            // Optimistic update
+            // Optimistic update while waiting for server confirmation
             setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, isRead: true } : n));
             setUnreadCount(prev => Math.max(0, prev - 1));
+
+            try {
+                await DataService.markNotificationAsRead(notification.id);
+            } catch (error) {
+                console.error("Failed to mark notification as read", error);
+            } finally {
+                await loadNotifications();
+            }
         }
 
         setIsOpen(false);

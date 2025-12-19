@@ -31,13 +31,13 @@ export function ClassCard({ classData, averageScore = 0, activeAssignments = 0 }
                         <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
                             <Users className="w-3 h-3" /> Sĩ số
                         </div>
-                        <div className="font-semibold">--</div>
+                        <div className="font-semibold">{classData.studentCount ?? "--"}</div>
                     </div>
                     <div className="text-center border-l border-border">
                         <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
                             <BookOpen className="w-3 h-3" /> Bài tập
                         </div>
-                        <div className="font-semibold">{activeAssignments}</div>
+                        <div className="font-semibold">{classData.activeAssignments ?? activeAssignments}</div>
                     </div>
                     <div className="text-center border-l border-border">
                         <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">

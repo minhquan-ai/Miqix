@@ -1,0 +1,34 @@
+t=2025-12-19T04:49:31+0700 lvl=info msg="no configuration paths supplied"
+t=2025-12-19T04:49:31+0700 lvl=info msg="using configuration at default config path" path="/Users/minhquan/Library/Application Support/ngrok/ngrok.yml"
+t=2025-12-19T04:49:31+0700 lvl=info msg="open config file" path="/Users/minhquan/Library/Application Support/ngrok/ngrok.yml" err=nil
+t=2025-12-19T04:49:31+0700 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+t=2025-12-19T04:49:32+0700 lvl=info msg="update available" obj=updater
+t=2025-12-19T04:49:32+0700 lvl=info msg="client session established" obj=tunnels.session
+t=2025-12-19T04:49:32+0700 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-12-19T04:49:32+0700 lvl=info msg="started tunnel" obj=tunnels name=command_line addr=http://localhost:3000 url=https://superparliamentary-labyrinthically-lucienne.ngrok-free.dev
+t=2025-12-19T07:22:00+0700 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=a6d3aea5cbcb err="read tcp [2606:4700:110:8e3f:ca47:867b:f47e:19ab]:62779->[2406:da18:27f:c800:5b25:8a0b:c732:c95f]:443: read: operation timed out"
+t=2025-12-19T07:37:27+0700 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=3311689eecc6 clientid=d54f33aad83bececc5c89d84304a8073
+t=2025-12-19T07:37:28+0700 lvl=info msg="client session established" obj=tunnels.session
+t=2025-12-19T07:37:28+0700 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-12-19T08:11:43+0700 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=47edc192fc7c clientid=d54f33aad83bececc5c89d84304a8073
+t=2025-12-19T08:11:43+0700 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=a6d3aea5cbcb err="session closed"
+t=2025-12-19T08:11:43+0700 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp 122.248.247.123:443: connect: connection refused"
+t=2025-12-19T08:26:54+0700 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to send authentication request: failed to fetch CRL. errors encountered: timed out fetching CRL"
+t=2025-12-19T08:27:07+0700 lvl=info msg="client session established" obj=tunnels.session
+t=2025-12-19T08:27:07+0700 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-12-19T08:58:58+0700 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=a6d3aea5cbcb err="read tcp [2606:4700:110:8e3f:ca47:867b:f47e:19ab]:65403->[2406:da14:540:e900:fefd:b5d:f310:acd5]:443: read: connection reset by peer"
+t=2025-12-19T08:59:00+0700 lvl=info msg="client session established" obj=tunnels.session
+t=2025-12-19T08:59:00+0700 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-12-19T09:31:53+0700 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=e9760e6eda8e clientid=d54f33aad83bececc5c89d84304a8073
+t=2025-12-19T09:46:59+0700 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=a6d3aea5cbcb err="read tcp 172.16.0.2:49216->18.177.245.43:443: read: operation timed out"
+t=2025-12-19T09:59:58+0700 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=691a68390be9 clientid=d54f33aad83bececc5c89d84304a8073
+t=2025-12-19T10:00:03+0700 lvl=info msg="client session established" obj=tunnels.session
+t=2025-12-19T10:00:03+0700 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-12-19T10:15:34+0700 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=a6d3aea5cbcb err="read tcp [2606:4700:110:8e3f:ca47:867b:f47e:19ab]:49583->[2406:da18:27f:c801:65ad:b035:643d:590f]:443: read: connection reset by peer"
+t=2025-12-19T10:15:42+0700 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to send authentication request: failed to fetch CRL. errors encountered: Get \"http://crl.ngrok-agent.com/ngrok.crl\": dial tcp 108.157.14.103:80: connect: connection refused"
+t=2025-12-19T10:33:09+0700 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=1aad7274d3c8 clientid=d54f33aad83bececc5c89d84304a8073
+t=2025-12-19T11:23:22+0700 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=05a5c09e4acf
+t=2025-12-19T11:23:22+0700 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to send authentication request: session closed"
+t=2025-12-19T11:23:33+0700 lvl=eror msg="failed to reconnect session" obj=tunnels.session err="failed to dial ngrok server with address \"connect.ngrok-agent.com:443\": dial tcp [2406:da18:27f:c800:eda3:909a:b688:ce9c]:443: i/o timeout"
+t=2025-12-19T11:23:41+0700 lvl=info msg="client session established" obj=tunnels.session
+t=2025-12-19T11:23:41+0700 lvl=info msg="tunnel session started" obj=tunnels.session

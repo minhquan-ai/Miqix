@@ -1,12 +1,5 @@
 export type UserRole = 'teacher' | 'student';
 
-export interface Badge {
-    id: string;
-    name: string;
-    icon: string; // Emoji or icon name
-    description: string;
-    earnedAt: string;
-}
 
 export interface User {
     id: string;
@@ -16,11 +9,6 @@ export interface User {
     avatarUrl?: string;
     // Student specific
     classId?: string;
-    xp?: number;
-    level?: number;
-    streak?: number;
-    lastSubmissionDate?: string; // ISO date string for streak tracking
-    badges?: Badge[];
     // Teacher specific
     subjects?: string[];
 }
@@ -34,6 +22,19 @@ export interface Class {
     schedule: string;
     avatar: string;
     code: string; // Unique 6-char code for joining
+    role?: 'main' | 'extra'; // Added role
+    grade?: string; // Added grade
+    stream?: string; // Added stream (Phân ban)
+    color?: string;
+    classType?: string;
+    maxStudents?: number;
+    codeEnabled?: boolean;
+    isPinned?: boolean;
+    pinnedAt?: Date | string; // Added for sorting
+    studentCount?: number;
+    activeAssignments?: number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface FileAttachment {
@@ -45,6 +46,20 @@ export interface FileAttachment {
     uploadedAt: string;
 }
 
+export interface RubricItem {
+    id: string;
+    criteria: string; // e.g., "Sáng tạo"
+    description: string; // e.g., "Bài làm có ý tưởng mới lạ..."
+    maxPoints: number; // e.g., 2.5
+}
+
+export interface AISettings {
+    enabled: boolean;
+    model: 'gpt-4o' | 'gemini-pro' | 'mock';
+    tone: 'encouraging' | 'neutral' | 'strict';
+    language: 'vi' | 'en';
+}
+
 export interface Assignment {
     id: string;
     title: string;
@@ -53,11 +68,13 @@ export interface Assignment {
     teacherId: string;
     classIds: string[]; // Changed from classId to support multiple classes
     type: 'exercise' | 'test' | 'project';
-    xpReward: number;
     status: 'draft' | 'open' | 'closed';
     subject?: string; // Môn học (Toán, Lý, Hóa...)
     attachments?: FileAttachment[]; // Teacher-uploaded files
     maxScore?: number; // Grading scale (e.g., 10, 100)
+    rubric?: RubricItem[];
+    aiSettings?: AISettings;
+    isPhysical?: boolean; // New field for physical/paper-based assignments
 }
 
 export interface Submission {
@@ -86,7 +103,7 @@ export interface Submission {
 export interface Notification {
     id: string;
     userId: string;
-    type: 'academic' | 'gamification' | 'system';
+    type: 'academic' | 'system';
     title: string;
     message: string;
     link?: string;
@@ -107,7 +124,6 @@ export interface Mission {
     dueDate?: string;
     status: 'pending' | 'in_progress' | 'completed';
     completedAt?: string;
-    xpReward?: number; // Only for students
     progress?: {
         current: number;
         total: number;
@@ -123,3 +139,78 @@ export interface AIHint {
     createdAt: string;
 }
 
+export interface Reaction {
+    userId: string;
+    type: 'respect' | 'challenge';
+}
+
+export interface SocialEvent {
+    id: string;
+    type: 'help_request' | 'submission';
+    userId: string;
+    userName?: string;
+    userAvatar?: string;
+    content: string;
+    timestamp: string;
+    reactions: Reaction[];
+    classId: string;
+}
+
+export interface AttendanceRecord {
+    id: string;
+    sessionId: string;
+    studentId: string;
+    studentName?: string; // For UI convenience
+    status: 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED';
+    note?: string;
+}
+
+export interface ClassSession {
+    id: string;
+    classId: string;
+    teacherId: string;
+    teacherName?: string;
+    date: string; // ISO Date
+    period: number;
+    subject?: string;
+    lessonContent?: string;
+    note?: string;
+    classification?: 'A' | 'B' | 'C' | 'D'; // Tốt, Khá, Trung bình, Yếu
+    attendanceRecords?: AttendanceRecord[];
+    createdAt: string;
+}
+
+export interface Comment {
+    id: string;
+    userId: string;
+    userName: string;
+    userAvatar?: string;
+    content: string;
+    createdAt: string;
+}
+
+export interface Announcement {
+    id: string;
+    classId: string;
+    teacherId: string;
+    teacherName: string;
+    teacherAvatar?: string;
+    content: string;
+    title?: string;
+    isPinned: boolean;
+    createdAt: string;
+    updatedAt: string;
+    type: 'normal' | 'urgent' | 'event' | 'important';
+    reactions: Reaction[];
+    comments: Comment[];
+}
+
+export interface Todo {
+    id: string;
+    userId: string;
+    content: string;
+    completed: boolean;
+    dueDate?: string;
+    priority?: 'low' | 'medium' | 'high';
+    createdAt: string;
+}
