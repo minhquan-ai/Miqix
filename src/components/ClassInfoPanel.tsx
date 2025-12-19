@@ -351,15 +351,6 @@ export default function ClassInfoPanel({
     const [saving, setSaving] = useState(false);
     const [activeSubPanel, setActiveSubPanel] = useState<SubPanelType>(null);
 
-    useEffect(() => {
-        if (isOpen && classId) {
-            loadClassInfo();
-        }
-        if (!isOpen) {
-            setActiveSubPanel(null);
-        }
-    }, [isOpen, classId]);
-
     const loadClassInfo = async () => {
         setLoading(true);
         console.log("ClassInfoPanel: Loading class info for", classId, "user", currentUserId);
@@ -372,6 +363,16 @@ export default function ClassInfoPanel({
         }
         setLoading(false);
     };
+
+    useEffect(() => {
+        if (isOpen && classId) {
+            loadClassInfo();
+        }
+        if (!isOpen) {
+            setActiveSubPanel(null);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, classId]);
 
     const copyCode = () => {
         if (classInfo?.classInfo.code) {

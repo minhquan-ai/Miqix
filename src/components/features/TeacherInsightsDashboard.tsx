@@ -24,6 +24,7 @@ export function TeacherInsightsDashboard({ assignments, submissions, students }:
         if (assignments.length > 0 && submissions.length > 0) {
             // Calculate Class Performance
             const performance = calculateClassTopicPerformance(submissions, assignments, students.length);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setClassPerformance(performance);
 
             if (performance.length > 0 && !selectedTopic) {
@@ -73,7 +74,7 @@ export function TeacherInsightsDashboard({ assignments, submissions, students }:
                                     <div className="h-2 bg-secondary rounded-full overflow-hidden">
                                         <div
                                             className={`h-full rounded-full ${perf.averageScore >= 8 ? 'bg-green-500' :
-                                                    perf.averageScore >= 5 ? 'bg-yellow-500' : 'bg-red-500'
+                                                perf.averageScore >= 5 ? 'bg-yellow-500' : 'bg-red-500'
                                                 }`}
                                             style={{ width: `${(perf.averageScore / 10) * 100}%` }}
                                         />

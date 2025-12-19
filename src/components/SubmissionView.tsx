@@ -254,7 +254,7 @@ export default function SubmissionView({ assignmentId, submission, currentUser, 
                 <div className="text-4xl font-extrabold text-green-600 dark:text-green-400 mb-4 tracking-tight">{submission.score}<span className="text-xl text-green-600/60 font-medium">/100</span></div>
                 {submission.feedback && (
                     <div className="bg-white/80 dark:bg-black/20 p-4 rounded-xl text-sm text-green-800 dark:text-green-200 italic border border-green-100 dark:border-green-800/50 shadow-sm">
-                        "{submission.feedback}"
+                        &quot;{submission.feedback}&quot;
                     </div>
                 )}
             </div>

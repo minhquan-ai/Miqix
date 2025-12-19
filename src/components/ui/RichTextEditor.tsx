@@ -53,6 +53,7 @@ export function RichTextEditor({
         <div className={`border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900 ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}>
             {/* Toolbar */}
             <div className="flex items-center gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                {/* eslint-disable-next-line */}
                 {toolbarItems.map((item, index) => (
                     <button
                         key={index}

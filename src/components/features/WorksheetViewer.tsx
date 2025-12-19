@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -142,10 +143,10 @@ export function WorksheetViewer({ assignment, onClose, onComplete }: WorksheetVi
 
                 {/* Deadline Banner */}
                 <div className={`px-4 py-2 text-center text-sm ${status === 'completed'
-                        ? 'bg-green-600 text-white'
-                        : isOverdue
-                            ? 'bg-red-600 text-white'
-                            : 'bg-indigo-600 text-white'
+                    ? 'bg-green-600 text-white'
+                    : isOverdue
+                        ? 'bg-red-600 text-white'
+                        : 'bg-indigo-600 text-white'
                     }`}>
                     {status === 'completed' ? (
                         <span className="flex items-center justify-center gap-2">

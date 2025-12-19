@@ -37,8 +37,8 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
 
             if (currentUser.role === 'student') {
                 const submissionData = await DataService.getStudentSubmission(id, currentUser.id);
-                if (submissionData) {
-                    setSubmission(submissionData);
+                if (submissionData && submissionData.length > 0) {
+                    setSubmission(submissionData[0]);
                 }
             }
         } catch (error) {

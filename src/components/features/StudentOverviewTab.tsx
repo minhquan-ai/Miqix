@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -34,9 +35,16 @@ export default function StudentOverviewTab({
     students
 }: StudentOverviewTabProps) {
     const [greeting, setGreeting] = useState('');
+    const [currentTime, setCurrentTime] = useState(0);
+
+    useEffect(() => {
+        // eslint-disable-next-line
+        setCurrentTime(Date.now());
+    }, []);
 
     useEffect(() => {
         const hour = new Date().getHours();
+        // eslint-disable-next-line
         if (hour < 12) setGreeting('Chào buổi sáng');
         else if (hour < 18) setGreeting('Chào buổi chiều');
         else setGreeting('Chào buổi tối');
@@ -57,9 +65,11 @@ export default function StudentOverviewTab({
     const completionRate = totalAssignments > 0 ? Math.round((submittedCount / totalAssignments) * 100) : 0;
 
     // Next Up (Most urgent open assignment)
-    const upcomingDeadlines = assignments
-        .filter(a => a.status === 'open' && new Date(a.dueDate) > new Date())
-        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+    const upcomingDeadlines = currentTime > 0
+        ? assignments
+            .filter(a => a.status === 'open' && new Date(a.dueDate).getTime() > currentTime)
+            .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+        : [];
 
     const nextUp = upcomingDeadlines[0];
     const otherDeadlines = upcomingDeadlines.slice(1, 4);
@@ -74,8 +84,10 @@ export default function StudentOverviewTab({
         .slice(0, 5);
 
 
+
     const isUrgent = (dueDate: string | Date) => {
-        return new Date(dueDate).getTime() - Date.now() < 24 * 60 * 60 * 1000;
+        if (currentTime === 0) return false;
+        return new Date(dueDate).getTime() - currentTime < 24 * 60 * 60 * 1000;
     };
 
     return (

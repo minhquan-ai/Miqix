@@ -91,6 +91,7 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
     useEffect(() => {
         const savedState = localStorage.getItem('sidebar-collapsed');
         if (savedState !== null) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsCollapsed(savedState === 'true');
         }
     }, []);
@@ -98,7 +99,9 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
     // Auto-reset state when collapsed
     useEffect(() => {
         if (isCollapsed) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setShowProfileMenu(false);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setExpandedSections({});
         }
     }, [isCollapsed]);

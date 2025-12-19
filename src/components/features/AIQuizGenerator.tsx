@@ -151,7 +151,7 @@ export function AIQuizGenerator({ onAccept, onCancel }: AIQuizGeneratorProps) {
                     <div>
                         <h3 className="font-semibold text-gray-900">Kết quả từ AI</h3>
                         <p className="text-sm text-gray-500">
-                            {generatedQuestions.length} câu hỏi về <span className="font-medium">"{topic}"</span>
+                            {generatedQuestions.length} câu hỏi về <span className="font-medium">&quot;{topic}&quot;</span>
                         </p>
                     </div>
                 </div>
@@ -192,8 +192,8 @@ export function AIQuizGenerator({ onAccept, onCancel }: AIQuizGeneratorProps) {
                                 <div
                                     key={i}
                                     className={`px-3 py-2 rounded-lg text-sm transition-all ${i === q.correctAnswer
-                                            ? 'bg-green-50 border border-green-200 text-green-800 font-medium'
-                                            : 'bg-gray-50 border border-gray-200 text-gray-700'
+                                        ? 'bg-green-50 border border-green-200 text-green-800 font-medium'
+                                        : 'bg-gray-50 border border-gray-200 text-gray-700'
                                         }`}
                                 >
                                     <span className="text-xs opacity-60 mr-1.5">{String.fromCharCode(65 + i)}.</span>

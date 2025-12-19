@@ -14,7 +14,7 @@ interface AnnouncementComposerProps {
     teacherName?: string;
 }
 
-export default function AnnouncementComposer({ classId, teacherId, onPost, teacherAvatar, teacherName }: AnnouncementComposerProps) {
+export default function AnnouncementComposer({ classId, onPost, teacherAvatar, teacherName }: AnnouncementComposerProps) {
     const [content, setContent] = useState("");
     const [title, setTitle] = useState("");
     const [type, setType] = useState("NORMAL");
@@ -57,7 +57,7 @@ export default function AnnouncementComposer({ classId, teacherId, onPost, teach
             } else {
                 showToast("Lỗi khi đăng thông báo", "error");
             }
-        } catch (error) {
+        } catch (_error) {
             showToast("Có lỗi xảy ra", "error");
         } finally {
             setIsPosting(false);
@@ -90,7 +90,7 @@ export default function AnnouncementComposer({ classId, teacherId, onPost, teach
         { value: 'EVENT', label: 'Sự kiện', icon: <Calendar className="w-3.5 h-3.5" />, color: 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100' },
     ];
 
-    const selectedType = types.find(t => t.value === type);
+    // const selectedType = types.find(t => t.value === type);
 
     // Collapsed state - Beautiful prompt button
     if (!isExpanded) {
@@ -164,8 +164,8 @@ export default function AnnouncementComposer({ classId, teacherId, onPost, teach
                         <button
                             onClick={() => setIsPreview(!isPreview)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${isPreview
-                                    ? 'bg-indigo-600 text-white shadow-sm'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+                                ? 'bg-indigo-600 text-white shadow-sm'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
                                 }`}
                         >
                             {isPreview ? <><Edit2 className="w-3 h-3" /> Viết tiếp</> : <><Eye className="w-3 h-3" /> Xem trước</>}
@@ -246,8 +246,8 @@ export default function AnnouncementComposer({ classId, teacherId, onPost, teach
                                 key={t.value}
                                 onClick={() => setType(t.value)}
                                 className={`px-3 py-1.5 rounded-full text-xs font-medium border flex items-center gap-1.5 transition-all ${type === t.value
-                                        ? `${t.color} ring-2 ring-offset-1 ring-current/20`
-                                        : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                                    ? `${t.color} ring-2 ring-offset-1 ring-current/20`
+                                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
                                     }`}
                             >
                                 {t.icon}

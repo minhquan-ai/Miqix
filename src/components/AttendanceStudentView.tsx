@@ -23,15 +23,14 @@ export default function AttendanceStudentView({ classId, studentId }: Attendance
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
+            const result = await getStudentAttendanceAction(classId, studentId);
+            setData(result);
+            setIsLoading(false);
+        };
         loadData();
     }, [classId, studentId]);
-
-    const loadData = async () => {
-        setIsLoading(true);
-        const result = await getStudentAttendanceAction(classId, studentId);
-        setData(result);
-        setIsLoading(false);
-    };
 
     const getStatusIcon = (status: string) => {
         switch (status) {

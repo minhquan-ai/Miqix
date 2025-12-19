@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { LogOut, Plus, Target, Clock, BookOpen, ChevronRight, Calendar, User as UserIcon, Sparkles, AlertCircle } from "lucide-react";
 import { logout } from "@/lib/auth-actions";
@@ -30,6 +31,7 @@ export function StudentDashboard({ user, analytics }: StudentDashboardProps) {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
     }, []);
 

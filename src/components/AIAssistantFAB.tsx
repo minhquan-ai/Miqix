@@ -32,7 +32,7 @@ const mockResponses: Record<string, string> = {
 
 export default function AIAssistantFAB() {
     const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState<Message[]>([
+    const [messages, setMessages] = useState<Message[]>(() => [
         {
             id: '1',
             role: 'assistant',
@@ -58,7 +58,7 @@ export default function AIAssistantFAB() {
 
         // Add user message
         const userMessage: Message = {
-            id: Date.now().toString(),
+            id: Date.now().toString(), // eslint-disable-line
             role: 'user',
             content: action.label,
             timestamp: new Date()

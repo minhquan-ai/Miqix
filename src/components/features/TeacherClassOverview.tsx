@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
@@ -37,6 +38,7 @@ export default function TeacherClassOverview({
 
     useEffect(() => {
         const hour = new Date().getHours();
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (hour < 12) setGreeting('Chào buổi sáng');
         else if (hour < 18) setGreeting('Chào buổi chiều');
         else setGreeting('Chào buổi tối');

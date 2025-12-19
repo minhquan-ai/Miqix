@@ -9,7 +9,7 @@ import {
     ArrowLeft, BookOpen, Users, Bell, Shield, FileText,
     Megaphone, GraduationCap, Clock, Lock, UserPlus,
     MessageSquare, Paperclip, FolderOpen, Calendar, Mail,
-    Smartphone, ChevronRight, Settings, Palette
+    Smartphone, ChevronRight, Settings
 } from "lucide-react";
 import { DataService } from "@/lib/data";
 import { getCurrentUserAction } from "@/lib/actions";
@@ -42,7 +42,7 @@ export default function ClassSettingsPage() {
     const [saving, setSaving] = useState(false);
     const [currentUserId, setCurrentUserId] = useState<string>("");
     const [activeTab, setActiveTab] = useState<SettingsTab>("general");
-    const [hasChanges, setHasChanges] = useState(false);
+    // const [hasChanges, setHasChanges] = useState(false);
 
     // Basic Info
     const [name, setName] = useState("");
@@ -163,7 +163,7 @@ export default function ClassSettingsPage() {
             }
         }
         loadData();
-    }, [classId]);
+    }, [classId, router, showToast]);
 
     const handleSave = async () => {
         setSaving(true);
@@ -199,8 +199,8 @@ export default function ClassSettingsPage() {
                 gradePostedNotify,
             });
             showToast("Đã lưu cài đặt thành công!", "success");
-            setHasChanges(false);
-        } catch (error) {
+            // setHasChanges(false);
+        } catch (_error) {
             showToast("Có lỗi xảy ra khi lưu", "error");
         } finally {
             setSaving(false);
@@ -385,7 +385,7 @@ export default function ClassSettingsPage() {
                                                 <FormField label="Tên lớp học" required>
                                                     <Input
                                                         value={name}
-                                                        onChange={(e) => { setName(e.target.value); setHasChanges(true); }}
+                                                        onChange={(e) => { setName(e.target.value); /* setHasChanges(true); */ }}
                                                         placeholder="Ví dụ: Toán 10A1"
                                                         className="h-11"
                                                     />
@@ -393,7 +393,7 @@ export default function ClassSettingsPage() {
                                                 <FormField label="Môn học">
                                                     <Input
                                                         value={subject}
-                                                        onChange={(e) => { setSubject(e.target.value); setHasChanges(true); }}
+                                                        onChange={(e) => { setSubject(e.target.value); /* setHasChanges(true); */ }}
                                                         placeholder="Ví dụ: Toán học"
                                                         className="h-11"
                                                     />
@@ -401,7 +401,7 @@ export default function ClassSettingsPage() {
                                                 <FormField label="Mô tả lớp học">
                                                     <textarea
                                                         value={description}
-                                                        onChange={(e) => { setDescription(e.target.value); setHasChanges(true); }}
+                                                        onChange={(e) => { setDescription(e.target.value); /* setHasChanges(true); */ }}
                                                         placeholder="Mô tả về lớp học của bạn..."
                                                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none transition-colors"
                                                         rows={4}
@@ -463,7 +463,7 @@ export default function ClassSettingsPage() {
                                                 <SelectDropdown
                                                     value={announcementPermission}
                                                     options={permissionOptions}
-                                                    onChange={(v) => { setAnnouncementPermission(v); setHasChanges(true); }}
+                                                    onChange={(v) => { setAnnouncementPermission(v); /* setHasChanges(true); */ }}
                                                 />
                                             </SettingItem>
 
@@ -477,7 +477,7 @@ export default function ClassSettingsPage() {
                                                 <SelectDropdown
                                                     value={attachmentPermission}
                                                     options={permissionOptions}
-                                                    onChange={(v) => { setAttachmentPermission(v); setHasChanges(true); }}
+                                                    onChange={(v) => { setAttachmentPermission(v); /* setHasChanges(true); */ }}
                                                 />
                                             </SettingItem>
                                         </div>
@@ -498,7 +498,7 @@ export default function ClassSettingsPage() {
                                                 <Input
                                                     type="number"
                                                     value={defaultMaxScore}
-                                                    onChange={(e) => { setDefaultMaxScore(Number(e.target.value)); setHasChanges(true); }}
+                                                    onChange={(e) => { setDefaultMaxScore(Number(e.target.value)); /* setHasChanges(true); */ }}
                                                     className="w-24 h-10 text-center"
                                                     min={1}
                                                     max={100}
@@ -512,7 +512,7 @@ export default function ClassSettingsPage() {
                                                 title="Cho phép nộp muộn"
                                                 description="Học sinh có thể nộp bài sau deadline"
                                             >
-                                                <Toggle enabled={allowLateSubmission} onChange={(v) => { setAllowLateSubmission(v); setHasChanges(true); }} />
+                                                <Toggle enabled={allowLateSubmission} onChange={(v) => { setAllowLateSubmission(v); /* setHasChanges(true); */ }} />
                                             </SettingItem>
 
                                             {allowLateSubmission && (
@@ -532,7 +532,7 @@ export default function ClassSettingsPage() {
                                                         <Input
                                                             type="number"
                                                             value={latePenaltyPercent}
-                                                            onChange={(e) => { setLatePenaltyPercent(Number(e.target.value)); setHasChanges(true); }}
+                                                            onChange={(e) => { setLatePenaltyPercent(Number(e.target.value)); /* setHasChanges(true); */ }}
                                                             className="w-24 h-10 text-center"
                                                             min={0}
                                                             max={100}
@@ -548,7 +548,7 @@ export default function ClassSettingsPage() {
                                                 title="Nhắc nhở tự động"
                                                 description="Gửi thông báo nhắc nhở trước deadline"
                                             >
-                                                <Toggle enabled={autoReminder} onChange={(v) => { setAutoReminder(v); setHasChanges(true); }} />
+                                                <Toggle enabled={autoReminder} onChange={(v) => { setAutoReminder(v); /* setHasChanges(true); */ }} />
                                             </SettingItem>
 
                                             {autoReminder && (
@@ -567,7 +567,7 @@ export default function ClassSettingsPage() {
                                                         <Input
                                                             type="number"
                                                             value={reminderDaysBefore}
-                                                            onChange={(e) => { setReminderDaysBefore(Number(e.target.value)); setHasChanges(true); }}
+                                                            onChange={(e) => { setReminderDaysBefore(Number(e.target.value)); /* setHasChanges(true); */ }}
                                                             className="w-24 h-10 text-center"
                                                             min={1}
                                                             max={7}
@@ -593,7 +593,7 @@ export default function ClassSettingsPage() {
                                                 <SelectDropdown
                                                     value={resourceUploadPermission}
                                                     options={permissionOptions}
-                                                    onChange={(v) => { setResourceUploadPermission(v); setHasChanges(true); }}
+                                                    onChange={(v) => { setResourceUploadPermission(v); /* setHasChanges(true); */ }}
                                                 />
                                             </SettingItem>
 
@@ -607,7 +607,7 @@ export default function ClassSettingsPage() {
                                                 <Input
                                                     type="number"
                                                     value={maxFileSizeMB}
-                                                    onChange={(e) => { setMaxFileSizeMB(Number(e.target.value)); setHasChanges(true); }}
+                                                    onChange={(e) => { setMaxFileSizeMB(Number(e.target.value)); /* setHasChanges(true); */ }}
                                                     className="w-24 h-10 text-center"
                                                     min={1}
                                                     max={500}
@@ -629,7 +629,7 @@ export default function ClassSettingsPage() {
                                                     title="Yêu cầu phê duyệt"
                                                     description="Giáo viên phải phê duyệt khi học sinh tham gia"
                                                 >
-                                                    <Toggle enabled={requireApproval} onChange={(v) => { setRequireApproval(v); setHasChanges(true); }} />
+                                                    <Toggle enabled={requireApproval} onChange={(v) => { setRequireApproval(v); /* setHasChanges(true); */ }} />
                                                 </SettingItem>
 
                                                 <SettingItem
@@ -639,7 +639,7 @@ export default function ClassSettingsPage() {
                                                     title="Cho phép mã tham gia"
                                                     description="Học sinh có thể tham gia bằng mã lớp"
                                                 >
-                                                    <Toggle enabled={codeEnabled} onChange={(v) => { setCodeEnabled(v); setHasChanges(true); }} />
+                                                    <Toggle enabled={codeEnabled} onChange={(v) => { setCodeEnabled(v); /* setHasChanges(true); */ }} />
                                                 </SettingItem>
 
                                                 <SettingItem
@@ -649,7 +649,7 @@ export default function ClassSettingsPage() {
                                                     title="Hiển thị danh sách lớp"
                                                     description="Học sinh có thể xem danh sách các bạn trong lớp"
                                                 >
-                                                    <Toggle enabled={allowStudentDirectory} onChange={(v) => { setAllowStudentDirectory(v); setHasChanges(true); }} />
+                                                    <Toggle enabled={allowStudentDirectory} onChange={(v) => { setAllowStudentDirectory(v); /* setHasChanges(true); */ }} />
                                                 </SettingItem>
                                             </div>
                                         </SettingsCard>
@@ -689,7 +689,7 @@ export default function ClassSettingsPage() {
                                                 title="Ẩn điểm với học sinh"
                                                 description="Học sinh không thể xem điểm cho đến khi bạn công bố"
                                             >
-                                                <Toggle enabled={hideGradesFromStudents} onChange={(v) => { setHideGradesFromStudents(v); setHasChanges(true); }} />
+                                                <Toggle enabled={hideGradesFromStudents} onChange={(v) => { setHideGradesFromStudents(v); /* setHasChanges(true); */ }} />
                                             </SettingItem>
 
                                             <SettingItem
@@ -699,7 +699,7 @@ export default function ClassSettingsPage() {
                                                 title="Hiển thị thống kê điểm"
                                                 description="Học sinh có thể xem điểm trung bình, cao nhất, thấp nhất"
                                             >
-                                                <Toggle enabled={showGradeStatistics} onChange={(v) => { setShowGradeStatistics(v); setHasChanges(true); }} />
+                                                <Toggle enabled={showGradeStatistics} onChange={(v) => { setShowGradeStatistics(v); /* setHasChanges(true); */ }} />
                                             </SettingItem>
                                         </div>
                                     </SettingsCard>
@@ -717,7 +717,7 @@ export default function ClassSettingsPage() {
                                                     title="Thông báo Email"
                                                     description="Gửi thông báo qua email cho học sinh"
                                                 >
-                                                    <Toggle enabled={emailNotifications} onChange={(v) => { setEmailNotifications(v); setHasChanges(true); }} />
+                                                    <Toggle enabled={emailNotifications} onChange={(v) => { setEmailNotifications(v); /* setHasChanges(true); */ }} />
                                                 </SettingItem>
 
                                                 <SettingItem
@@ -727,7 +727,7 @@ export default function ClassSettingsPage() {
                                                     title="Thông báo đẩy"
                                                     description="Gửi thông báo đẩy trên ứng dụng"
                                                 >
-                                                    <Toggle enabled={pushNotifications} onChange={(v) => { setPushNotifications(v); setHasChanges(true); }} />
+                                                    <Toggle enabled={pushNotifications} onChange={(v) => { setPushNotifications(v); /* setHasChanges(true); */ }} />
                                                 </SettingItem>
                                             </div>
                                         </SettingsCard>
@@ -741,7 +741,7 @@ export default function ClassSettingsPage() {
                                                     title="Thông báo mới"
                                                     description="Khi có thông báo mới trên bảng tin"
                                                 >
-                                                    <Toggle enabled={newAnnouncementNotify} onChange={(v) => { setNewAnnouncementNotify(v); setHasChanges(true); }} />
+                                                    <Toggle enabled={newAnnouncementNotify} onChange={(v) => { setNewAnnouncementNotify(v); /* setHasChanges(true); */ }} />
                                                 </SettingItem>
 
                                                 <SettingItem
@@ -751,7 +751,7 @@ export default function ClassSettingsPage() {
                                                     title="Bài tập mới"
                                                     description="Khi có bài tập mới được giao"
                                                 >
-                                                    <Toggle enabled={newAssignmentNotify} onChange={(v) => { setNewAssignmentNotify(v); setHasChanges(true); }} />
+                                                    <Toggle enabled={newAssignmentNotify} onChange={(v) => { setNewAssignmentNotify(v); /* setHasChanges(true); */ }} />
                                                 </SettingItem>
 
                                                 <SettingItem
@@ -761,7 +761,7 @@ export default function ClassSettingsPage() {
                                                     title="Nhắc deadline"
                                                     description="Nhắc nhở trước khi bài tập hết hạn"
                                                 >
-                                                    <Toggle enabled={deadlineReminderNotify} onChange={(v) => { setDeadlineReminderNotify(v); setHasChanges(true); }} />
+                                                    <Toggle enabled={deadlineReminderNotify} onChange={(v) => { setDeadlineReminderNotify(v); /* setHasChanges(true); */ }} />
                                                 </SettingItem>
 
                                                 <SettingItem
@@ -771,7 +771,7 @@ export default function ClassSettingsPage() {
                                                     title="Điểm được công bố"
                                                     description="Khi giáo viên chấm điểm bài tập"
                                                 >
-                                                    <Toggle enabled={gradePostedNotify} onChange={(v) => { setGradePostedNotify(v); setHasChanges(true); }} />
+                                                    <Toggle enabled={gradePostedNotify} onChange={(v) => { setGradePostedNotify(v); /* setHasChanges(true); */ }} />
                                                 </SettingItem>
                                             </div>
                                         </SettingsCard>
@@ -843,7 +843,7 @@ export default function ClassSettingsPage() {
                             <DialogTitle className="text-red-900">Xác nhận xóa lớp học</DialogTitle>
                         </div>
                         <DialogDescription className="text-gray-600">
-                            Để xác nhận, vui lòng nhập tên lớp học <span className="font-semibold text-gray-900">"{name}"</span> vào ô bên dưới.
+                            Để xác nhận, vui lòng nhập tên lớp học <span className="font-semibold text-gray-900">&quot;{name}&quot;</span> vào ô bên dưới.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="py-4">

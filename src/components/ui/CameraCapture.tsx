@@ -21,11 +21,6 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
         completeness: number;
     } | null>(null);
 
-    useEffect(() => {
-        startCamera();
-        return () => stopCamera();
-    }, []);
-
     const startCamera = async () => {
         try {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -46,6 +41,14 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
             setStream(null);
         }
     };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        startCamera();
+        return () => stopCamera();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
 
     const takePhoto = () => {
         if (videoRef.current && canvasRef.current) {

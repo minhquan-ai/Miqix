@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Download, Search, Filter, MoreVertical, FileSpreadsheet, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -22,11 +22,7 @@ export default function GradebookPage() {
     } | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => {
-        loadData();
-    }, [classId]);
-
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         setLoading(true);
         const result = await getClassGradesAction(classId);
         if (result.success && result.data) {
@@ -35,7 +31,11 @@ export default function GradebookPage() {
             showToast(result.message || "Lỗi tải dữ liệu", "error");
         }
         setLoading(false);
-    };
+    }, [classId, showToast]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     const handleExport = () => {
         if (!data) return;
@@ -208,7 +208,7 @@ export default function GradebookPage() {
                                                                 }
                                                             }}
                                                             className={`w-12 text-center border rounded p-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 ${submission?.grade !== undefined && submission.grade >= 5 ? 'text-green-600 font-medium' :
-                                                                    submission?.grade !== undefined ? 'text-red-600 font-medium' : 'text-gray-500'
+                                                                submission?.grade !== undefined ? 'text-red-600 font-medium' : 'text-gray-500'
                                                                 }`}
                                                         />
                                                         {submission?.submittedAt && (

@@ -30,14 +30,14 @@ export const GroqService = {
         }
     },
 
-    async analyzeClassPerformance(data: any) {
+    async analyzeClassPerformance(data: { className: string, averageScore: number, submissionRate: number, atRiskStudents: string[] | number, recentAssignments: { title: string, avgScore: number }[] }) {
         const systemPrompt = "Bạn là trợ lý AI cho giáo viên. Phân tích dữ liệu lớp học và trả về JSON.";
         const prompt = `
 Lớp: ${data.className}
 Điểm trung bình: ${data.averageScore}/10
 Tỉ lệ nộp bài: ${data.submissionRate}%
 Học sinh cần chú ý: ${data.atRiskStudents}
-Bài tập gần đây: ${data.recentAssignments.map((a: any) => `- ${a.title}: ${a.avgScore}/10`).join('\n')}
+Bài tập gần đây: ${data.recentAssignments.map((a: { title: string, avgScore: number }) => `- ${a.title}: ${a.avgScore}/10`).join('\n')}
 
 Trả về JSON format:
 {

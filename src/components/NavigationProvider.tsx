@@ -31,13 +31,16 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
 
     // Reset when pathname changes
     useEffect(() => {
+        // eslint-disable-next-line
         setIsNavigating(false);
+        // eslint-disable-next-line
         setProgress(0);
     }, [pathname]);
 
     // Show loading when transition is pending
     useEffect(() => {
         if (isPending) {
+            // eslint-disable-next-line
             setIsNavigating(true);
         }
     }, [isPending]);

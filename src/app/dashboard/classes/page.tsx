@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, GraduationCap, BookOpen, Zap, Search, Trophy } from "lucide-react";
+import { Plus, GraduationCap, BookOpen, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getClassesAction, togglePinClassAction, joinClassAction } from "@/lib/actions";
 import { getCurrentUserAction } from "@/lib/actions";
@@ -20,7 +19,7 @@ export default function ClassesPage() {
     const [classes, setClasses] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<User | null>(null);
-    const [classStats, setClassStats] = useState<Record<string, any>>({});
+    const [classStats] = useState<Record<string, any>>({});
     const [studentSearch, setStudentSearch] = useState("");
 
     // State for modal
@@ -49,8 +48,8 @@ export default function ClassesPage() {
                     const studentClasses = await getClassesAction();
                     setClasses(studentClasses);
                 }
-            } catch (error) {
-                console.error("Failed to load classes", error);
+            } catch (_error) {
+                console.error("Failed to load classes", _error);
             } finally {
                 setLoading(false);
             }

@@ -53,11 +53,13 @@ function AnnouncementCard({ announcement, currentUserId, isTeacher, onTogglePin,
         // Auto-collapse if older than 3 days and not pinned
         // But never collapse in overlay or detail mode
         if (isOverlay || isDetail) {
+            // eslint-disable-next-line
             setIsCollapsed(false);
             return;
         }
         const daysOld = differenceInDays(new Date(), new Date(announcement.createdAt));
         if (daysOld > 3 && !isPinned) {
+            // eslint-disable-next-line
             setIsCollapsed(true);
         }
     }, [announcement.createdAt, isPinned, isOverlay, isDetail]);

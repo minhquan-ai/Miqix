@@ -2,6 +2,7 @@
 
 import { BookOpen, Clock, Star, Users, Bell, Zap, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Class } from "@/types";
 import { formatDistanceToNow } from "date-fns";
@@ -34,9 +35,16 @@ export function ClassCardStudent({ classData, progress }: StudentClassCardProps)
             progressBar: "bg-indigo-500"
         };
 
+    const [currentTime, setCurrentTime] = useState(0);
+
+    useEffect(() => {
+        // eslint-disable-next-line
+        setCurrentTime(Date.now());
+    }, []);
+
     const hasDeadline = progress?.nextDeadline;
-    const isUrgent = hasDeadline
-        ? new Date(progress.nextDeadline!.dueDate).getTime() - Date.now() < 24 * 60 * 60 * 1000
+    const isUrgent = hasDeadline && currentTime > 0
+        ? new Date(progress.nextDeadline!.dueDate).getTime() - currentTime < 24 * 60 * 60 * 1000
         : false;
 
     // Status badge logic
@@ -139,4 +147,3 @@ export function ClassCardStudent({ classData, progress }: StudentClassCardProps)
         </motion.div>
     );
 }
-

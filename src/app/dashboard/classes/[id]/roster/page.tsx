@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { DataService } from "@/lib/data";
 import { getCurrentUserAction, getPendingEnrollmentsAction, approveEnrollmentAction, rejectEnrollmentAction } from "@/lib/actions";
 import { Class, User } from "@/types";
-import { ArrowLeft, Search, UserPlus, Users, Clock, CheckCircle, XCircle, Trash2, Copy, MoreVertical } from "lucide-react";
+import { ArrowLeft, Search, Users, Clock, CheckCircle, XCircle, Trash2, Copy } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/components/ui/Toast";
 import InviteStudentModal from "@/components/InviteStudentModal";
@@ -36,17 +36,9 @@ function RosterContent() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [activeTab, setActiveTab] = useState<'members' | 'pending'>('members');
-    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+    // const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
-    useEffect(() => {
-        const tab = searchParams.get('tab');
-        if (tab === 'pending') {
-            setActiveTab('pending');
-        }
-        loadData();
-    }, [classId, searchParams]);
-
-    async function loadData() {
+    const loadData = useCallback(async () => {
         try {
             setLoading(true);
             const user = await getCurrentUserAction();
@@ -76,13 +68,21 @@ function RosterContent() {
 
             setMembers(enrollments as any);
             setPendingEnrollments(pending as any);
-        } catch (error) {
-            console.error('Failed to load roster:', error);
+        } catch (_error) {
+            console.error('Failed to load roster:', _error);
             showToast('Không thể tải danh sách thành viên', 'error');
         } finally {
             setLoading(false);
         }
-    }
+    }, [classId, router, showToast]);
+
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab === 'pending') {
+            setActiveTab('pending');
+        }
+        loadData();
+    }, [classId, searchParams, loadData]);
 
     async function handleRemoveMember(enrollmentId: string, userName: string) {
         if (!confirm(`Bạn có chắc muốn xóa ${userName} khỏi lớp?`)) {
@@ -93,8 +93,8 @@ function RosterContent() {
             await DataService.removeStudentFromClass(enrollmentId);
             showToast(`Đã xóa ${userName} khỏi lớp`, 'success');
             await loadData(); // Reload
-        } catch (error) {
-            console.error('Failed to remove member:', error);
+        } catch (_error) {
+            console.error('Failed to remove member:', _error);
             showToast('Không thể xóa thành viên', 'error');
         }
     }
@@ -331,7 +331,7 @@ function RosterContent() {
                                                             } else {
                                                                 showToast(result.message, 'error');
                                                             }
-                                                        } catch (error) {
+                                                        } catch (_error) {
                                                             showToast('Không thể chấp nhận học sinh', 'error');
                                                         }
                                                     }}
@@ -352,7 +352,7 @@ function RosterContent() {
                                                             } else {
                                                                 showToast(result.message, 'error');
                                                             }
-                                                        } catch (error) {
+                                                        } catch (_error) {
                                                             showToast('Không thể từ chối yêu cầu', 'error');
                                                         }
                                                     }}

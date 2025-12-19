@@ -46,7 +46,7 @@ export default function RecentFeedbackWidget({ feedback }: RecentFeedbackWidgetP
 
                 <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-700 italic border border-gray-100 relative">
                     <div className="absolute -top-2 left-4 w-4 h-4 bg-gray-50 border-t border-l border-gray-100 transform rotate-45" />
-                    "{feedback.feedback || "Làm tốt lắm!"}"
+                    &quot;{feedback.feedback || "Làm tốt lắm!"}&quot;
                 </div>
             </div>
         </div>

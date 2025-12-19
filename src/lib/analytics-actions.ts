@@ -25,18 +25,8 @@ export async function getStudentDashboardAnalyticsAction(): Promise<StudentAnaly
     });
     const classIds = enrollments.map(e => e.classId);
 
-    // Get assignments for these classes
-    const assignments = await db.assignment.findMany({
-        where: {
-            OR: [
-                { assignmentClasses: { some: { classId: { in: classIds } } } },
-                // Legacy support if needed, but assuming migration to assignmentClasses
-            ],
-            status: 'open' // Only care about open assignments for pending? Or all for stats?
-            // For stats we need all.
-        },
-        include: { assignmentClasses: { include: { class: true } } }
-    });
+    // Get assignments for these classes - unused in this scope
+    // Removed unused assignment fetch
 
     // Get all assignments (even closed) for stats
     const allAssignments = await db.assignment.findMany({
@@ -158,7 +148,7 @@ export async function getTeacherDashboardAnalyticsAction(): Promise<ClassAnalyti
             id: e.user.id,
             name: e.user.name,
             email: e.user.email,
-            role: e.user.role as any,
+            role: e.user.role as any, // eslint-disable-line @typescript-eslint/no-explicit-any
             avatarUrl: e.user.avatarUrl || undefined
         });
     });

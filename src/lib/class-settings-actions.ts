@@ -139,7 +139,7 @@ export async function updateClassSettingsAction(
 export async function getClassInfoAction(classId: string, userId: string) {
     try {
         // Get class with settings and teacher
-        let classData = await db.class.findUnique({
+        const classData = await db.class.findUnique({
             where: { id: classId },
             include: {
                 teacher: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Calendar, Users, CheckCircle, XCircle, Clock, TrendingUp, Download } from "lucide-react";
 import { motion } from "framer-motion";
@@ -36,11 +36,7 @@ export default function AttendanceHistoryPage() {
     const [studentStats, setStudentStats] = useState<StudentStats[]>([]);
     const [activeTab, setActiveTab] = useState<"sessions" | "students">("sessions");
 
-    useEffect(() => {
-        loadData();
-    }, [classId]);
-
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         setLoading(true);
 
         // Load class info
@@ -57,7 +53,11 @@ export default function AttendanceHistoryPage() {
         }
 
         setLoading(false);
-    };
+    }, [classId]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -163,8 +163,8 @@ export default function AttendanceHistoryPage() {
                         <button
                             onClick={() => setActiveTab("sessions")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === "sessions"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                                ? "bg-blue-600 text-white"
+                                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                                 }`}
                         >
                             Theo buổi học
@@ -172,8 +172,8 @@ export default function AttendanceHistoryPage() {
                         <button
                             onClick={() => setActiveTab("students")}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === "students"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                                ? "bg-blue-600 text-white"
+                                : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                                 }`}
                         >
                             Theo học sinh

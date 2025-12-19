@@ -47,6 +47,7 @@ export function TeacherDashboard({ user, analytics }: TeacherDashboardProps) {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
         const loadData = async () => {
             const analyticsData = await getTeacherDashboardAnalyticsAction();

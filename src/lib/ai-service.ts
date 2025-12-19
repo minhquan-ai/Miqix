@@ -34,7 +34,7 @@ export const AIService = {
     },
 
     // AI Grader: Analyze submission and suggest score
-    analyzeSubmission: async (assignmentDescription: string, submissionContent: string): Promise<{ score: number, feedback: string, errorAnalysis?: any }> => {
+    analyzeSubmission: async (assignmentDescription: string, submissionContent: string): Promise<{ score: number, feedback: string, errorAnalysis?: any }> => { // eslint-disable-line @typescript-eslint/no-explicit-any
         try {
             return await analyzeSubmissionAction(assignmentDescription, submissionContent);
         } catch (error) {

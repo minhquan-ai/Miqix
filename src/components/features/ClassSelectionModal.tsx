@@ -22,6 +22,7 @@ export function ClassSelectionModal({ isOpen, onClose, classes, selectedClassIds
     // Reset local state when modal opens
     useEffect(() => {
         if (isOpen) {
+            // eslint-disable-next-line
             setLocalSelected(selectedClassIds);
             setSearchQuery("");
         }

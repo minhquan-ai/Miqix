@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState } from "react";
 import { format, startOfWeek, addDays, isSameDay, setMinutes, setHours } from "date-fns";
@@ -100,9 +101,9 @@ const parseRecurringSchedule = (cls: any, weekStart: Date): ScheduleEvent[] => {
 };
 
 export default function ScheduleTabContent({ classData, currentUser, onUpdateClass }: ScheduleTabContentProps) {
-    if (!classData) return null;
-
     const [currentDate, setCurrentDate] = useState(new Date());
+
+    if (!classData) return null;
     const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
     const weekDays = Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
 

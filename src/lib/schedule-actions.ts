@@ -2,9 +2,8 @@
 
 import { db } from "@/lib/db";
 import { getCurrentUserAction } from "@/lib/actions";
-import { Class, Assignment, ClassSession } from "@/types";
-import { addDays, startOfWeek, format, parseISO, getDay, setHours, setMinutes } from "date-fns";
-import { vi } from "date-fns/locale";
+import { addDays, startOfWeek, parseISO, setHours, setMinutes } from "date-fns";
+// import { vi } from "date-fns/locale";
 
 export type ScheduleEventType = 'class' | 'assignment' | 'exam' | 'event';
 
@@ -25,16 +24,16 @@ export interface ScheduleEvent {
 }
 
 // Helper to deterministically generate a color or grab from class
-const getEventColor = (classColor?: string, type?: ScheduleEventType) => {
-    if (type === 'assignment') return 'orange';
-    return classColor || 'blue';
-};
+// export const getEventColor = (classColor?: string, type?: ScheduleEventType) => {
+//     if (type === 'assignment') return 'orange';
+//     return classColor || 'blue';
+// };
 
 // Parse schedule string into event objects for a specific week
 // Handles multiple formats:
 // 1. "Thứ 2, 4, 6 (07:00 - 08:30)" - Multi-day with HH:MM
 // 2. JSON object for extra classes: {"extra_xxx": {"dayId": "Mon", "startTime": "17:30", "endTime": "19:00"}}
-const parseRecurringSchedule = (cls: any, weekStart: Date): ScheduleEvent[] => {
+const parseRecurringSchedule = (cls: any, weekStart: Date): ScheduleEvent[] => { // eslint-disable-line @typescript-eslint/no-explicit-any
     const events: ScheduleEvent[] = [];
     if (!cls.schedule) return events;
 
@@ -49,7 +48,7 @@ const parseRecurringSchedule = (cls: any, weekStart: Date): ScheduleEvent[] => {
         if (cls.schedule.startsWith('{')) {
             const jsonSchedule = JSON.parse(cls.schedule);
             for (const [key, slot] of Object.entries(jsonSchedule)) {
-                const s = slot as any;
+                const s = slot as any; // eslint-disable-line @typescript-eslint/no-explicit-any
                 if (s.dayId && s.startTime && s.endTime) {
                     const dayId = s.dayId.toLowerCase().slice(0, 3); // "Tue" -> "tue"
                     const offset = dayMap[dayId];
@@ -80,7 +79,7 @@ const parseRecurringSchedule = (cls: any, weekStart: Date): ScheduleEvent[] => {
             }
             return events;
         }
-    } catch (e) {
+    } catch {
         // Not JSON, continue with string parsing
     }
 

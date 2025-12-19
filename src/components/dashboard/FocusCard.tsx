@@ -81,7 +81,7 @@ export default function FocusCard({ item }: FocusCardProps) {
                             <BrainCircuit className="w-4 h-4" />
                         </div>
                         <p className="text-xs text-indigo-800 italic relative z-10">
-                            "{item.aiInsight}"
+                            &quot;{item.aiInsight}&quot;
                         </p>
                     </div>
                 )}

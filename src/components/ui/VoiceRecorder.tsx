@@ -22,7 +22,7 @@ export function VoiceRecorder({ onRecordingComplete, onDelete, existingAudioUrl 
 
     useEffect(() => {
         if (existingAudioUrl) {
-            setAudioUrl(existingAudioUrl);
+            setAudioUrl(existingAudioUrl); // eslint-disable-line react-hooks/set-state-in-effect
         }
     }, [existingAudioUrl]);
 
@@ -103,8 +103,8 @@ export function VoiceRecorder({ onRecordingComplete, onDelete, existingAudioUrl 
                     <button
                         onClick={isRecording ? stopRecording : startRecording}
                         className={`p-3 rounded-full transition-all ${isRecording
-                                ? 'bg-red-100 text-red-600 animate-pulse'
-                                : 'bg-primary/10 text-primary hover:bg-primary/20'
+                            ? 'bg-red-100 text-red-600 animate-pulse'
+                            : 'bg-primary/10 text-primary hover:bg-primary/20'
                             }`}
                     >
                         {isRecording ? <Square className="w-5 h-5 fill-current" /> : <Mic className="w-5 h-5" />}

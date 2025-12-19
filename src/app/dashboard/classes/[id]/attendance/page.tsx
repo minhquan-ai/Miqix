@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -59,58 +59,58 @@ export default function AttendancePage() {
     const [className, setClassName] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
 
+    const loadData = useCallback(async () => {
+        setLoading(true);
+        try {
+            // 1. Get Class Info & Students
+            const enrollments = await DataService.getClassMembers(classId);
+            const studentList = enrollments.map((e: any) => ({
+                id: e.userId,
+                name: e.user.name,
+                avatarUrl: e.user.avatarUrl,
+                email: e.user.email
+            }));
+            setStudents(studentList);
+
+            // Get class name
+            const cls = await DataService.getClassById(classId);
+            if (cls) setClassName(cls.name);
+
+            // 2. Get existing attendance
+            const session = await getAttendanceSessionAction(classId, date, period);
+            const newAttendance: AttendanceState = {};
+
+            // Initialize defaults
+            studentList.forEach((s: Student) => {
+                newAttendance[s.id] = { status: 'PRESENT', note: '' };
+            });
+
+            // Override with saved data
+            if (session && session.attendanceRecords) {
+                session.attendanceRecords.forEach((r: any) => {
+                    if (newAttendance[r.studentId]) {
+                        newAttendance[r.studentId] = {
+                            status: r.status as AttendanceStatus,
+                            note: r.note || ''
+                        };
+                    }
+                });
+            }
+
+            setAttendance(newAttendance);
+
+        } catch (error) {
+            console.error("Load attendance error:", error);
+            showToast("Không thể tải danh sách học sinh", "error");
+        } finally {
+            setLoading(false);
+        }
+    }, [classId, date, period, showToast]);
+
     // Load students and existing attendance
     useEffect(() => {
-        async function loadData() {
-            setLoading(true);
-            try {
-                // 1. Get Class Info & Students
-                const enrollments = await DataService.getClassMembers(classId);
-                const studentList = enrollments.map((e: any) => ({
-                    id: e.userId,
-                    name: e.user.name,
-                    avatarUrl: e.user.avatarUrl,
-                    email: e.user.email
-                }));
-                setStudents(studentList);
-
-                // Get class name
-                const cls = await DataService.getClassById(classId);
-                if (cls) setClassName(cls.name);
-
-                // 2. Get existing attendance
-                const session = await getAttendanceSessionAction(classId, date, period);
-                const newAttendance: AttendanceState = {};
-
-                // Initialize defaults
-                studentList.forEach((s: Student) => {
-                    newAttendance[s.id] = { status: 'PRESENT', note: '' };
-                });
-
-                // Override with saved data
-                if (session && session.attendanceRecords) {
-                    session.attendanceRecords.forEach((r: any) => {
-                        if (newAttendance[r.studentId]) {
-                            newAttendance[r.studentId] = {
-                                status: r.status as AttendanceStatus,
-                                note: r.note || ''
-                            };
-                        }
-                    });
-                }
-
-                setAttendance(newAttendance);
-
-            } catch (error) {
-                console.error("Load attendance error:", error);
-                showToast("Không thể tải danh sách học sinh", "error");
-            } finally {
-                setLoading(false);
-            }
-        }
-
         loadData();
-    }, [classId, date, period]);
+    }, [loadData]);
 
     const handleStatusChange = (studentId: string, status: AttendanceStatus) => {
         setAttendance(prev => ({

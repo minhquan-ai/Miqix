@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Upload, FileText, Download, Trash2, CheckCircle, AlertCircle, Loader2, FileSpreadsheet, X } from "lucide-react";
+import { Upload, FileText, Download, Trash2, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import Papa from "papaparse";
 import { importStudentsFromCSVAction } from "@/lib/actions";
 import { useToast } from "@/components/ui/Toast";
@@ -91,7 +91,7 @@ export default function CSVImportModal({ isOpen, onClose, classId, onSuccess }: 
             } else {
                 showToast(result.message, "error");
             }
-        } catch (error) {
+        } catch (_error) {
             showToast("Có lỗi xảy ra khi nhập dữ liệu", "error");
         } finally {
             setIsImporting(false);

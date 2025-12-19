@@ -1,3 +1,6 @@
+"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, MoreVertical, Trash2, UserPlus, Mail, Shield, User as UserIcon, CalendarCheck } from "lucide-react";

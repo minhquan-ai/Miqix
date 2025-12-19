@@ -304,7 +304,7 @@ export default function ClassDetailPage() {
                     const mySubmissions: Submission[] = [];
                     for (const assignment of classAssignments) {
                         const sub = await DataService.getStudentSubmission(assignment.id, user.id);
-                        if (sub) mySubmissions.push(sub);
+                        if (sub && sub.length > 0) mySubmissions.push(sub[0]);
                     }
                     setSubmissions(mySubmissions);
 

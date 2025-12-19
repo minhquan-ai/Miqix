@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -57,59 +57,59 @@ export default function AttendanceReportPage() {
     const [loading, setLoading] = useState(true);
     const [className, setClassName] = useState("");
 
-    useEffect(() => {
-        async function loadData() {
-            setLoading(true);
-            try {
-                // 1. Get Class Info & Students
-                const enrollments = await DataService.getClassMembers(classId);
-                const studentList = enrollments.map((e: any) => ({
-                    id: e.userId,
-                    name: e.user.name,
-                    avatarUrl: e.user.avatarUrl,
-                    email: e.user.email
-                })).sort((a: any, b: any) => a.name.localeCompare(b.name));
-                setStudents(studentList);
+    const loadData = useCallback(async () => {
+        setLoading(true);
+        try {
+            // 1. Get Class Info & Students
+            const enrollments = await DataService.getClassMembers(classId);
+            const studentList = enrollments.map((e: any) => ({
+                id: e.userId,
+                name: e.user.name,
+                avatarUrl: e.user.avatarUrl,
+                email: e.user.email
+            })).sort((a: any, b: any) => a.name.localeCompare(b.name));
+            setStudents(studentList);
 
-                const cls = await DataService.getClassById(classId);
-                if (cls) setClassName(cls.name);
+            const cls = await DataService.getClassById(classId);
+            if (cls) setClassName(cls.name);
 
-                // 2. Get Sessions for the month
-                const start = startOfMonth(currentMonth);
-                const end = endOfMonth(currentMonth);
-                const sessions = await getClassSessionsAction(classId, start, end);
+            // 2. Get Sessions for the month
+            const start = startOfMonth(currentMonth);
+            const end = endOfMonth(currentMonth);
+            const sessions = await getClassSessionsAction(classId, start, end);
 
-                // 3. Build Grid Data
-                const grid: AttendanceGrid = {};
+            // 3. Build Grid Data
+            const grid: AttendanceGrid = {};
 
-                // Initialize grid
-                studentList.forEach((s: any) => {
-                    grid[s.id] = {};
+            // Initialize grid
+            studentList.forEach((s: any) => {
+                grid[s.id] = {};
+            });
+
+            sessions.forEach((session: any) => {
+                const dateStr = format(new Date(session.date), 'yyyy-MM-dd');
+                session.attendanceRecords.forEach((record: any) => {
+                    if (grid[record.studentId]) {
+                        grid[record.studentId][dateStr] = {
+                            status: record.status,
+                            note: record.note
+                        };
+                    }
                 });
+            });
 
-                sessions.forEach((session: any) => {
-                    const dateStr = format(new Date(session.date), 'yyyy-MM-dd');
-                    session.attendanceRecords.forEach((record: any) => {
-                        if (grid[record.studentId]) {
-                            grid[record.studentId][dateStr] = {
-                                status: record.status,
-                                note: record.note
-                            };
-                        }
-                    });
-                });
+            setAttendanceData(grid);
 
-                setAttendanceData(grid);
-
-            } catch (error) {
-                console.error("Load report error:", error);
-            } finally {
-                setLoading(false);
-            }
+        } catch (error) {
+            console.error("Load report error:", error);
+        } finally {
+            setLoading(false);
         }
-
-        loadData();
     }, [classId, currentMonth]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     const daysInMonth = eachDayOfInterval({
         start: startOfMonth(currentMonth),

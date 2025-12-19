@@ -6,6 +6,7 @@ import { ClassPerformanceOverview } from "./ClassPerformanceOverview";
 import { AtRiskAlert } from "./AtRiskAlert";
 import { KnowledgeGapHeatMap } from "./KnowledgeGapHeatMap";
 import { User, Submission, Assignment } from "@/types";
+import { getEnhancedAtRiskStudents } from "@/lib/analytics";
 
 interface AnalyticsModalProps {
     users: User[];
@@ -84,10 +85,7 @@ export function AnalyticsModal({
                                 <QuickStat
                                     icon={<AlertTriangle className="w-5 h-5" />}
                                     label="Cần hỗ trợ"
-                                    value={(() => {
-                                        const { getEnhancedAtRiskStudents } = require("@/lib/analytics");
-                                        return getEnhancedAtRiskStudents(users, submissions, classStudentIds).length;
-                                    })()}
+                                    value={getEnhancedAtRiskStudents(users, submissions, classStudentIds).length}
                                     color="red"
                                 />
                             </div>

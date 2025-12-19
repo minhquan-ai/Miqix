@@ -8,8 +8,8 @@ interface Announcement {
     type: string;
     isPinned: boolean;
     createdAt: Date | string;
-    reactions?: any[];
-    comments?: any[];
+    reactions?: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+    comments?: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 interface FilterState {

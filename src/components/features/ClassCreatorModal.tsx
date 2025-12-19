@@ -215,9 +215,7 @@ export function ClassCreatorModal({ isOpen, onClose, onSuccess }: ClassCreatorMo
         schedule: formData.scheduleSlots.map(s => `${s.day} ${s.startTime}-${s.endTime}`).join(", "),
         avatar: formData.avatar,
         stream: formData.stream,
-        // @ts-ignore
         color: formData.color,
-        // @ts-ignore
         classType: formData.classType,
         // Set role based on classType for correct preview display
         role: formData.classType === 'NORMAL' ? 'main' : 'extra',
@@ -565,7 +563,7 @@ export function ClassCreatorModal({ isOpen, onClose, onSuccess }: ClassCreatorMo
                                                             </button>
                                                         </div>
                                                         {formData.scheduleSlots.length === 0 && (
-                                                            <p className="text-xs text-gray-400 italic">Nhấn "Thêm" để thêm lịch học.</p>
+                                                            <p className="text-xs text-gray-400 italic">Nhấn &quot;Thêm&quot; để thêm lịch học.</p>
                                                         )}
                                                         {formData.scheduleSlots.map((slot, idx) => (
                                                             <div key={idx} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg">
