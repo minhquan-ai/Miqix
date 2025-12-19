@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,7 @@ async function main() {
             id: 'u2',
             name: 'Cô Giáo Hạnh',
             email: 'hanh@school.edu',
+            password: await bcrypt.hash('123456', 10),
             role: 'teacher',
             avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hanh',
             xp: 1250,
@@ -94,6 +96,7 @@ async function main() {
                     id: `s_${cls.id}_${i}`,
                     name: fullName,
                     email: email,
+                    password: await bcrypt.hash('123456', 10),
                     role: 'student',
                     avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${cls.id}_${i}`,
                     xp: randomInt(100, 2000),
