@@ -234,7 +234,7 @@ export async function getAggregatedScheduleAction(weekStartStr?: string) {
 }
 
 // AI Analysis Action
-export async function analyzeScheduleAIAction(weekStartStr: string, query?: string, history: any[] = []) {
+export async function analyzeScheduleAIAction(weekStartStr: string, query?: string, history: any[] = [], mode: 'chat' | 'edit' = 'chat') {
     const user = await getCurrentUserAction();
     const scheduleData = await getAggregatedScheduleAction(weekStartStr);
     const events = scheduleData.events;
@@ -286,16 +286,20 @@ export async function analyzeScheduleAIAction(weekStartStr: string, query?: stri
         console.error("Error in schedule pre-processing:", preprocessingError);
     }
 
-    // 3. Optimize event list for AI (limit tokens)
+    // Optimize event list for AI
+    // Edit mode might need more context to avoid conflicts, but standard limit is mostly fine.
+    const limit = 50;
+
     const sortedEvents = [...events].sort((a, b) =>
         Math.abs(new Date(a.start).getTime() - new Date().getTime()) -
         Math.abs(new Date(b.start).getTime() - new Date().getTime())
     );
-    const relevantEvents = sortedEvents.slice(0, 40);
+    const relevantEvents = sortedEvents.slice(0, limit);
 
     // Prompt Construction
     const contextLines = [
         `HÔM NAY LÀ: ${format(new Date(), 'EEEE, dd/MM/yyyy', { locale: vi })} (Giờ hiện tại: ${format(new Date(), 'HH:mm')})`,
+        `CHẾ ĐỘ HIỆN TẠI: ${mode === 'edit' ? "CHỈNH SỬA (Tập trung vào Actions/Options)" : "TRÒ CHUYỆN (Tập trung giải đáp/tư vấn)"}`,
         `THÔNG TIN NGƯỜI DÙNG:`,
         `- Tên: ${user?.name || "Người dùng"}`,
         `- Vai trò: ${user?.role === 'teacher' ? 'Giáo viên' : 'Học sinh'}`,
@@ -303,7 +307,7 @@ export async function analyzeScheduleAIAction(weekStartStr: string, query?: stri
         `Dữ liệu lịch trình (từ ngày ${format(weekStart, 'dd/MM/yyyy')}):`,
         `- Các ngày bận rộn: ${busyDays.join(", ") || "Không có đặc biệt"}`,
         `- Các khoảng trống gợi ý: ${freeSlots.slice(0, 5).join(", ")}...`,
-        `- Tổng số sự kiện: ${events.length} ${events.length > 40 ? "(Hiển thị 40 sự kiện quan trọng nhất)" : ""}`,
+        `- Tổng số sự kiện: ${events.length} ${events.length > limit ? `(Hiển thị ${limit} sự kiện quan trọng nhất)` : ""}`,
         `- DANH SÁCH CHI TIẾT SỰ KIỆN:`,
         relevantEvents.length === 0 ? "Chưa có sự kiện nào." : relevantEvents.map(e => {
             const typeStr = e.type === 'class' ? '[CLASS]' : e.type === 'assignment' ? '[TODO]' : '[PERS]';
@@ -317,58 +321,67 @@ export async function analyzeScheduleAIAction(weekStartStr: string, query?: stri
     ].join("\n");
 
     const historyText = history.length > 0
-        ? `LỊCH SỬ TRÒ CHUYỆN:\n${history.map(m => `${m.role === 'user' ? 'Người dùng' : 'AI'}: ${m.content}`).join("\n")}`
+        ? `LỊCH SỬ TRÒ CHUYỆN (RẤT QUAN TRỌNG - ĐỌC KỸ ĐỂ HIỂU NGỮ CẢNH):\n${history.map(m => `${m.role === 'user' ? 'Người dùng' : 'AI'}: ${m.content}`).join("\n")}`
         : "";
 
     const systemPrompt = `Bạn là Trợ lý Lịch biểu Ergonix (Ergonix AI).
 Nhiệm vụ: Trả lời câu hỏi về lịch trình dựa trên dữ liệu sự kiện và lịch sử trò chuyện.
 
-QUY TẮC BẮT BUỘC:
-1. LUÔN trả về một đối tượng JSON duy nhất. KHÔNG kèm theo lời giải thích bên ngoài JSON.
-2. Định dạng JSON:
+CHẾ ĐỘ HOẠT ĐỘNG: ${mode === 'edit' ? "**CHỈNH SỬA (EDIT)**" : "**TRÒ CHUYỆN (CHAT)**"}
+${mode === 'edit'
+            ? "- Ưu tiên tìm kiếm ý định THÊM (add), SỬA (update), XÓA (delete) sự kiện.\n- Luôn đề xuất 'options' hoặc 'actions' khi người dùng có ý định thay đổi lịch.\n- Trả lời ngắn gọn, tập trung vào hành động."
+            : "- Tập trung vào việc tra cứu, tổng hợp và giải thích lịch trình.\n- Chỉ đề xuất thay đổi lịch nếu người dùng yêu cầu rõ ràng.\n- Giao tiếp thân thiện, tự nhiên."}
+
+QUY CÁCH TRẢ LỜI (BẮT BUỘC):
+1. **Định dạng tin nhắn (message)**:
+   - Sử dụng **MARKDOWN**.
+   - **Xuống dòng**: Dùng '\\n'.
+   - **In đậm**: Dùng **từ khóa**.
+   - **Danh sách**: Dùng gạch đầu dòng -.
+
+2. **JSON Format**:
+   - Trả về JSON duy nhất.
+
+QUY ĐỊNH JSON:
 {
     "options": [
         {
-            "label": "Tên khung giờ (VD: Thứ 2 Chiều)",
-            "description": "Mô tả hành động",
-            "events": [{ "title": "...", "start": "...", "end": "..." }]
+            "label": "Tên (VD: Dời lịch Toán)",
+            "description": "Mô tả (VD: Chuyển từ 14h sang 16h)",
+            "events": [{ "title": "...", "start": "...", "end": "..." }],
+            "actions": [{ "type": "delete_personal", "eventId": "UUID", "title": "Tên cũ" }]
         }
     ],
-    "message": "Lời giải đáp thân thiện bằng Markdown.",
-    "actions": [
-        {
-            "type": "delete_personal",
-            "eventId": "UUID",
-            "title": "Tên sự kiện"
-        }
-    ]
+    "message": "Nội dung trả lời...",
+    "actions": [] 
 }
+- **LƯU Ý**: Nếu người dùng muốn ĐỔI (reschedule), hãy đặt hành động 'delete_personal' (xóa lịch cũ) và dữ liệu 'events' (lịch mới) vào TRONG CÙNG MỘT Option để người dùng xác nhận một lần.
 3. JSON FORMAT (NGHIÊM NGẶT): 
-   - KHÔNG được có dấu phẩy (trailing comma) ở cuối danh sách/đối tượng.
-   - KHÔNG chứa comment.
-   - Chuỗi văn bản phải thoát ký tự đặc biệt đúng chuẩn JSON (VD: "dòng 1\\ndòng 2").
+   - KHÔNG dấu phẩy cuối.
+   - KHÔNG comment.
 4. QUY TẮC ACTIONS:
    - CHỈ dùng 'delete_personal' cho sự kiện [PERS].
-   - Dùng chính xác ID từ danh sách trên.
+   - 'actions' có thể nằm ở top-level (chỉ xóa) hoặc bên trong 'options' (vừa xóa vừa thêm).
 5. KIỂM TRA DỮ LIỆU: Chỉ dựa vào dữ liệu được cung cấp.
-6. DUY TRÌ NGỮ CẢNH: Đọc kỹ "LỊCH SỬ TRÒ CHUYỆN".
-7. 'options': Chỉ dùng khi người dùng muốn THÊM lịch. Phải có ít nhất 1 event.
-8. 'actions': Mảng các hành động xóa.`;
+6. DUY TRÌ NGỮ CẢNH: Đọc kỹ "LỊCH SỬ TRÒ CHUYỆN".`;
 
     const fullPrompt = `
-DỮ LIỆU LỊCH TRÌNH HIỆN TẠI:
+THỜI GIAN HIỆN TẠI: ${format(new Date(), 'HH:mm')} ngày ${format(new Date(), 'dd/MM/yyyy EEEE', { locale: vi })}
+
+DỮ LIỆU LỊCH TRÌNH:
 ${contextLines}
 
 ${historyText}
 
-CÂU HỎI HIỆN TẠI CỦA NGƯỜI DÙNG:
+TIN NHẮN MỚI NHẤT CỦA NGƯỜI DÙNG:
 "${query || "Phân tích tổng quan"}"
 
-Hãy phản hồi bằng JSON theo quy tắc đã nêu.`;
+${history.length > 0 ? "LƯU Ý: Đây có thể là câu trả lời cho câu hỏi trước của bạn trong LỊCH SỬ TRÒ CHUYỆN. Hãy xem xét ngữ cảnh!" : ""}
+
+Phản hồi bằng JSON:`;
 
     try {
         const result = await GroqService.generateText(fullPrompt, systemPrompt);
-
         // More robust JSON extraction
         let jsonStr = result.trim();
         const jsonBlockMatch = result.match(/```json\s*([\s\S]*?)\s*```/) || result.match(/```\s*([\s\S]*?)\s*```/);

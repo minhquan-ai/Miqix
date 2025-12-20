@@ -1,69 +1,49 @@
-import Groq from "groq-sdk";
+export const AIService = {
+    async generateText(prompt: string, systemPrompt?: string, options?: { reasoning?: boolean }): Promise<string> {
+        // Xiaomi MiMo-V2-Flash - free model with reasoning capabilities
+        const OPENROUTER_MODEL = "xiaomi/mimo-v2-flash:free";
+        const openRouterKey = process.env.OPENROUTER_API_KEY;
 
-const getGroqClient = () => {
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-        throw new Error("GROQ_API_KEY is not defined in environment variables");
-    }
-    return new Groq({ apiKey });
-};
+        if (!openRouterKey) {
+            console.error("OPENROUTER_API_KEY is missing via AIService");
+            throw new Error("OPENROUTER_API_KEY is missing. Please add it to .env.local");
+        }
 
-const DEFAULT_MODEL = "llama-3.3-70b-versatile";
-const OPENROUTER_MODEL = "xiaomi/mimo-v2-flash:free";
-
-export const GroqService = {
-    async generateText(prompt: string, systemPrompt?: string): Promise<string> {
         try {
-            // Priority: OpenRouter (Temporary)
-            const openRouterKey = process.env.OPENROUTER_API_KEY;
-            if (openRouterKey) {
-                console.log("[AIService] Using OpenRouter with model:", OPENROUTER_MODEL);
-                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${openRouterKey}`,
-                        "Content-Type": "application/json",
-                        "HTTP-Referer": "https://ergonix.vn", // Optional for OpenRouter
-                        "X-Title": "Ergonix Assistant"
-                    },
-                    body: JSON.stringify({
-                        model: OPENROUTER_MODEL,
-                        messages: [
-                            { role: "system", content: systemPrompt || "Bạn là Ergonix AI." },
-                            { role: "user", content: prompt }
-                        ],
-                        temperature: 0.7,
-                        max_tokens: 2048,
-                    })
-                });
+            const useReasoning = options?.reasoning ?? false;
+            console.log(`[AIService] Calling OpenRouter (Reasoning: ${useReasoning})`);
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`OpenRouter API error: ${JSON.stringify(errorData)}`);
-                }
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${openRouterKey}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://ergonix.vn",
+                    "X-Title": "Ergonix Assistant"
+                },
+                body: JSON.stringify({
+                    model: OPENROUTER_MODEL,
+                    messages: [
+                        { role: "system", content: systemPrompt || "Bạn là Ergonix AI." },
+                        { role: "user", content: prompt }
+                    ],
+                    // Toggle reasoning based on user choice
+                    reasoning: { enabled: useReasoning },
+                    temperature: useReasoning ? 0.8 : 0.7, // Higher temp often good for reasoning exploration
+                    max_tokens: useReasoning ? 4096 : 2048, // More tokens for thinking
+                })
+            });
 
-                const data = await response.json();
-                return data.choices[0]?.message?.content || "";
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`OpenRouter API error: ${JSON.stringify(errorData)}`);
             }
 
-            // Fallback to Groq
-            const groq = getGroqClient();
-            const finalSystemPrompt = systemPrompt || `Bạn là Ergonix AI - trợ lý học thuật thông minh cho nền tảng giáo dục Ergonix tại Việt Nam. 
-            Nhiệm vụ: Hỗ trợ giáo viên quản lý lớp học và trợ giúp học sinh học tập bằng phương pháp Socratic (dẫn dắt, gợi mở, không đưa đáp án ngay). 
-            Phong cách: Thân thiện, chuyên nghiệp, ngôn ngữ tiếng Việt tự nhiên.`;
+            const data = await response.json();
+            return data.choices[0]?.message?.content || "";
 
-            const completion = await groq.chat.completions.create({
-                messages: [
-                    { role: "system" as const, content: finalSystemPrompt },
-                    { role: "user" as const, content: prompt }
-                ],
-                model: DEFAULT_MODEL,
-                temperature: 0.7,
-                max_tokens: 2048,
-            });
-            return completion.choices[0]?.message?.content || "";
         } catch (error) {
-            console.error("[GroqService] Error generating text:", error);
+            console.error("[AIService] Error generating text:", error);
             throw error;
         }
     },
@@ -112,3 +92,6 @@ Trả về CHÍNH XÁC một mảng JSON các đối tượng:
         return JSON.parse(response.replace(/```json\n?|\n?```/g, '').trim());
     }
 };
+
+// Export as GroqService for backward compatibility
+export const GroqService = AIService;

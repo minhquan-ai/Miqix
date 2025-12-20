@@ -1,15 +1,26 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Mail, Lock, ArrowRight, Loader2, GraduationCap, AlertCircle } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Mail, Lock, ArrowRight, Loader2, GraduationCap, AlertCircle, CheckCircle2 } from "lucide-react";
 import { authenticate } from "@/lib/auth-actions";
 
 export default function LoginPage() {
     const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const searchParams = useSearchParams();
+    const justRegistered = searchParams.get('registered') === 'true';
+    const [showSuccess, setShowSuccess] = useState(justRegistered);
+
+    // Hide success message after 5 seconds
+    useEffect(() => {
+        if (showSuccess) {
+            const timer = setTimeout(() => setShowSuccess(false), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [showSuccess]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-muted/20 p-4">
@@ -21,6 +32,14 @@ export default function LoginPage() {
                     <h1 className="text-2xl font-bold">Đăng nhập</h1>
                     <p className="text-muted-foreground mt-2">Chào mừng bạn quay trở lại với Ergonix</p>
                 </div>
+
+                {/* Success message after registration */}
+                {showSuccess && (
+                    <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 p-3 rounded-lg mb-4 border border-green-200">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                        <p>Đăng ký thành công! Hãy đăng nhập để tiếp tục.</p>
+                    </div>
+                )}
 
                 <form action={formAction} className="space-y-4">
                     <div className="space-y-2">

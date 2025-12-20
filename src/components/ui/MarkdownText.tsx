@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 
 interface MarkdownTextProps {
@@ -8,54 +9,41 @@ interface MarkdownTextProps {
     className?: string;
 }
 
-/**
- * A lightweight component to render basic Markdown-like elements
- * that AI often outputs (bold, bullet points, horizontal lines, emojis).
- */
 export function MarkdownText({ content, className }: MarkdownTextProps) {
     if (!content) return null;
 
-    // Split by lines and process each line
-    const lines = content.split('\n');
-
     return (
-        <div className={cn("flex flex-col gap-y-1.5", className)}>
-            {lines.map((line, idx) => {
-                if (!line.trim() && line.length === 0) return <div key={idx} className="h-2" />;
-                let renderedLine: React.ReactNode = line;
+        <div className={cn("leading-relaxed text-sm whitespace-pre-wrap", className)}>
+            <ReactMarkdown
+                components={{
+                    // Paragraph
+                    p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
 
-                // 1. Handle Horizontal Dividers (---)
-                if (line.trim() === '---' || line.trim() === '***') {
-                    return <hr key={idx} className="my-4 border-gray-100 dark:border-gray-800" />;
-                }
+                    // Bold
+                    strong: ({ node, ...props }) => <span className="font-bold text-[inherit]" {...props} />,
 
-                // 2. Handle Bullet Points (- or •)
-                const isBullet = line.trim().startsWith('- ') || line.trim().startsWith('• ');
-                const content = isBullet ? line.trim().substring(2) : line;
+                    // Italic
+                    em: ({ node, ...props }) => <span className="italic opacity-90" {...props} />,
 
-                // 3. Handle Bold (**text**)
-                if (content.includes('**')) {
-                    const parts = content.split(/(\*\*.*?\*\*)/g);
-                    renderedLine = parts.map((part, pIdx) => {
-                        if (part.startsWith('**') && part.endsWith('**')) {
-                            return <strong key={pIdx} className="font-bold text-gray-900 dark:text-gray-100">{part.slice(2, -2)}</strong>;
-                        }
-                        return part;
-                    });
-                } else {
-                    renderedLine = content;
-                }
+                    // Lists
+                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-2 space-y-1" {...props} />,
+                    ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-2 space-y-1" {...props} />,
+                    li: ({ node, ...props }) => <li className="pl-1" {...props} />,
 
-                return (
-                    <div key={idx} className={cn(
-                        "min-h-[1.25rem]",
-                        isBullet && "pl-5 relative flex items-start"
-                    )}>
-                        {isBullet && <span className="absolute left-1 text-indigo-400 font-bold">•</span>}
-                        <span>{renderedLine}</span>
-                    </div>
-                );
-            })}
+                    // Headings
+                    h1: ({ node, ...props }) => <h1 className="text-lg font-bold mb-2 mt-4 text-[inherit]" {...props} />,
+                    h2: ({ node, ...props }) => <h2 className="text-base font-bold mb-2 mt-3 text-[inherit]" {...props} />,
+                    h3: ({ node, ...props }) => <h3 className="text-sm font-bold mb-1 mt-2 text-[inherit]" {...props} />,
+
+                    // Links
+                    a: ({ node, ...props }) => <a className="underline decoration-indigo-400 font-medium" target="_blank" rel="noopener noreferrer" {...props} />,
+
+                    // Blockquote
+                    blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-current/20 pl-4 py-1 italic opacity-80 bg-black/5 rounded-r my-2" {...props} />,
+                }}
+            >
+                {content}
+            </ReactMarkdown>
         </div>
     );
 }

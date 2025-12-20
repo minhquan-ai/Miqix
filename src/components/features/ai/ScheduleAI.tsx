@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, MessageSquare, ArrowRight, Loader2, Bot, Send } from "lucide-react";
+import { Sparkles, ArrowRight, Loader2, Bot, MessageCircle, PenLine, ChevronDown, Plus, Mic, Globe, History, Image as ImageIcon, MoreHorizontal, X } from "lucide-react";
 import { analyzeScheduleAIAction, createPersonalEventAction, deletePersonalEventAction } from "@/lib/schedule-actions";
 import { format, parseISO } from "date-fns";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { AIPanelShell } from "./AIPanelShell";
 import { MarkdownText } from "@/components/ui/MarkdownText";
 
@@ -28,16 +28,21 @@ interface AIResponseOption {
         start: string;
         end: string;
     }>;
+    actions?: AIAction[];
 }
 
 export function ScheduleAI({ onClose, weekStartStr, onEventAdded }: ScheduleAIProps) {
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const [mode, setMode] = useState<'chat' | 'edit'>('chat');
+    const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
 
-    // UI state for the latest AI options/actions to display
+    // AI suggestions state
     const [currentOptions, setCurrentOptions] = useState<AIResponseOption[] | null>(null);
     const [currentActions, setCurrentActions] = useState<AIAction[] | null>(null);
+    const [pendingOption, setPendingOption] = useState<AIResponseOption | null>(null);
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -53,27 +58,22 @@ export function ScheduleAI({ onClose, weekStartStr, onEventAdded }: ScheduleAIPr
 
         const userMsg = input;
         setInput("");
+
         setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
         setLoading(true);
-        setCurrentOptions(null); // Clear previous options
-        setCurrentActions(null); // Clear previous actions
+        setCurrentOptions(null);
+        setCurrentActions(null);
+        setPendingOption(null);
 
         try {
-            const result = await analyzeScheduleAIAction(weekStartStr, userMsg, messages);
-
+            const result = await analyzeScheduleAIAction(weekStartStr, userMsg, messages, mode);
             setMessages(prev => [...prev, {
                 role: 'assistant',
                 content: result.message || "Mình đã tìm thấy một vài lựa chọn cho bạn:"
             }]);
 
-            if (result.options && result.options.length > 0) {
-                setCurrentOptions(result.options);
-            }
-
-            if (result.actions && result.actions.length > 0) {
-                setCurrentActions(result.actions);
-            }
-
+            if (result.options && result.options.length > 0) setCurrentOptions(result.options);
+            if (result.actions && result.actions.length > 0) setCurrentActions(result.actions);
         } catch (error) {
             console.error(error);
             setMessages(prev => [...prev, { role: 'assistant', content: 'Xin lỗi, mình gặp chút sự cố khi phân tích lịch. Bạn thử lại nhé!' }]);
@@ -82,227 +82,225 @@ export function ScheduleAI({ onClose, weekStartStr, onEventAdded }: ScheduleAIPr
         }
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-        }
+    const handleSelectOption = (option: AIResponseOption) => {
+        setPendingOption({ ...option });
+        setTimeout(scrollToBottom, 100);
     };
 
-    const handleAcceptOption = async (option: AIResponseOption) => {
+    const handleConfirmOption = async () => {
+        if (!pendingOption) return;
+        const optionToRegister = pendingOption;
+        setPendingOption(null);
+        setLoading(true);
+
         try {
-            // Add all events in this option
-            for (const evt of option.events) {
+            if (optionToRegister.actions) {
+                for (const action of optionToRegister.actions) {
+                    if (action.type === 'delete_personal') await deletePersonalEventAction(action.eventId);
+                }
+            }
+            for (const evt of optionToRegister.events) {
                 await createPersonalEventAction({
                     title: evt.title,
-                    description: `Được AI thêm từ lựa chọn: ${option.label}`,
+                    description: `Được AI thêm từ lựa chọn: ${optionToRegister.label}`,
                     start: evt.start,
                     end: evt.end,
                     color: 'emerald'
                 });
             }
-
-            // Delay to ensure DB propagation and UI refresh
-            setTimeout(() => {
-                onEventAdded();
-            }, 800);
-
-            // Remove only this option from the list, allow others to remain (User Request: Multi-select support)
-            setCurrentOptions(prev => prev ? prev.filter(o => o !== option) : null);
-
+            setTimeout(() => onEventAdded(), 800);
+            setCurrentOptions(prev => prev ? prev.filter(o => o.label !== optionToRegister.label) : null);
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: `Đã thêm thành công: **${option.label}**. Bạn có muốn thêm khung giờ nào khác không?`
+                content: `✅ Đã thực hiện thay đổi: **${optionToRegister.label}** thành công.`
             }]);
         } catch (error) {
             console.error(error);
-            setMessages(prev => [...prev, { role: 'assistant', content: "Có lỗi xảy ra khi thêm lịch. Bạn thử lại xem sao." }]);
-        }
-    };
-
-    const handleExecuteAction = async (action: AIAction) => {
-        try {
-            if (action.type === 'delete_personal') {
-                const result = await deletePersonalEventAction(action.eventId);
-
-                if (result.count > 0) {
-                    setMessages(prev => [...prev, {
-                        role: 'assistant',
-                        content: `Đã xóa sự kiện "${action.title}" khỏi lịch của bạn.`
-                    }]);
-                } else {
-                    setMessages(prev => [...prev, {
-                        role: 'assistant',
-                        content: `Mình không tìm thấy sự kiện "${action.title}" để xóa. Có thể nó đã được xóa trước đó rồi.`
-                    }]);
-                }
-            }
-
-            // Delay to ensure DB propagation and UI refresh
-            setTimeout(() => {
-                onEventAdded();
-            }, 800);
-
-            // Remove only this action from the list
-            setCurrentActions(prev => prev ? prev.filter(a => a !== action) : null);
-        } catch (error) {
-            console.error(error);
-            setMessages(prev => [...prev, { role: 'assistant', content: "Không thể thực hiện hành động này. Thử lại sau nhé." }]);
+            setMessages(prev => [...prev, { role: 'assistant', content: "Có lỗi xảy ra khi thực hiện thay đổi." }]);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <AIPanelShell onClose={onClose} title="Trợ lý Lịch biểu" loading={loading}>
-            {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-5 bg-white scrollbar-thin scrollbar-thumb-gray-100">
+            <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-white scrollbar-thin scrollbar-thumb-gray-100">
                 {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-full text-center space-y-8 opacity-90 pb-10">
-                        <div className="w-20 h-20 bg-gradient-to-tr from-indigo-50 to-white rounded-[2rem] flex items-center justify-center shadow-sm border border-indigo-50/50">
-                            <Bot className="w-8 h-8 text-indigo-400" />
+                    <div className="flex flex-col items-center justify-center h-full text-center space-y-8 opacity-90 pb-12">
+                        <div className="relative">
+                            <motion.div
+                                animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
+                                transition={{ duration: 4, repeat: Infinity }}
+                                className="w-24 h-24 bg-gradient-to-tr from-indigo-50 to-white rounded-[2.5rem] flex items-center justify-center shadow-xl shadow-indigo-100/50 border border-white relative z-10"
+                            >
+                                <Bot className="w-10 h-10 text-indigo-500" />
+                            </motion.div>
+                            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg border border-gray-50">
+                                <Sparkles className="w-5 h-5 text-amber-400" />
+                            </div>
                         </div>
-                        <div className="space-y-1">
-                            <p className="font-bold text-gray-800 text-base">Hôm nay bạn cần gì?</p>
-                        </div>
-
-                        <div className="flex flex-wrap justify-center gap-2 max-w-[280px]">
-                            <QuickPromptBtn text="Sắp xếp 3 tiết Toán" onClick={() => { setInput("Tìm giúp mình 3 tiếng ôn Toán"); handleSend(); }} />
-                            <QuickPromptBtn text="Lên lịch nghỉ ngơi" onClick={() => { setInput("Tuần này bận quá, xếp lịch nghỉ ngơi"); handleSend(); }} />
+                        <div className="space-y-2">
+                            <h2 className="font-extrabold text-gray-900 text-xl tracking-tight">Chào bạn, mình là Ergonix AI!</h2>
+                            <p className="text-gray-400 text-sm font-medium">Bạn cần hỗ trợ gì cho lịch trình hôm nay?</p>
                         </div>
                     </div>
                 )}
 
                 {messages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start items-start'}`}>
                         {msg.role === 'assistant' && (
-                            <div className="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center mr-3 mt-1 shrink-0 border border-indigo-100">
-                                <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                            <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center mr-3 mt-0.5 shrink-0 border border-indigo-100">
+                                <Sparkles className="w-4 h-4 text-indigo-500" />
                             </div>
                         )}
-                        <div className={`max-w-[85%] px-4 py-3 rounded-[1.2rem] text-sm leading-relaxed shadow-sm ${msg.role === 'user'
-                            ? 'bg-gray-900 text-white rounded-tr-sm'
-                            : 'bg-white border border-gray-100 text-gray-700 rounded-tl-sm'
-                            }`}>
+                        <div className={`max-w-[85%] px-4 py-3 rounded-[1.3rem] text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white font-semibold' : 'bg-white border border-gray-100 text-gray-700'}`} style={msg.role === 'user' ? { background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' } : {}}>
                             <MarkdownText content={msg.content} />
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
 
                 {loading && (
-                    <div className="flex justify-start">
-                        <div className="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center mr-3 mt-1 shrink-0 border border-indigo-100">
-                            <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                    <div className="flex justify-start items-start">
+                        <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center mr-3 mt-0.5 shrink-0 border border-indigo-100">
+                            <Sparkles className="w-4 h-4 text-indigo-500" />
                         </div>
-                        <div className="bg-white border border-gray-100 px-4 py-3 rounded-[1.2rem] rounded-tl-sm shadow-sm flex items-center gap-2">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400" />
-                            <span className="text-xs text-gray-400 font-medium tracking-wide">Đang suy nghĩ...</span>
+                        <div className="bg-white border border-gray-100 px-5 py-3 rounded-[1.3rem] flex items-center gap-1.5 min-w-[60px] justify-center">
+                            {[0, 1, 2].map((i) => (
+                                <motion.div
+                                    key={i}
+                                    className="w-1.5 h-1.5 bg-indigo-400 rounded-full"
+                                    animate={{ y: [0, -6, 0] }}
+                                    transition={{
+                                        duration: 0.8,
+                                        repeat: Infinity,
+                                        delay: i * 0.15,
+                                        ease: "easeInOut"
+                                    }}
+                                />
+                            ))}
                         </div>
                     </div>
                 )}
 
-                {/* Options Display */}
-                {currentOptions && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="pl-10 space-y-3"
-                    >
-                        <div className="grid grid-cols-1 gap-2">
-                            {currentOptions
-                                .filter(opt => opt.label && opt.events && opt.events.length > 0)
-                                .map((option, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="bg-white p-4 rounded-[1.5rem] border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all cursor-pointer group relative overflow-hidden"
-                                        onClick={() => handleAcceptOption(option)}
-                                    >
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div>
-                                                <h4 className="font-bold text-gray-800 text-sm">{option.label}</h4>
-                                                <p className="text-xs text-gray-500 mt-0.5">{option.description}</p>
-                                            </div>
-                                            <div className="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                                                <ArrowRight className="w-3.5 h-3.5" />
-                                            </div>
-                                        </div>
-
-                                        {option.events && option.events.length > 0 && (
-                                            <div className="space-y-1 mt-3 pt-3 border-t border-dashed border-gray-100">
-                                                {option.events.map((evt, eIdx) => (
-                                                    <div key={eIdx} className="flex items-center gap-2 text-xs text-gray-600">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                                                        <span className="font-medium">{evt.title}</span>
-                                                        <span className="text-gray-400 ml-auto font-mono text-[10px]">
-                                                            {format(parseISO(evt.start), "HH:mm")}
-                                                        </span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
+                {/* AI Options / Pending Confirmation UI */}
+                {(currentOptions && !pendingOption) && (
+                    <div className="pl-10 space-y-3">
+                        {currentOptions.map((option, idx) => (
+                            <div key={idx} onClick={() => handleSelectOption(option)} className="bg-white p-4 rounded-[1.5rem] border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all cursor-pointer group">
+                                <div className="flex justify-between items-start mb-2">
+                                    <div><h4 className="font-bold text-gray-800 text-sm">{option.label}</h4><p className="text-xs text-gray-500">{option.description}</p></div>
+                                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                                {option.events.map((evt, eIdx) => (
+                                    <div key={eIdx} className="flex items-center gap-2 text-xs text-gray-600 mt-1">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div><span>{evt.title}</span><span className="text-gray-400 ml-auto">{format(parseISO(evt.start), "HH:mm")}</span>
                                     </div>
                                 ))}
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* Actions Display */}
-                {currentActions && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="pl-10 space-y-2"
-                    >
-                        {currentActions.map((action, idx) => (
-                            <div key={idx} className="bg-rose-50 border border-rose-100 p-4 rounded-[1.5rem] flex items-center justify-between">
-                                <div className="flex-1">
-                                    <p className="text-xs font-bold text-rose-700 uppercase tracking-wider mb-1">Yêu cầu xóa lịch</p>
-                                    <p className="text-sm font-semibold text-gray-800">{action.title}</p>
-                                </div>
-                                <button
-                                    onClick={() => handleExecuteAction(action)}
-                                    className="px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-700 transition-colors shadow-sm"
-                                >
-                                    Xác nhận xóa
-                                </button>
                             </div>
                         ))}
-                    </motion.div>
+                    </div>
+                )}
+
+                {pendingOption && (
+                    <div className="pl-10 pb-4">
+                        <div className="bg-indigo-50/50 border border-indigo-100 p-5 rounded-[2rem] shadow-xl space-y-4">
+                            <h4 className="font-bold text-indigo-900 text-sm">Xác nhận lịch: {pendingOption.label}</h4>
+                            <div className="space-y-2">
+                                {pendingOption.events.map((evt, eIdx) => (
+                                    <div key={eIdx} className="bg-white p-3 rounded-[1.2rem] border border-white shadow-sm">
+                                        <div className="flex justify-between text-[10px] font-bold text-gray-400 mb-1">
+                                            <span>SỰ KIỆN {eIdx + 1}</span><span>{format(parseISO(evt.start), "HH:mm")} - {format(parseISO(evt.end), "HH:mm")}</span>
+                                        </div>
+                                        <div className="text-sm font-bold text-gray-800">{evt.title}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex gap-2">
+                                <button onClick={() => setPendingOption(null)} className="flex-1 py-3 bg-white border border-gray-100 text-gray-500 text-xs font-bold rounded-2xl hover:bg-gray-50">Hủy</button>
+                                <button onClick={handleConfirmOption} className="flex-[2] py-3 bg-indigo-600 text-white text-xs font-bold rounded-2xl hover:bg-indigo-700 shadow-lg flex items-center justify-center gap-2"><Sparkles className="w-3.5 h-3.5" /> Thêm vào lịch</button>
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="p-4 bg-white">
-                <div className="relative flex items-center gap-2 bg-gray-50 p-1.5 rounded-[1.5rem] border border-transparent focus-within:bg-white focus-within:border-gray-200 focus-within:shadow-sm transition-all duration-300">
-                    <input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        disabled={loading}
-                        type="text"
-                        placeholder="Nhập yêu cầu..."
-                        className="flex-1 bg-transparent border-none text-sm px-4 py-2 focus:ring-0 focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
-                    />
-                    <button
-                        onClick={handleSend}
-                        disabled={!input.trim() || loading}
-                        className="p-2.5 bg-gray-900 text-white rounded-full shadow-md disabled:opacity-20 disabled:shadow-none hover:bg-black transition-all transform hover:scale-105 active:scale-95"
-                    >
-                        <Send className="w-3.5 h-3.5" />
-                    </button>
+            {/* Specialized Capsule Input Area */}
+            <div className="p-4 bg-white/50 backdrop-blur-sm pb-6">
+                <div className="bg-white rounded-[2rem] border border-gray-200 shadow-xl px-2 py-2 transition-all focus-within:ring-2 focus-within:ring-indigo-100 focus-within:border-indigo-200 relative">
+
+                    {/* Main Input Part */}
+                    <div className="px-3 pt-2">
+                        <textarea
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                            disabled={loading}
+                            placeholder="Nhập yêu cầu lịch trình..."
+                            className="w-full bg-transparent border-none text-[16px] py-1 focus:ring-0 focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium resize-none overflow-y-auto scrollbar-none leading-relaxed"
+                            rows={2}
+                            style={{ height: 'auto', minHeight: '40px', maxHeight: '150px' }}
+                        />
+                    </div>
+
+                    {/* Bottom Toolbar Area */}
+                    <div className="flex items-center justify-between px-1 pb-1">
+                        <div className="flex items-center gap-2 pl-1">
+                            {/* Mode Selector - Now the only toolbar item */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsModeMenuOpen(!isModeMenuOpen)}
+                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-100 bg-gray-50/50 hover:bg-gray-100 transition-all active:scale-95`}
+                                >
+                                    {mode === 'chat' ? <MessageCircle className="w-3.5 h-3.5 text-gray-400" /> : <PenLine className="w-3.5 h-3.5 text-indigo-500" />}
+                                    <span className={`text-[11px] font-bold ${mode === 'edit' ? 'text-indigo-600' : 'text-gray-600'}`}>
+                                        {mode === 'chat' ? "Bình thường" : "Chỉnh sửa"}
+                                    </span>
+                                    <ChevronDown className="w-3 h-3 text-gray-400" />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isModeMenuOpen && (
+                                        <>
+                                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-10" onClick={() => setIsModeMenuOpen(false)} />
+                                            <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute bottom-full mb-3 left-0 bg-white border border-gray-100 shadow-2xl rounded-2xl py-2 z-20 min-w-[160px] overflow-hidden">
+                                                <ModeMenuItem active={mode === 'chat'} icon={<MessageCircle className="w-4 h-4" />} label="Bình thường" onClick={() => { setMode('chat'); setIsModeMenuOpen(false); }} />
+                                                <ModeMenuItem active={mode === 'edit'} icon={<PenLine className="w-4 h-4" />} label="Chỉnh sửa" onClick={() => { setMode('edit'); setIsModeMenuOpen(false); }} />
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </div>
+
+                        {/* Black Circular Send Button */}
+                        <button
+                            onClick={handleSend}
+                            disabled={!input.trim() || loading}
+                            className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 transform ${!input.trim() || loading ? 'bg-gray-100 text-gray-300' : 'bg-black text-white hover:scale-105 active:scale-95 shadow-lg'}`}
+                        >
+                            <ArrowRight className="w-5 h-5" strokeWidth={3} />
+                        </button>
+                    </div>
                 </div>
             </div>
         </AIPanelShell>
     );
 }
 
+function ModeMenuItem({ icon, label, onClick, active }: { icon: React.ReactNode, label: string, onClick: () => void, active: boolean }) {
+    return (
+        <button onClick={onClick} className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold transition-all ${active ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'}`}>
+            <span className={active ? "text-indigo-500" : "text-gray-400"}>{icon}</span>
+            {label}
+            {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-500" />}
+        </button>
+    );
+}
+
 function QuickPromptBtn({ text, onClick }: { text: string, onClick: () => void }) {
     return (
-        <button
-            onClick={onClick}
-            className="text-xs font-medium bg-white border border-gray-200 px-4 py-2 rounded-full text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
-        >
-            {text}
-        </button>
-    )
+        <button onClick={onClick} className="text-xs font-bold bg-white border border-gray-200 px-4 py-2 rounded-full text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-100 transition-all shadow-sm active:scale-95">{text}</button>
+    );
 }

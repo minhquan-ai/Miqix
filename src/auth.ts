@@ -16,11 +16,25 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             if (token.role && session.user) {
                 session.user.role = token.role as "teacher" | "student";
             }
+            if (session.user) {
+                session.user.avatarUrl = token.avatarUrl as string | null;
+                session.user.isNewUser = token.isNewUser as boolean;
+            }
             return session;
         },
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger }) {
             if (user) {
                 token.role = user.role;
+                token.avatarUrl = user.avatarUrl;
+                token.isNewUser = !user.avatarUrl;
+            }
+            // Refresh avatar status on update
+            if (trigger === 'update' && token.sub) {
+                const dbUser = await db.user.findUnique({ where: { id: token.sub } });
+                if (dbUser) {
+                    token.avatarUrl = dbUser.avatarUrl;
+                    token.isNewUser = !dbUser.avatarUrl;
+                }
             }
             return token;
         },
