@@ -58,9 +58,9 @@ export function ClassesFilterBar({
                     onChange={(e) => onTypeChange(e.target.value)}
                     className="px-3 py-2 bg-gray-50 rounded-xl text-sm border-none focus:ring-2 focus:ring-blue-500/20 text-gray-600 min-w-[120px]"
                 >
-                    <option value="">Tất cả loại</option>
-                    <option value="main">Lớp Chính</option>
-                    <option value="extra">Lớp Phụ</option>
+                    <option value="">Lớp học</option>
+                    <option value="main">Chính khoá</option>
+                    <option value="extra">Lớp Học Thêm</option>
                 </select>
 
                 <div className="w-px h-6 bg-gray-200 mx-1" />

@@ -2,8 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
-import { DataService } from "@/lib/data";
-import { getCurrentUserAction } from "@/lib/actions";
+import { getCurrentUserAction, getAssignmentByIdAction, getStudentSubmissionAction } from "@/lib/actions";
 import { Assignment, Submission, User } from "@/types";
 import { Skeleton } from "@/components/ui/Skeleton";
 import SubmissionView from "@/components/SubmissionView";
@@ -27,7 +26,7 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
             }
             setUser(currentUser);
 
-            const assignmentData = await DataService.getAssignmentById(id);
+            const assignmentData = await getAssignmentByIdAction(id);
             if (!assignmentData) {
                 alert("Bài tập không tồn tại");
                 router.push('/dashboard/assignments');
@@ -36,9 +35,9 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
             setAssignment(assignmentData);
 
             if (currentUser.role === 'student') {
-                const submissionData = await DataService.getStudentSubmission(id, currentUser.id);
-                if (submissionData && submissionData.length > 0) {
-                    setSubmission(submissionData[0]);
+                const submissionData = await getStudentSubmissionAction(id, currentUser.id);
+                if (submissionData) {
+                    setSubmission(submissionData);
                 }
             }
         } catch (error) {

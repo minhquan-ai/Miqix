@@ -3,8 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
-import { DataService } from "@/lib/data";
-import { getCurrentUserAction } from "@/lib/actions";
+import { getCurrentUserAction, getAssignmentsAction, createAssignmentAction, getClassesAction } from "@/lib/actions";
 import { Class, User, FileAttachment, RubricItem, AISettings } from "@/types";
 import { ArrowLeft, BookOpen, Calendar, FileText, Plus, Paperclip, AlertCircle, Settings, Sparkles, CheckCircle2, Users, Clock, X, ChevronRight, Loader2, Zap } from "lucide-react";
 import { FileUpload } from "@/components/ui/FileUpload";
@@ -49,7 +48,7 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
         rubric: [] as RubricItem[],
         aiSettings: {
             enabled: true,
-            model: 'gemini-pro',
+            model: 'llama-3.3-70b-versatile',
             tone: 'encouraging',
             language: 'vi'
         } as AISettings,
@@ -86,7 +85,7 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
                     return;
                 }
                 setUser(currentUser as any);
-                const teacherClasses = await DataService.getClasses();
+                const teacherClasses = await getClassesAction();
                 setClasses(teacherClasses as unknown as Class[]);
             } catch (error) {
                 console.error("Failed to load data", error);
@@ -179,7 +178,7 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
 
         setSubmitting(true);
         try {
-            await DataService.createAssignment({
+            await createAssignmentAction({
                 title: formData.title,
                 description: formData.description,
                 subject: formData.subject,

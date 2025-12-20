@@ -9,6 +9,8 @@ import { formatDistanceToNow, isPast, isToday, isTomorrow, format } from 'date-f
 import { vi } from 'date-fns/locale';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { AIPageWrapper } from "@/components/layout/AIPageWrapper";
+import { MissionAI } from "@/components/features/ai/MissionAI";
 
 interface StudentMission {
     id: string;
@@ -172,111 +174,115 @@ export default function MissionsPage() {
     const completedCount = missions.filter(m => m.status === 'completed').length;
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white -m-8 p-6">
-            <div className="max-w-full mx-auto space-y-6">
-                <MissionsHero
-                    title="Nhiệm vụ của tôi"
-                    subtitle="Quản lý, theo dõi và hoàn thành các nhiệm vụ học tập của bạn để nâng cao kết quả học tập."
-                    icon={<Target size={24} />}
-                />
+        <AIPageWrapper
+            renderAI={({ onClose }) => <MissionAI onClose={onClose} userId={userId} missions={missions} />}
+        >
+            <div className="flex-1 flex flex-col overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+                <div className="space-y-6 p-1">
+                    <MissionsHero
+                        title="Nhiệm vụ của tôi"
+                        subtitle="Quản lý, theo dõi và hoàn thành các nhiệm vụ học tập của bạn để nâng cao kết quả học tập."
+                        icon={<Target size={24} />}
+                    />
 
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-800">Danh sách nhiệm vụ</h2>
-                    <div className="flex gap-2">
-                        {urgentCount > 0 && (
-                            <span className="text-sm font-medium text-red-600 bg-red-50 border border-red-100 px-3 py-1 rounded-lg">
-                                {urgentCount} Cần làm gấp
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-xl font-bold text-gray-800">Danh sách nhiệm vụ</h2>
+                        <div className="flex gap-2">
+                            {urgentCount > 0 && (
+                                <span className="text-sm font-medium text-red-600 bg-red-50 border border-red-100 px-3 py-1 rounded-lg">
+                                    {urgentCount} Cần làm gấp
+                                </span>
+                            )}
+                            <span className="text-sm font-medium text-gray-500 bg-white border border-gray-100 px-3 py-1 rounded-lg">
+                                Tổng số: {missions.length}
                             </span>
-                        )}
-                        <span className="text-sm font-medium text-gray-500 bg-white border border-gray-100 px-3 py-1 rounded-lg">
-                            Tổng số: {missions.length}
-                        </span>
+                        </div>
                     </div>
-                </div>
 
-                {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="bg-white border border-gray-100 rounded-2xl p-6 animate-pulse">
-                                <div className="h-6 bg-gray-100 rounded w-1/3 mb-4" />
-                                <div className="h-8 bg-gray-100 rounded w-3/4 mb-4" />
-                                <div className="h-4 bg-gray-100 rounded w-full" />
-                            </div>
-                        ))}
-                    </div>
-                ) : missions.length === 0 ? (
-                    <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
-                        <BookOpen className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-                        <h3 className="text-xl font-bold text-gray-800 mb-2">Chưa có nhiệm vụ nào</h3>
-                        <p className="text-gray-500 mb-6">Tham gia lớp học để nhận nhiệm vụ từ giáo viên.</p>
-                        <Link
-                            href="/dashboard/classes"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
-                        >
-                            Tham gia lớp học
-                        </Link>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {missions.map((mission, index) => {
-                            const subjectStyle = getSubjectStyle(mission.subject);
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="bg-white border border-gray-100 rounded-2xl p-6 animate-pulse">
+                                    <div className="h-6 bg-gray-100 rounded w-1/3 mb-4" />
+                                    <div className="h-8 bg-gray-100 rounded w-3/4 mb-4" />
+                                    <div className="h-4 bg-gray-100 rounded w-full" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : missions.length === 0 ? (
+                        <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+                            <BookOpen className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                            <h3 className="text-xl font-bold text-gray-800 mb-2">Chưa có nhiệm vụ nào</h3>
+                            <p className="text-gray-500 mb-6">Tham gia lớp học để nhận nhiệm vụ từ giáo viên.</p>
+                            <Link
+                                href="/dashboard/classes"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
+                            >
+                                Tham gia lớp học
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {missions.map((mission, index) => {
+                                const subjectStyle = getSubjectStyle(mission.subject);
 
-                            return (
-                                <motion.div
-                                    key={mission.id}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.05 }}
-                                    whileHover={{ y: -5 }}
-                                    className={`bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all cursor-pointer group relative overflow-hidden ${mission.status === 'urgent' ? 'border-red-200' :
+                                return (
+                                    <motion.div
+                                        key={mission.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        whileHover={{ y: -5 }}
+                                        className={`bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all cursor-pointer group relative overflow-hidden ${mission.status === 'urgent' ? 'border-red-200' :
                                             mission.status === 'completed' ? 'border-green-200' :
                                                 'border-gray-100'
-                                        }`}
-                                    onClick={() => router.push(`/dashboard/assignments/${mission.id}`)}
-                                >
-                                    {/* Accent line */}
-                                    <div className={`absolute top-0 left-0 w-1 h-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ${mission.status === 'urgent' ? 'bg-red-500' :
+                                            }`}
+                                        onClick={() => router.push(`/dashboard/assignments/${mission.id}`)}
+                                    >
+                                        {/* Accent line */}
+                                        <div className={`absolute top-0 left-0 w-1 h-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ${mission.status === 'urgent' ? 'bg-red-500' :
                                             mission.status === 'completed' ? 'bg-green-500' :
                                                 'bg-blue-600'
-                                        }`} />
+                                            }`} />
 
-                                    {/* Header */}
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className={`w-12 h-12 rounded-xl ${subjectStyle.bg} flex items-center justify-center text-2xl`}>
-                                            {subjectStyle.icon || '📝'}
+                                        {/* Header */}
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className={`w-12 h-12 rounded-xl ${subjectStyle.bg} flex items-center justify-center text-2xl`}>
+                                                {subjectStyle.icon || '📝'}
+                                            </div>
+                                            {getStatusBadge(mission.status)}
                                         </div>
-                                        {getStatusBadge(mission.status)}
-                                    </div>
 
-                                    {/* Title */}
-                                    <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
-                                        {mission.title}
-                                    </h3>
+                                        {/* Title */}
+                                        <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                                            {mission.title}
+                                        </h3>
 
-                                    {/* Subject & Class */}
-                                    <p className="text-sm text-gray-500 mb-4">
-                                        {mission.subject} - {mission.className}
-                                    </p>
+                                        {/* Subject & Class */}
+                                        <p className="text-sm text-gray-500 mb-4">
+                                            {mission.subject} - {mission.className}
+                                        </p>
 
-                                    {/* Footer */}
-                                    <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-                                        <div className={`flex items-center gap-1.5 text-sm ${mission.status === 'urgent' ? 'text-red-600' :
+                                        {/* Footer */}
+                                        <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                                            <div className={`flex items-center gap-1.5 text-sm ${mission.status === 'urgent' ? 'text-red-600' :
                                                 mission.status === 'completed' ? 'text-green-600' :
                                                     'text-gray-500'
-                                            }`}>
-                                            <Clock className="w-4 h-4" />
-                                            {mission.status === 'completed' ? 'Đã hoàn thành' : formatDueDate(mission.dueDate)}
+                                                }`}>
+                                                <Clock className="w-4 h-4" />
+                                                {mission.status === 'completed' ? 'Đã hoàn thành' : formatDueDate(mission.dueDate)}
+                                            </div>
+                                            <span className="text-sm font-bold text-indigo-600 group-hover:text-indigo-700">
+                                                {mission.status === 'completed' ? 'Xem kết quả →' : 'Bắt đầu ngay →'}
+                                            </span>
                                         </div>
-                                        <span className="text-sm font-bold text-indigo-600 group-hover:text-indigo-700">
-                                            {mission.status === 'completed' ? 'Xem kết quả →' : 'Bắt đầu ngay →'}
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-                )}
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
+        </AIPageWrapper>
     );
 }

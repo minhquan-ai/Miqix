@@ -22,7 +22,7 @@ export async function GET() {
             { name: 'Lê Văn Cường', email: 'cuong@ergonix.edu', seed: 'Cuong' },
         ];
 
-        const students = [];
+        const students: any[] = [];
         for (const s of studentsData) {
             const student = await db.user.upsert({
                 where: { email: s.email },

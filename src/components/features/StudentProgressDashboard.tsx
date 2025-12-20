@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, Target, BookOpen, Award, AlertCircle } from 'lucide-react';
-import { DataService } from '@/lib/data';
+import { getSubmissionsAction, getAssignmentsAction } from '@/lib/actions';
 import { Assignment, Submission } from '@/types';
 import {
     calculateTopicPerformance,
@@ -22,11 +22,11 @@ export function StudentProgressDashboard({ studentId }: { studentId: string }) {
     useEffect(() => {
         async function loadData() {
             try {
-                const allSubmissions = await DataService.getSubmissions();
+                const allSubmissions = await getSubmissionsAction();
                 const studentSubs = allSubmissions.filter(s => s.studentId === studentId);
                 setSubmissions(studentSubs);
 
-                const allAssignments = await DataService.getAssignments();
+                const allAssignments = await getAssignmentsAction();
                 setAssignments(allAssignments);
             } catch (error) {
                 console.error('Failed to load progress data', error);

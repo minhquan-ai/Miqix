@@ -108,7 +108,7 @@ export async function getWorksheetProgressAction(assignmentId: string) {
 
         for (const ac of assignment.assignmentClasses) {
             for (const enrollment of ac.class.enrollments) {
-                const progress = progressMap.get(enrollment.user.id);
+                const progress = progressMap.get(enrollment.user.id) as any;
                 allStudents.push({
                     id: enrollment.user.id,
                     name: enrollment.user.name,

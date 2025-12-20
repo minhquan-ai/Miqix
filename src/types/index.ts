@@ -55,7 +55,7 @@ export interface RubricItem {
 
 export interface AISettings {
     enabled: boolean;
-    model: 'gpt-4o' | 'gemini-pro' | 'mock';
+    model: 'llama-3.3-70b-versatile' | 'llama-3.1-8b-instant' | 'mixtral-8x7b-32768' | 'mock';
     tone: 'encouraging' | 'neutral' | 'strict';
     language: 'vi' | 'en';
 }

@@ -76,10 +76,18 @@ export function ClassCardStudent({ classData, progress }: StudentClassCardProps)
                                 <BookOpen className="w-6 h-6 text-white" />
                             </div>
 
-                            {/* Status Badge */}
-                            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg ${statusBadge.style}`}>
-                                {statusBadge.text}
-                            </span>
+                            {/* Status & Type Badges */}
+                            <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg ${statusBadge.style}`}>
+                                    {statusBadge.text}
+                                </span>
+                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md border uppercase tracking-wider ${isMain
+                                    ? "bg-blue-50 text-blue-700 border-blue-100"
+                                    : "bg-indigo-50 text-indigo-700 border-indigo-100"
+                                    }`}>
+                                    {isMain ? "Chính khoá" : "Học thêm"}
+                                </span>
+                            </div>
                         </div>
 
                         {/* Class Name & Subject */}

@@ -98,9 +98,9 @@ export const DataService = {
         return await getAssignmentsAction(classId) as unknown as Assignment[];
     },
 
-    getAssignmentById: async (_id: string): Promise<Assignment | null> => {
-        console.warn("DataService.getAssignmentById is deprecated. Use Prisma directly");
-        return null;
+    getAssignmentById: async (id: string): Promise<Assignment | null> => {
+        const { getAssignmentByIdAction } = await import("@/lib/actions");
+        return await getAssignmentByIdAction(id) as unknown as Assignment;
     },
 
     createAssignment: async (_data: any) => {

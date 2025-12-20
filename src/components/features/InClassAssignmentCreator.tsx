@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { X, FileText, Calendar, Paperclip, Sparkles, CheckCircle2, Clock, AlertCircle } from "lucide-react";
-import { DataService } from "@/lib/data";
-import { getCurrentUserAction } from "@/lib/actions";
+import { getCurrentUserAction, createAssignmentAction } from "@/lib/actions";
 import { User, FileAttachment, RubricItem, AISettings, Class } from "@/types";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { RubricBuilder } from "@/components/features/RubricBuilder";
@@ -57,7 +56,7 @@ export function InClassAssignmentCreator({ classData, onClose, onSuccess }: InCl
         rubric: [] as RubricItem[],
         aiSettings: {
             enabled: true,
-            model: 'gemini-pro',
+            model: 'llama-3.3-70b-versatile',
             tone: 'encouraging',
             language: 'vi'
         } as AISettings,
@@ -139,7 +138,7 @@ export function InClassAssignmentCreator({ classData, onClose, onSuccess }: InCl
 
         setSubmitting(true);
         try {
-            await DataService.createAssignment({
+            await createAssignmentAction({
                 title: formData.title,
                 description: formData.description,
                 subject: formData.subject,

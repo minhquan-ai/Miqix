@@ -74,7 +74,7 @@ export async function getAssignmentsAction(classId?: string): Promise<Assignment
         }
     });
 
-    return assignments.map(a => ({
+    return assignments.map((a: any) => ({
         id: a.id,
         title: a.title,
         description: a.description,
@@ -260,7 +260,7 @@ export async function getSubmissionsByAssignmentIdAction(assignmentId: string): 
         include: { student: true }
     });
 
-    return subs.map(sub => ({
+    return subs.map((sub: any) => ({
         id: sub.id,
         assignmentId: sub.assignmentId,
         studentId: sub.studentId,
@@ -404,7 +404,7 @@ export async function getSubmissionsForTeacherAction(teacherId: string): Promise
         orderBy: { submittedAt: 'desc' }
     });
 
-    return submissions.map(sub => ({
+    return submissions.map((sub: any) => ({
         id: sub.id,
         assignmentId: sub.assignmentId,
         studentId: sub.studentId,
@@ -428,7 +428,7 @@ export async function getSubmissionsAction(): Promise<Submission[]> {
         orderBy: { submittedAt: 'desc' }
     });
 
-    return submissions.map(sub => ({
+    return submissions.map((sub: any) => ({
         id: sub.id,
         assignmentId: sub.assignmentId,
         studentId: sub.studentId,
@@ -483,9 +483,9 @@ export async function getClassesAction(): Promise<Class[]> {
         });
 
         console.log('  📚 Found classes:', classes.length);
-        classes.forEach(c => console.log(`    - ${c.name} (teacherId: ${c.teacherId})`));
+        classes.forEach((c: any) => console.log(`    - ${c.name} (teacherId: ${c.teacherId})`));
 
-        return classes.map(c => ({
+        return classes.map((c: any) => ({
             id: c.id,
             name: c.name,
             subject: c.subject,
@@ -524,7 +524,7 @@ export async function getClassesAction(): Promise<Class[]> {
         orderBy: { joinedAt: 'desc' }
     });
 
-    return enrollments.map(e => ({
+    return enrollments.map((e: any) => ({
         id: e.class.id,
         name: e.class.name,
         subject: e.class.subject,
@@ -959,7 +959,7 @@ export async function getClassEnrollmentsAction(classId: string) {
         include: { user: true }
     });
 
-    return enrollments.map(e => ({
+    return enrollments.map((e: any) => ({
         id: e.id,
         userId: e.userId,
         classId: e.classId,
@@ -984,7 +984,7 @@ export async function getPendingEnrollmentsAction(classId: string) {
         where: { classId, status: 'pending' },
         include: { user: true }
     });
-    return enrollments.map(e => ({
+    return enrollments.map((e: any) => ({
         id: e.id,
         userId: e.userId,
         classId: e.classId,
@@ -1209,11 +1209,11 @@ export async function getAttendanceHistoryAction(classId: string): Promise<{
         const totalStudents = enrollments.length;
 
         // Map sessions to summary
-        const sessionSummaries = sessions.map(s => {
-            const presentCount = s.attendanceRecords.filter(r => r.status === 'present').length;
-            const absentCount = s.attendanceRecords.filter(r => r.status === 'absent').length;
-            const lateCount = s.attendanceRecords.filter(r => r.status === 'late').length;
-
+        const sessionSummaries = sessions.map((s: typeof db.classSession.$inferResult & { attendanceRecords: (typeof db.attendanceRecord.$inferResult & { student: typeof db.user.$inferResult })[] }) => {
+            const presentCount = s.attendanceRecords.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'present').length;
+            const absentCount = s.attendanceRecords.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'absent').length;
+            const lateCount = s.attendanceRecords.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'late').length;
+            const excusedCount = s.attendanceRecords.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'excused').length;
             return {
                 id: s.id,
                 date: s.date.toISOString(),
@@ -1300,38 +1300,38 @@ export async function exportGradesAction(classId: string): Promise<{
             return { success: false, error: "Không có quyền truy cập" };
         }
 
-        // Get all assignments for this class
-        const assignments = await db.assignment.findMany({
-            where: {
-                OR: [
-                    { classIds: { contains: classId } },
-                    { assignmentClasses: { some: { classId } } }
-                ]
-            },
-            orderBy: { createdAt: 'asc' }
-        });
-
         // Get all enrolled students
         const enrollments = await db.classEnrollment.findMany({
             where: { classId, status: 'active' },
             include: { user: true }
         });
 
+        // Get all assignments for this class
+        const assignments = await db.assignment.findMany({
+            where: {
+                assignmentClasses: { some: { classId } }
+            },
+            orderBy: { createdAt: 'asc' }
+        });
+
         // Get all submissions
         const submissions = await db.submission.findMany({
             where: {
-                assignmentId: { in: assignments.map(a => a.id) },
-                studentId: { in: enrollments.map(e => e.userId) }
+                assignmentId: { in: assignments.map((a: typeof db.assignment.$inferResult) => a.id) },
+                studentId: { in: enrollments.map((e: typeof db.classEnrollment.$inferResult) => e.userId) }
             }
         });
 
+        // Filter graded submissions and group by student
+        const gradedSubmissions = submissions.filter((sub: typeof db.submission.$inferResult) => sub.status === 'graded');
+
         // Build headers
-        const headers = ['STT', 'Họ và tên', 'Email', ...assignments.map(a => a.title), 'Điểm TB'];
+        const headers = ['STT', 'Họ và tên', 'Email', ...assignments.map((a: typeof db.assignment.$inferResult) => a.title), 'Điểm TB'];
 
         // Build rows
-        const rows = enrollments.map((enr) => {
-            const studentGrades = assignments.map(assignment => {
-                const sub = submissions.find(s => s.assignmentId === assignment.id && s.studentId === enr.userId);
+        const rows = enrollments.map((enr: typeof db.classEnrollment.$inferResult & { user: typeof db.user.$inferResult }) => {
+            const studentGrades = assignments.map((assignment: typeof db.assignment.$inferResult) => {
+                const sub = submissions.find((s: typeof db.submission.$inferResult) => s.assignmentId === assignment.id && s.studentId === enr.userId);
                 return {
                     assignmentTitle: assignment.title,
                     score: sub?.score ?? null,
@@ -1349,11 +1349,11 @@ export async function exportGradesAction(classId: string): Promise<{
         // Generate CSV content
         const csvRows = [
             headers.join(','),
-            ...rows.map((row, index) => {
-                const scores = row.grades.map(g => g.score !== null ? g.score.toString() : '');
-                const gradedScores = row.grades.filter(g => g.score !== null);
+            ...rows.map((row: { studentName: string; studentId: string; grades: Array<{ assignmentTitle: string; score: number | null; maxScore: number }> }, index: number) => {
+                const scores = row.grades.map((g: { assignmentTitle: string; score: number | null; maxScore: number }) => g.score !== null ? g.score.toString() : '');
+                const gradedScores = row.grades.filter((g: { assignmentTitle: string; score: number | null; maxScore: number }) => g.score !== null);
                 const average = gradedScores.length > 0
-                    ? (gradedScores.reduce((sum, g) => sum + (g.score || 0), 0) / gradedScores.length).toFixed(1)
+                    ? (gradedScores.reduce((sum: number, g: { assignmentTitle: string; score: number | null; maxScore: number }) => sum + (g.score || 0), 0) / gradedScores.length).toFixed(1)
                     : '';
 
                 const enrollment = enrollments[index];
@@ -1402,9 +1402,9 @@ export async function getSocialEventsAction(classId: string): Promise<SocialEven
         include: { user: true, reactions: true }
     });
 
-    return events.map(e => ({
+    return events.map((e: any) => ({
         id: e.id,
-        type: e.type as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+        type: e.type as 'announcement' | 'assignment' | 'event' | 'general', // eslint-disable-line @typescript-eslint/no-explicit-any
         userId: e.userId,
         userName: e.user.name,
         userAvatar: e.user.avatarUrl || undefined,
@@ -1479,7 +1479,7 @@ export async function createAnnouncementAction(data: {
                 title: data.title,
                 content: data.content,
                 isPinned: data.isPinned,
-                type: data.type.toUpperCase() as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+                type: data.type.toUpperCase() as 'NORMAL' | 'URGENT' | 'EVENT', // eslint-disable-line @typescript-eslint/no-explicit-any
                 attachments: data.attachments || "[]"
             }
         });
@@ -1630,9 +1630,10 @@ export async function getAttendanceStatsAction(classId: string) {
 
     if (records.length === 0) return { attendanceRate: 100 }; // Default if no data
 
-    const presentCount = records.filter(r => r.status === 'PRESENT').length;
-    const lateCount = records.filter(r => r.status === 'LATE').length;
-    const excusedCount = records.filter(r => r.status === 'EXCUSED').length; // eslint-disable-line @typescript-eslint/no-unused-vars
+    const presentCount = records.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'PRESENT').length;
+    const absentCount = records.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'ABSENT').length;
+    const lateCount = records.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'LATE').length;
+    const excusedCount = records.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'EXCUSED').length; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     // We count Present and Late as "Attended" (maybe Late counts as 0.5? For now let's say 1)
     // Actually, usually Rate = (Present + Late) / Total
@@ -1738,7 +1739,7 @@ export async function deleteAnnouncementAction(announcementId: string) {
 
 // --- Class Settings Actions ---
 
-export async function updateClassDetailsAction(classId: string, data: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+export async function updateClassDetailsAction(classId: string, data: { name: string; subject: string; description?: string; schedule?: string }) { // eslint-disable-line @typescript-eslint/no-explicit-any
     const session = await getCurrentUserAction();
     if (!session || session.role !== 'teacher') {
         return { success: false, message: "Unauthorized" };
@@ -1821,25 +1822,25 @@ export async function getClassAnnouncementsAction(classId: string) {
         }
     });
 
-    return announcements.map(a => ({
-        id: a.id,
-        classId: a.classId,
-        teacherId: a.teacherId,
-        teacherName: a.teacher.name,
-        teacherAvatar: a.teacher.avatarUrl || undefined,
-        content: a.content,
-        title: a.title || undefined,
-        isPinned: a.isPinned,
-        createdAt: a.createdAt.toISOString(),
-        updatedAt: a.updatedAt.toISOString(),
-        type: (a.type?.toUpperCase() || 'NORMAL') as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-        attachments: a.attachments || '[]',
-        reactions: a.reactions.map(r => ({ userId: r.userId, type: r.type as any })), // eslint-disable-line @typescript-eslint/no-explicit-any
-        comments: a.comments.map(c => ({
+    return announcements.map((ann: typeof db.announcement.$inferResult & { teacher: typeof db.user.$inferResult | null; reactions: typeof db.reaction.$inferResult[]; comments: (typeof db.comment.$inferResult & { user: typeof db.user.$inferResult | null })[] }) => ({
+        id: ann.id,
+        classId: ann.classId,
+        teacherId: ann.teacherId,
+        teacherName: ann.teacher?.name || "Giáo viên",
+        teacherAvatar: ann.teacher?.avatarUrl || undefined,
+        content: ann.content,
+        title: ann.title || undefined,
+        isPinned: ann.isPinned,
+        createdAt: ann.createdAt.toISOString(),
+        updatedAt: ann.updatedAt.toISOString(),
+        type: (ann.type?.toUpperCase() || 'NORMAL') as 'NORMAL' | 'URGENT' | 'EVENT', // eslint-disable-line @typescript-eslint/no-explicit-any
+        attachments: ann.attachments || '[]',
+        reactions: ann.reactions.map((r: typeof db.reaction.$inferResult) => ({ userId: r.userId, type: r.type as 'respect' | 'challenge' })), // eslint-disable-line @typescript-eslint/no-explicit-any
+        comments: ann.comments.map((c: typeof db.comment.$inferResult & { user: typeof db.user.$inferResult | null }) => ({
             id: c.id,
             userId: c.userId,
-            userName: c.user.name,
-            userAvatar: c.user.avatarUrl || undefined,
+            userName: c.user?.name || "Người dùng",
+            userAvatar: c.user?.avatarUrl || undefined,
             content: c.content,
             createdAt: c.createdAt.toISOString()
         }))
@@ -2082,12 +2083,13 @@ export async function getNotificationsAction() {
             where: { userId: session.user.id },
             orderBy: { createdAt: 'desc' }
         });
-        return notifications.map(n => ({
+        const formattedNotifications = notifications.map((n: any) => ({
             ...n,
             type: n.type as any, // eslint-disable-line @typescript-eslint/no-explicit-any
             link: n.link || undefined,
             createdAt: n.createdAt.toISOString()
         }));
+        return formattedNotifications;
     } catch (error) {
         console.error("Get notifications error:", error);
         return [];
@@ -2198,7 +2200,7 @@ export async function getClassSessionsAction(classId: string, startDate: Date, e
         }
     });
 
-    return sessions.map(s => ({
+    return sessions.map((s: any) => ({
         id: s.id,
         classId: s.classId,
         teacherId: s.teacherId,
@@ -2209,7 +2211,7 @@ export async function getClassSessionsAction(classId: string, startDate: Date, e
         lessonContent: s.lessonContent || undefined,
         note: s.note || undefined,
         classification: (s.classification as any) || undefined, // eslint-disable-line @typescript-eslint/no-explicit-any
-        attendanceRecords: s.attendanceRecords.map(r => ({
+        attendanceRecords: s.attendanceRecords.map((r: any) => ({
             ...r,
             status: r.status as any, // eslint-disable-line @typescript-eslint/no-explicit-any
             note: r.note || undefined
@@ -2562,7 +2564,7 @@ export async function getTeacherAssignmentsAction(classId: string) {
         orderBy: { dueDate: 'asc' }
     });
 
-    return assignments.map(a => ({
+    return assignments.map((a: any) => ({
         id: a.id,
         title: a.title,
         description: a.description,

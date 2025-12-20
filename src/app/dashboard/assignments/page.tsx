@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, CheckCircle, Clock, Plus, Search, FileEdit } from "lucide-react";
-import { DataService } from "@/lib/data";
-import { getCurrentUserAction } from "@/lib/actions";
+import { getCurrentUserAction, getAssignmentsAction, getSubmissionsAction, getClassesAction } from "@/lib/actions";
 import { Assignment, Submission, User } from "@/types";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,17 +39,19 @@ function AssignmentsContent() {
                 setUser(currentUser);
 
                 const [allAssignments, allSubmissions] = await Promise.all([
-                    DataService.getAssignments(currentUser.role === 'student' ? currentUser.classId : undefined),
-                    currentUser.role === 'teacher'
-                        ? DataService.getSubmissions()
-                        : DataService.getSubmissions().then(subs => subs.filter(s => s.studentId === currentUser.id))
+                    getAssignmentsAction(currentUser.role === 'student' ? (currentUser as any).classId : undefined),
+                    getSubmissionsAction().then(subs =>
+                        currentUser.role === 'teacher'
+                            ? subs
+                            : subs.filter(s => s.studentId === currentUser.id)
+                    )
                 ]);
 
                 setAssignments(allAssignments);
                 setSubmissions(allSubmissions);
 
                 if (currentUser.role === 'teacher') {
-                    const teacherClasses = await DataService.getClasses();
+                    const teacherClasses = await getClassesAction();
                     setClasses(teacherClasses);
                 }
             } catch (error) {
@@ -167,7 +168,7 @@ function AssignmentsContent() {
                     isOpen={showCreateModal}
                     onClose={() => setShowCreateModal(false)}
                     onSuccess={async () => {
-                        const allAssignments = await DataService.getAssignments();
+                        const allAssignments = await getAssignmentsAction();
                         setAssignments(allAssignments);
                     }}
                 />

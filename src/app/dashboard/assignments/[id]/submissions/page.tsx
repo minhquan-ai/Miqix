@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { DataService } from "@/lib/data";
-import { getCurrentUserAction } from "@/lib/actions";
+import { getCurrentUserAction, getAssignmentByIdAction, getSubmissionsByAssignmentIdAction } from "@/lib/actions";
+import { getClassMembersAction } from "@/lib/class-member-actions";
 import { Assignment, Submission, User } from "@/types";
 import { ArrowLeft, BookOpen, Calendar, CheckCircle, Clock, FileText, Search, User as UserIcon, X } from "lucide-react";
 import SubmissionView from "@/components/SubmissionView";
@@ -36,7 +36,7 @@ export default function AssignmentSubmissionsPage() {
                 return;
             }
 
-            const assignmentData = await DataService.getAssignmentById(assignmentId);
+            const assignmentData = await getAssignmentByIdAction(assignmentId);
             if (!assignmentData) {
                 showToast("Bài tập không tồn tại", "error");
                 router.push('/dashboard/assignments');
@@ -45,23 +45,23 @@ export default function AssignmentSubmissionsPage() {
             setAssignment(assignmentData);
 
             // Load submissions
-            const subs = await DataService.getSubmissionsByAssignmentId(assignmentId);
+            const subs = await getSubmissionsByAssignmentIdAction(assignmentId);
             setSubmissions(subs);
 
-            // Load students from the first class (assuming assignment is for one class for now)
-            // In a real app, we might need to handle multiple classes or filter by class
+            // Load students from the first class
             if (assignmentData.classIds && assignmentData.classIds.length > 0) {
                 const classId = assignmentData.classIds[0];
-                const classMembers = await DataService.getClassMembers(classId);
-                // Filter only students and map to flat structure
+                const classMembers = await getClassMembersAction(classId);
+
+                // getClassMembersAction already returns flat student objects
                 const studentMembers = classMembers
-                    .filter((m: any) => m.user.role === 'student')
+                    .filter((m: any) => m.role === 'student')
                     .map((m: any) => ({
-                        userId: m.userId,
-                        name: m.user.name,
-                        email: m.user.email,
-                        avatarUrl: m.user.avatarUrl,
-                        role: m.user.role
+                        userId: m.id,
+                        name: m.name,
+                        email: m.email,
+                        avatarUrl: m.avatarUrl,
+                        role: m.role
                     }));
                 setStudents(studentMembers);
             }

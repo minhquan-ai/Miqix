@@ -3,9 +3,9 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, BookOpen, Clock, Copy, LayoutDashboard, MessageSquare, Settings, Users, CalendarCheck, Home, Trash2, Plus, Check, Trophy, Calendar, FolderOpen, Search, Filter, CheckCircle, FileSpreadsheet, FileEdit, Sparkles, Bell, AlertTriangle, Info, ChevronRight } from "lucide-react";
-import { DataService } from "@/lib/data";
+import { getCurrentUserAction, getAssignmentsAction, getStudentSubmissionAction, getSubmissionsByAssignmentIdAction, createAnnouncementAction, getClassAnnouncementsAction, getTeacherAssignmentsAction, updateClassDetailsAction, getClassResourcesAction } from "@/lib/actions";
+import { getUserEnrollmentsAction, getClassMembersAction, removeStudentFromClassAction } from "@/lib/class-member-actions";
 import StreamTabContent from '@/components/features/StreamTabContent';
-import { createAnnouncementAction, getClassAnnouncementsAction, getStudentSubmissionsAction, getTeacherAssignmentsAction, updateClassDetailsAction, getClassResourcesAction, getCurrentUserAction } from "@/lib/actions";
 import { useToast } from "@/components/ui/Toast";
 import { Assignment, Class, Submission, User } from "@/types";
 import { ResourceCard } from "@/components/ResourceCard";
@@ -155,12 +155,12 @@ export default function ClassDetailPage() {
         if (!confirm("Bạn có chắc chắn muốn rời khỏi lớp học này? Mọi dữ liệu điểm số và bài làm sẽ được lưu trữ nhưng bạn sẽ không thể truy cập lớp học nữa.")) return;
 
         try {
-            const result = await DataService.removeStudentFromClass(myEnrollmentId);
+            const result = await removeStudentFromClassAction(myEnrollmentId);
             if (result.success) {
                 showToast("Đã rời lớp học thành công", "success");
                 router.push('/dashboard/classes');
             } else {
-                showToast(result.message, "error");
+                showToast(result.message || "Không thể rời lớp", "error");
             }
         } catch (error) {
             showToast("Có lỗi xảy ra khi rời lớp", "error");
@@ -172,7 +172,7 @@ export default function ClassDetailPage() {
         if (!student || !student.enrollmentId) return;
 
         if (confirm(`Bạn có chắc muốn xóa học sinh ${student.name} khỏi lớp?`)) {
-            const result = await DataService.removeStudentFromClass(student.enrollmentId);
+            const result = await removeStudentFromClassAction(student.enrollmentId);
             if (result.success) {
                 setStudents(prev => prev.filter(s => s.userId !== studentId));
                 showToast("Đã xóa học sinh khỏi lớp", "success");
@@ -190,7 +190,7 @@ export default function ClassDetailPage() {
             // Refresh counts and lists
             const pending = await (await import('@/lib/actions')).getPendingEnrollmentsAction(classId);
             setPendingStudents(pending);
-            const classEnrollments = await DataService.getClassMembers(classId);
+            const classEnrollments = await getClassMembersAction(classId);
             const transformedStudents = classEnrollments.map((e: any) => ({
                 ...e,
                 userId: e.id,
@@ -252,7 +252,7 @@ export default function ClassDetailPage() {
                 }
                 setCurrentUser(user);
 
-                const cls = await DataService.getClassById(classId);
+                const cls = await (await import("@/lib/actions")).getClassByIdAction(classId);
                 if (!cls) {
                     setError("Không tìm thấy lớp học hoặc bạn không có quyền truy cập.");
                     return;
@@ -265,17 +265,14 @@ export default function ClassDetailPage() {
                 });
 
                 // Load students (Classmates)
-                const classEnrollments = await DataService.getClassMembers(classId);
+                const classEnrollments = await getClassMembersAction(classId);
                 // Transform to old format for backward compatibility with PeopleTabContent
-                // DataService.getClassMembers now returns User[] directly
                 const transformedStudents = classEnrollments.map((e: any) => ({
                     ...e,
                     userId: e.id, // Map for PeopleTabContent
                     name: e.name,
                     email: e.email,
-                    avatarUrl: e.avatarUrl,
-                    // xp: e.xp, // Removed
-                    // level: e.level // Removed
+                    avatarUrl: e.avatarUrl
                 }));
                 setStudents(transformedStudents);
 
@@ -287,15 +284,15 @@ export default function ClassDetailPage() {
                 }
 
                 // Load assignments
-                const allAssignments = await DataService.getAssignments();
-                const classAssignments = allAssignments.filter(a => a.classIds.includes(classId));
+                const allAssignments = await getAssignmentsAction();
+                const classAssignments = allAssignments.filter(a => a.classIds && a.classIds.includes(classId));
                 setAssignments(classAssignments);
 
                 // Load submissions based on role
                 if (user.role === 'teacher') {
                     const classSubmissions: Submission[] = [];
                     for (const assignment of classAssignments) {
-                        const subs = await DataService.getSubmissionsByAssignmentId(assignment.id);
+                        const subs = await getSubmissionsByAssignmentIdAction(assignment.id);
                         classSubmissions.push(...subs);
                     }
                     setSubmissions(classSubmissions);
@@ -303,16 +300,16 @@ export default function ClassDetailPage() {
                     // For student, only load their own submissions
                     const mySubmissions: Submission[] = [];
                     for (const assignment of classAssignments) {
-                        const sub = await DataService.getStudentSubmission(assignment.id, user.id);
-                        if (sub && sub.length > 0) mySubmissions.push(sub[0]);
+                        const sub = await getStudentSubmissionAction(assignment.id, user.id);
+                        if (sub) mySubmissions.push(sub);
                     }
                     setSubmissions(mySubmissions);
 
                     // Fetch teacher name and my enrollment ID
-                    const enrollments = await DataService.getUserEnrollments();
+                    const enrollments = await getUserEnrollmentsAction();
                     const currentEnrollment = enrollments.find((e: any) => e.classId === classId) as any;
                     if (currentEnrollment) {
-                        setTeacherName(currentEnrollment.teacherName);
+                        setTeacherName(currentEnrollment.className || "Giáo viên");
                         setMyEnrollmentId(currentEnrollment.id);
                         setMyRole(currentEnrollment.role);
                     }
@@ -479,8 +476,8 @@ export default function ClassDetailPage() {
                         onClose={() => setShowInClassAssignment(false)}
                         onSuccess={async () => {
                             // Reload assignments after creating new one
-                            const allAssignments = await DataService.getAssignments();
-                            const classAssignments = allAssignments.filter(a => a.classIds.includes(classId));
+                            const allAssignments = await getAssignmentsAction();
+                            const classAssignments = allAssignments.filter(a => a.classIds && a.classIds.includes(classId));
                             setAssignments(classAssignments);
                         }}
                     />
