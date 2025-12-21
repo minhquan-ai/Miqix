@@ -13,7 +13,7 @@ interface AIPageWrapperProps {
 }
 
 export function AIPageWrapper({ children, renderAI, className, aiWrapperClassName }: AIPageWrapperProps) {
-    const [isAIOpen, setIsAIOpen] = useState(false);
+    const [isAIOpen, setIsAIOpen] = useState(true);
 
     return (
         // Wrapper chính: Flex row, chiều cao tối thiểu fit màn hình

@@ -42,7 +42,7 @@ export function ClassesFilterBar({
             </div>
 
             {/* Filters */}
-            <div className="flex-[1.5] flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+            <div className="flex-[1.5] flex items-center gap-2 overflow-x-auto scrollbar-none pb-2 md:pb-0">
                 <ElegantSelect
                     value={selectedSubject}
                     onChange={(val) => onSubjectChange(val)}

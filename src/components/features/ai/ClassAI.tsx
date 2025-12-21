@@ -78,9 +78,9 @@ export function ClassAI({ onClose, user, classes }: ClassAIProps) {
                 className={`flex-1 flex flex-col p-4 space-y-6 bg-white scrollbar-thin scrollbar-thumb-gray-100 ${messages.length > 0 ? 'overflow-y-auto' : 'overflow-hidden'}`}
             >
                 {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-full text-center space-y-8 opacity-90">
-                        {/* Spacer giúp robot không bị kéo lên cao bởi các nút phía dưới */}
-                        <div className="h-24 shrink-0" />
+                    <div className="flex flex-col items-center justify-center h-full text-center space-y-6 opacity-90">
+                        {/* Spacer reduced to better center content */}
+                        <div className="h-4 shrink-0" />
 
                         <div className="relative">
                             <motion.div
@@ -163,7 +163,7 @@ export function ClassAI({ onClose, user, classes }: ClassAIProps) {
             </div>
 
             {/* Specialized Capsule Input Area - Styled matched with ScheduleAI */}
-            <div className="p-4 bg-white/50 backdrop-blur-sm pb-6">
+            <div className="pt-3 px-4 bg-white/50 backdrop-blur-sm pb-8">
                 <div className="bg-white rounded-[2rem] border border-gray-200 shadow-xl px-2 py-2 transition-all focus-within:ring-2 focus-within:ring-teal-100 focus-within:border-teal-200 relative">
 
                     {/* Main Input Part */}

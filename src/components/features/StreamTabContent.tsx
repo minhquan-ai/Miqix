@@ -134,11 +134,11 @@ export default function StreamTabContent({
 
     // Filter type options for teacher
     const filterTypes = [
-        { value: 'ALL', label: 'Tất cả', icon: null, activeColor: 'bg-white text-indigo-700 border-indigo-200 shadow-md ring-2 ring-indigo-50' },
-        { value: 'NORMAL', label: 'Thông thường', icon: Sparkles, activeColor: 'bg-blue-50 text-blue-700 border-blue-200 shadow-sm' },
-        { value: 'IMPORTANT', label: 'Quan trọng', icon: Bell, activeColor: 'bg-amber-50 text-amber-700 border-amber-200 shadow-sm' },
-        { value: 'URGENT', label: 'Khẩn cấp', icon: AlertTriangle, activeColor: 'bg-red-50 text-red-700 border-red-200 shadow-sm' },
-        { value: 'EVENT', label: 'Sự kiện', icon: Calendar, activeColor: 'bg-purple-50 text-purple-700 border-purple-200 shadow-sm' },
+        { value: 'ALL', label: 'Tất cả', icon: Sparkles, activeColor: 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-200' },
+        { value: 'NORMAL', label: 'Thông thường', icon: FileText, activeColor: 'bg-blue-600 text-white border-blue-600 shadow-blue-200' },
+        { value: 'IMPORTANT', label: 'Quan trọng', icon: Bell, activeColor: 'bg-amber-500 text-white border-amber-500 shadow-amber-200' },
+        { value: 'URGENT', label: 'Khẩn cấp', icon: AlertTriangle, activeColor: 'bg-red-600 text-white border-red-600 shadow-red-200' },
+        { value: 'EVENT', label: 'Sự kiện', icon: Calendar, activeColor: 'bg-purple-600 text-white border-purple-600 shadow-purple-200' },
     ];
 
     return (
@@ -156,15 +156,15 @@ export default function StreamTabContent({
 
                 {/* Compact Filter Bar */}
                 <div className="relative z-30 bg-white rounded-2xl border border-gray-100 px-4 py-2 flex items-center gap-3 flex-wrap shadow-sm">
-                    {/* Search - Classes Page Vibe */}
-                    <div className="relative flex-1 min-w-[200px] group">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+                    {/* Search - Premium Style */}
+                    <div className="relative flex-1 min-w-[240px] group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-500 group-focus-within:scale-110 transition-all duration-300" />
                         <input
                             type="text"
                             placeholder="Tìm kiếm thông báo..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 placeholder:text-gray-400 transition-all font-medium"
+                            className="w-full pl-11 pr-4 py-2.5 bg-gray-50/80 hover:bg-white border border-transparent hover:border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 placeholder:text-gray-400 transition-all duration-300 font-semibold text-gray-700 shadow-sm"
                         />
                     </div>
 
@@ -172,7 +172,7 @@ export default function StreamTabContent({
                     <div className="h-5 w-px bg-gray-200" />
 
                     {/* Filter Pills - Premium Style */}
-                    <div className="flex items-center gap-2 p-1 bg-gray-50/50 rounded-2xl border border-gray-100">
+                    <div className="flex items-center gap-1.5 p-1 bg-gray-100/50 rounded-2xl border border-gray-100/50">
                         {filterTypes.map((ft) => {
                             const Icon = ft.icon;
                             const isActive = filters.type === ft.value;
@@ -180,12 +180,21 @@ export default function StreamTabContent({
                                 <button
                                     key={ft.value}
                                     onClick={() => setFilters({ ...filters, type: ft.value as any })}
-                                    className={`px-4 py-2 rounded-xl text-[13px] font-bold transition-all flex items-center gap-2 border ${isActive
-                                        ? ft.activeColor
-                                        : 'text-gray-500 hover:text-gray-800 hover:bg-white border-transparent'
-                                        }`}
+                                    className={cn(
+                                        "px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 flex items-center gap-2 border",
+                                        isActive
+                                            ? `${ft.activeColor} shadow-lg scale-105 z-10`
+                                            : "text-gray-500 hover:text-gray-800 hover:bg-white border-transparent hover:shadow-sm"
+                                    )}
                                 >
-                                    {Icon && <Icon className={cn("w-3.5 h-3.5", isActive ? "animate-pulse" : "")} />}
+                                    {Icon && (
+                                        <Icon
+                                            className={cn(
+                                                "w-4 h-4 transition-transform duration-500",
+                                                isActive ? "rotate-12" : "group-hover:scale-110"
+                                            )}
+                                        />
+                                    )}
                                     <span>{ft.label}</span>
                                 </button>
                             );
@@ -196,12 +205,14 @@ export default function StreamTabContent({
                     {/* Pinned Toggle - Premium */}
                     <button
                         onClick={() => setFilters({ ...filters, showPinnedOnly: !filters.showPinnedOnly })}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold transition-all border ${filters.showPinnedOnly
-                            ? 'bg-amber-50 text-amber-700 border-amber-200 shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50/50 border-transparent'
-                            }`}
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 border",
+                            filters.showPinnedOnly
+                                ? 'bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-200 scale-105'
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-white border-transparent hover:shadow-sm'
+                        )}
                     >
-                        <Pin className={cn("w-3.5 h-3.5", filters.showPinnedOnly ? "fill-amber-500 text-amber-500" : "")} />
+                        <Pin className={cn("w-4 h-4 transition-all duration-300", filters.showPinnedOnly ? "fill-white text-white rotate-[30deg]" : "")} />
                         <span>Ghim</span>
                     </button>
 
