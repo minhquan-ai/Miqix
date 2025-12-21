@@ -125,8 +125,8 @@ function AssignmentsContent() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white -m-8 p-6">
-            <div className="max-w-full mx-auto space-y-8">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white -m-8 p-8 px-4 md:px-8">
+            <div className="w-full space-y-8">
                 <AssignmentCreatorModal
                     isOpen={showCreateModal}
                     onClose={() => setShowCreateModal(false)}
