@@ -44,9 +44,13 @@ export function ScheduleAI({ onClose, weekStartStr, onEventAdded }: ScheduleAIPr
     const [pendingOption, setPendingOption] = useState<AIResponseOption | null>(null);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null); // Ref cho container cuộn
 
+    // Cuộn xuống đáy TRONG container AI, không cuộn window
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
     };
 
     useEffect(() => {
@@ -124,9 +128,13 @@ export function ScheduleAI({ onClose, weekStartStr, onEventAdded }: ScheduleAIPr
 
     return (
         <AIPanelShell onClose={onClose} title="Trợ lý Lịch biểu" loading={loading}>
-            <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-white scrollbar-thin scrollbar-thumb-gray-100">
+            {/* Container: flex flex-col h-full để empty state có thể căn giữa */}
+            <div
+                ref={messagesContainerRef}
+                className={`flex-1 flex flex-col p-4 space-y-6 bg-white scrollbar-thin scrollbar-thumb-gray-100 ${messages.length > 0 ? 'overflow-y-auto' : 'overflow-hidden'}`}
+            >
                 {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-full text-center space-y-8 opacity-90 pb-12">
+                    <div className="flex flex-col items-center justify-center h-full text-center space-y-8 opacity-90">
                         <div className="relative">
                             <motion.div
                                 animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}

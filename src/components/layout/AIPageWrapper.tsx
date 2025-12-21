@@ -7,49 +7,56 @@ import { cn } from "@/lib/utils";
 
 interface AIPageWrapperProps {
     children: ReactNode;
-    /**
-     * Function to render the AI component.
-     * It receives `isOpen` and `onClose` to manage its own state if needed,
-     * though `AIPageWrapper` manages the layout visibility.
-     */
     renderAI: (props: { isOpen: boolean; onClose: () => void }) => ReactNode;
-
-    /**
-     * Optional class name for the wrapper div
-     */
     className?: string;
+    aiWrapperClassName?: string;
 }
 
-export function AIPageWrapper({ children, renderAI, className }: AIPageWrapperProps) {
+export function AIPageWrapper({ children, renderAI, className, aiWrapperClassName }: AIPageWrapperProps) {
     const [isAIOpen, setIsAIOpen] = useState(false);
 
     return (
-        <div className={cn("h-[calc(100vh-64px)] bg-gray-50/50 -m-8 flex overflow-hidden p-6 pb-0 gap-6", className)}>
-            {/* Main Content Area */}
-            <motion.div
-                layout
-                className="flex-1 flex flex-col gap-6 overflow-hidden min-w-0" // min-w-0 is crucial for flex child text truncation
-                transition={{ type: "tween", duration: 0.4, ease: "easeInOut" }}
-            >
-                {children}
-            </motion.div>
+        // Wrapper chính: Flex row, chiều cao tối thiểu fit màn hình
+        // min-h-[calc(100vh-64px)]: đảm bảo ít nhất full màn hình, cho phép tràn
+        // overflowAnchor: 'none' -> NGĂN CHẶN browser tự động cuộn lung tung khi resize layout
+        <div
+            className={cn("flex min-h-[calc(100vh-64px)] -m-8 relative", className)}
+            style={{ overflowAnchor: "none" }}
+        >
 
-            {/* AI Panel Area */}
-            <AnimatePresence>
+            {/* Main Content Area - Bên trái */}
+            {/* flex-1: Chiếm hết không gian, tự giãn theo nội dung */}
+            {/* Bỏ transition-all để content resize ngay lập tức theo sidebar, tránh xung đột animation */}
+            <div className="flex-1 bg-gray-50/50 p-6">
+                <div className="flex flex-col gap-6">
+                    {children}
+                </div>
+            </div>
+
+            {/* AI Panel Area - Bên phải */}
+            {/* sticky top-0: Bám dính vào cạnh trên màn hình khi cuộn */}
+            {/* AI Panel Area - Bên phải - Maximized & Centered */}
+            <AnimatePresence mode="wait">
                 {isAIOpen && (
                     <motion.div
-                        initial={{ opacity: 0, x: "100%", width: 0 }}
-                        animate={{ opacity: 1, x: 0, width: 450 }}
-                        exit={{ opacity: 0, x: "100%", width: 0 }}
-                        transition={{ type: "tween", duration: 0.4, ease: "easeInOut" }}
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: 500, opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                        // Wrapper sticky:
+                        // top-1: Cách Header chỉ 4px - Gần như sát đỉnh
+                        // h-[calc(100vh-4.5rem)]: Chiều cao tối đa, chừa ~4px ở đáy
+                        // pl-1: Padding trái 4px (gần content)
+                        // pr-6: Padding phải 24px -> Khoảng cách lớn với lề phải -> ĐẨY PANEL SANG TRÁI
                         className={cn(
-                            "bg-white z-50 flex flex-col overflow-hidden",
-                            "fixed top-0 right-0 bottom-0 w-[calc(100%-1rem)] shadow-2xl rounded-l-[2rem] border-l border-gray-100", // Mobile/Default
-                            "md:relative md:shadow-xl md:shadow-indigo-500/5", // Desktop sidebar
-                            "min-w-0"
+                            "z-20 shrink-0 sticky top-1 h-[calc(100vh-4.5rem)] pl-1 pr-6 pointer-events-none",
+                            aiWrapperClassName
                         )}
                     >
-                        {renderAI({ isOpen: isAIOpen, onClose: () => setIsAIOpen(false) })}
+                        {/* Inner Container: Floating Card */}
+                        <div className="w-full h-full flex flex-col bg-white border border-gray-100 shadow-2xl rounded-[1.5rem] overflow-hidden pointer-events-auto">
+                            {renderAI({ isOpen: isAIOpen, onClose: () => setIsAIOpen(false) })}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -68,13 +75,6 @@ export function AIPageWrapper({ children, renderAI, className }: AIPageWrapperPr
                         title="Trợ lý AI"
                     >
                         <Bot className="w-8 h-8 group-hover:rotate-[-10deg] transition-transform" />
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            whileHover={{ opacity: 1, x: -10 }}
-                            className="absolute right-full mr-4 bg-gray-900 text-white px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-xl pointer-events-none"
-                        >
-                            Trợ lý AI
-                        </motion.div>
                     </motion.button>
                 )}
             </AnimatePresence>

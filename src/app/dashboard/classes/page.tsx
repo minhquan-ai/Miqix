@@ -11,6 +11,7 @@ import { ClassCardTeacher } from "@/components/classes/ClassCardTeacher";
 import { ClassCardStudent } from "@/components/classes/ClassCardStudent";
 import { ClassesFilterBar } from "@/components/classes/ClassesFilterBar";
 import { JoinClassWidget } from "@/components/classes/JoinClassWidget";
+import { ElegantSelect } from "@/components/ui/ElegantSelect";
 
 import { ClassCreatorModal } from '@/components/features/ClassCreatorModal';
 import { AIPageWrapper } from "@/components/layout/AIPageWrapper";
@@ -117,6 +118,7 @@ export default function ClassesPage() {
         return (
             <AIPageWrapper
                 renderAI={({ onClose }) => <ClassAI onClose={onClose} user={user} classes={classes} />}
+                aiWrapperClassName="top-[32px] h-[calc(100vh-2.25rem)]"
             >
                 <div className="flex-1 flex flex-col overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                     <div className="space-y-5 p-1">
@@ -161,9 +163,9 @@ export default function ClassesPage() {
                             transition={{ delay: 0.15 }}
                             className="space-y-4 shrink-0"
                         >
-                            <div className="flex flex-col lg:flex-row gap-4">
-                                {/* Search Bar */}
-                                <div className="flex-1 relative">
+                            <div className="flex flex-wrap gap-4">
+                                {/* Search Bar - Tự giãn, tối thiểu 240px */}
+                                <div className="flex-auto min-w-[240px] relative">
                                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                     <input
                                         type="text"
@@ -174,30 +176,32 @@ export default function ClassesPage() {
                                     />
                                 </div>
 
-                                {/* Filters Group */}
-                                <div className="flex items-center gap-3">
-                                    <select
+                                {/* Filters Group - Flex wrap nội bộ, không set min-w cứng container */}
+                                <div className="flex-auto flex flex-wrap items-center gap-3">
+                                    <ElegantSelect
                                         value={selectedSubject}
-                                        onChange={(e) => setSelectedSubject(e.target.value)}
-                                        className="bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 min-w-[140px] shadow-sm cursor-pointer"
-                                    >
-                                        <option value="">Tất cả môn</option>
-                                        {["Toán học", "Vật lý", "Hóa học", "Sinh học", "Tin học", "Ngữ văn", "Tiếng Anh"].map(s => (
-                                            <option key={s} value={s}>{s}</option>
-                                        ))}
-                                    </select>
+                                        onChange={(val) => setSelectedSubject(val)}
+                                        options={[
+                                            { value: "", label: "Tất cả môn" },
+                                            ...["Toán học", "Vật lý", "Hóa học", "Sinh học", "Tin học", "Ngữ văn", "Tiếng Anh"].map(s => ({ value: s, label: s }))
+                                        ]}
+                                        className="flex-1 min-w-[130px]"
+                                    />
 
-                                    <select
+                                    <ElegantSelect
                                         value={selectedType}
-                                        onChange={(e) => setSelectedType(e.target.value)}
-                                        className="bg-white border border-gray-200 rounded-2xl px-4 py-3.5 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 min-w-[140px] shadow-sm cursor-pointer"
-                                    >
-                                        <option value="">Lớp học</option>
-                                        <option value="main">Chính khoá</option>
-                                        <option value="extra">Lớp Học Thêm</option>
-                                    </select>
+                                        onChange={(val) => setSelectedType(val)}
+                                        options={[
+                                            { value: "", label: "Lớp học" },
+                                            { value: "main", label: "Chính khoá" },
+                                            { value: "extra", label: "Lớp Học Thêm" }
+                                        ]}
+                                        className="flex-1 min-w-[130px]"
+                                    />
 
-                                    <JoinClassWidget onJoin={handleJoinClass} />
+                                    <div className="shrink-0">
+                                        <JoinClassWidget onJoin={handleJoinClass} />
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
@@ -261,6 +265,7 @@ export default function ClassesPage() {
     return (
         <AIPageWrapper
             renderAI={({ onClose }) => <ClassAI onClose={onClose} user={user} classes={classes} />}
+            aiWrapperClassName="top-[32px] h-[calc(100vh-2.25rem)]"
         >
             <div className="flex-1 flex flex-col overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                 <div className="space-y-5 p-1">

@@ -60,21 +60,45 @@ export default function ScheduleContent() {
     const goToToday = () => setCurrentDate(new Date());
 
     // Time Grid Settings
-    const START_HOUR = 6; // 6:00 AM
-    const END_HOUR = 22;  // 10:00 PM
+    const START_HOUR = 0; // 0:00 AM
+    const END_HOUR = 24;  // 24:00 (end of day)
+    // Tạo mảng 25 nhãn từ 0 đến 24 để hiển thị đủ chặn đầu và chặn đuôi
     const hours = Array.from({ length: END_HOUR - START_HOUR + 1 }).map((_, i) => START_HOUR + i);
 
-    // Helper to position events
-    const getEventStyle = (event: ScheduleEvent) => {
-        const start = new Date(event.start);
-        const end = new Date(event.end);
+    // Helper to position events - handles multi-day events, overnight events, etc.
+    const getEventStyle = (event: ScheduleEvent, currentDay: Date) => {
+        const eventStart = new Date(event.start);
+        const eventEnd = new Date(event.end);
 
-        const startMinutes = (getHours(start) * 60 + getMinutes(start)) - (START_HOUR * 60);
-        const durationMinutes = differenceInMinutes(end, start);
+        // Xác định ngày hiện tại đang render (đầu ngày và cuối ngày)
+        const dayStart = new Date(currentDay);
+        dayStart.setHours(START_HOUR, 0, 0, 0);
+
+        const dayEnd = new Date(currentDay);
+        dayEnd.setHours(END_HOUR - 1, 59, 59, 999); // 23:59:59
+
+        // Giới hạn start/end trong phạm vi ngày đang render
+        // - Nếu sự kiện bắt đầu trước ngày hiện tại → bắt đầu từ đầu ngày
+        // - Nếu sự kiện kết thúc sau ngày hiện tại → kết thúc cuối ngày
+        const clampedStart = eventStart < dayStart ? dayStart : eventStart;
+        const clampedEnd = eventEnd > dayEnd ? dayEnd : eventEnd;
+
+        // Kiểm tra nếu sự kiện không thuộc ngày này (hoàn toàn ngoài phạm vi)
+        if (clampedStart > dayEnd || clampedEnd < dayStart) {
+            return { display: 'none' as const };
+        }
+
+        // Tính vị trí top và chiều cao dựa trên phần đã giới hạn
+        const startMinutes = (getHours(clampedStart) * 60 + getMinutes(clampedStart)) - (START_HOUR * 60);
+        const durationMinutes = differenceInMinutes(clampedEnd, clampedStart);
+
+        // Đảm bảo chiều cao tối thiểu 40px và tối đa không vượt quá phạm vi ngày
+        const maxDuration = (END_HOUR - START_HOUR) * 60; // 24 giờ = 1440 phút
+        const safeDuration = Math.min(Math.max(durationMinutes, 15), maxDuration - startMinutes);
 
         return {
-            top: `${(startMinutes / 60) * 80}px`, // 80px per hour height (taller rows)
-            height: `${Math.max((durationMinutes / 60) * 80, 40)}px`,
+            top: `${Math.max(0, (startMinutes / 60) * 80)}px`,
+            height: `${Math.max((safeDuration / 60) * 80, 40)}px`,
             position: 'absolute' as const,
             width: '92%',
             left: '4%',
@@ -219,9 +243,12 @@ export default function ScheduleContent() {
                             {/* Body Rows (Time Slots) */}
                             <div className="relative grid grid-cols-[70px_1fr_1fr_1fr_1fr_1fr_1fr_1fr]">
                                 {/* Time Column */}
-                                <div className="border-r border-gray-100 bg-gray-50/30">
-                                    {hours.map(hour => (
-                                        <div key={hour} className="h-20 border-b border-gray-100/60 text-xs font-semibold text-gray-400 text-right pr-3 pt-2 relative">
+                                <div className="border-r border-gray-100 bg-gray-50/30 pb-4">
+                                    {hours.map((hour, idx) => (
+                                        <div key={hour} className={cn(
+                                            "h-20 border-b border-gray-100/60 text-xs font-semibold text-gray-400 text-right pr-3 pt-2 relative",
+                                            idx === hours.length - 1 ? "border-b-0" : ""
+                                        )}>
                                             <span className="-top-3 relative">{hour}:00</span>
                                         </div>
                                     ))}
@@ -237,12 +264,19 @@ export default function ScheduleContent() {
                                             isToday ? "bg-purple-50/10" : ""
                                         )}>
                                             {/* Horizontal Grid Lines */}
-                                            {hours.map(hour => (
-                                                <div key={hour} className="h-20 border-b border-gray-100/60 relative">
-                                                    {/* Optional: Half-hour dashed line */}
-                                                    <div className="absolute w-full border-b border-gray-50 top-1/2 border-dashed"></div>
-                                                </div>
-                                            ))}
+                                            <div className="pb-4">
+                                                {hours.map((hour, idx) => (
+                                                    <div key={hour} className={cn(
+                                                        "h-20 border-b border-gray-100/60 relative",
+                                                        idx === hours.length - 1 ? "border-b-0" : ""
+                                                    )}>
+                                                        {/* Optional: Half-hour dashed line */}
+                                                        {idx !== hours.length - 1 && (
+                                                            <div className="absolute w-full border-b border-gray-50/50 top-1/2 border-dashed"></div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
 
                                             {/* Current Time Indicator Line for Today */}
                                             {isToday && timeIndicatorTop && (
@@ -258,7 +292,18 @@ export default function ScheduleContent() {
                                             {/* Events */}
                                             <AnimatePresence>
                                                 {events
-                                                    .filter(e => isSameDay(new Date(e.start), day))
+                                                    .filter(e => {
+                                                        // Hiển thị event nếu ngày hiện tại nằm trong khoảng start → end
+                                                        const eventStart = new Date(e.start);
+                                                        const eventEnd = new Date(e.end);
+                                                        const dayStart = new Date(day);
+                                                        dayStart.setHours(0, 0, 0, 0);
+                                                        const dayEnd = new Date(day);
+                                                        dayEnd.setHours(23, 59, 59, 999);
+
+                                                        // Event xuất hiện trong ngày nếu: eventStart <= dayEnd && eventEnd >= dayStart
+                                                        return eventStart <= dayEnd && eventEnd >= dayStart;
+                                                    })
                                                     .map((event, idx) => {
                                                         const duration = differenceInMinutes(new Date(event.end), new Date(event.start));
                                                         const isMicro = duration < 15;
@@ -271,7 +316,7 @@ export default function ScheduleContent() {
                                                                 initial={{ opacity: 0, scale: 0.9 }}
                                                                 animate={{ opacity: 1, scale: 1 }}
                                                                 whileHover={{ scale: 1.02, zIndex: 50 }}
-                                                                style={getEventStyle(event)}
+                                                                style={getEventStyle(event, day)}
                                                                 onClick={() => setSelectedEvent(event)}
                                                                 className={cn(
                                                                     "rounded-xl border shadow-sm hover:shadow-lg cursor-pointer flex transition-all duration-200 relative overflow-hidden backdrop-blur-md group",

@@ -2,6 +2,7 @@
 
 import { Search, LayoutGrid, List, BookOpen } from "lucide-react";
 import { useState } from "react";
+import { ElegantSelect } from "@/components/ui/ElegantSelect";
 
 interface ClassesFilterBarProps {
     searchQuery: string;
@@ -27,41 +28,41 @@ export function ClassesFilterBar({
     const subjects = ["Toán học", "Vật lý", "Hóa học", "Sinh học", "Tin học", "Ngữ văn", "Tiếng Anh"];
 
     return (
-        <div className="bg-white p-2 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-2">
+        <div className="relative z-20 bg-white p-2 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-2">
             {/* Search */}
-            <div className="relative flex-1">
+            <div className="relative flex-[2.5]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                     type="text"
                     placeholder="Tìm kiếm lớp học..."
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400"
+                    className="w-full pl-9 pr-4 py-3.5 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 placeholder:text-gray-400"
                 />
             </div>
 
             {/* Filters */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
-                <select
+            <div className="flex-[1.5] flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+                <ElegantSelect
                     value={selectedSubject}
-                    onChange={(e) => onSubjectChange(e.target.value)}
-                    className="px-3 py-2 bg-gray-50 rounded-xl text-sm border-none focus:ring-2 focus:ring-blue-500/20 text-gray-600 min-w-[120px]"
-                >
-                    <option value="">Tất cả môn</option>
-                    {subjects.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                    ))}
-                </select>
+                    onChange={(val) => onSubjectChange(val)}
+                    options={[
+                        { value: "", label: "Tất cả môn" },
+                        ...subjects.map(s => ({ value: s, label: s }))
+                    ]}
+                    className="flex-1 min-w-[120px]"
+                />
 
-                <select
+                <ElegantSelect
                     value={selectedType}
-                    onChange={(e) => onTypeChange(e.target.value)}
-                    className="px-3 py-2 bg-gray-50 rounded-xl text-sm border-none focus:ring-2 focus:ring-blue-500/20 text-gray-600 min-w-[120px]"
-                >
-                    <option value="">Lớp học</option>
-                    <option value="main">Chính khoá</option>
-                    <option value="extra">Lớp Học Thêm</option>
-                </select>
+                    onChange={(val) => onTypeChange(val)}
+                    options={[
+                        { value: "", label: "Lớp học" },
+                        { value: "main", label: "Chính khoá" },
+                        { value: "extra", label: "Lớp Học Thêm" }
+                    ]}
+                    className="flex-1 min-w-[120px]"
+                />
 
                 <div className="w-px h-6 bg-gray-200 mx-1" />
 

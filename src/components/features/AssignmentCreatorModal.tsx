@@ -14,6 +14,7 @@ import { QuizQuestion } from "@/lib/ai-service";
 import { useToast } from "@/components/ui/Toast";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { refineAssignmentAction } from "@/lib/ai-actions";
+import { ElegantSelect } from "@/components/ui/ElegantSelect";
 
 interface AssignmentCreatorModalProps {
     isOpen: boolean;
@@ -497,15 +498,16 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
                                                         </div>
                                                         <div className="space-y-2">
                                                             <label className="text-sm font-medium">Thang điểm</label>
-                                                            <select
-                                                                value={formData.maxScore}
-                                                                onChange={(e) => setFormData({ ...formData, maxScore: parseInt(e.target.value) })}
-                                                                className="w-full px-4 py-3 rounded-xl border border-input bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                                                            >
-                                                                <option value="10">10 điểm</option>
-                                                                <option value="100">100 điểm</option>
-                                                                <option value="4">4 điểm (GPA)</option>
-                                                            </select>
+                                                            <ElegantSelect
+                                                                value={formData.maxScore.toString()}
+                                                                onChange={(val) => setFormData({ ...formData, maxScore: parseInt(val) })}
+                                                                options={[
+                                                                    { value: "10", label: "10 điểm" },
+                                                                    { value: "100", label: "100 điểm" },
+                                                                    { value: "4", label: "4 điểm (GPA)" }
+                                                                ]}
+                                                                className="w-full"
+                                                            />
                                                         </div>
                                                     </div>
 
@@ -583,18 +585,19 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
                                                             <div className="space-y-4 pt-4 border-t border-purple-100">
                                                                 <div className="space-y-2">
                                                                     <label className="text-sm font-medium">Phong cách nhận xét</label>
-                                                                    <select
+                                                                    <ElegantSelect
                                                                         value={formData.aiSettings.tone}
-                                                                        onChange={(e) => setFormData({
+                                                                        onChange={(val: any) => setFormData({
                                                                             ...formData,
-                                                                            aiSettings: { ...formData.aiSettings, tone: e.target.value as any }
+                                                                            aiSettings: { ...formData.aiSettings, tone: val }
                                                                         })}
-                                                                        className="w-full px-4 py-2 rounded-lg border border-purple-200 bg-white/50 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 transition-all"
-                                                                    >
-                                                                        <option value="encouraging">Động viên, khích lệ</option>
-                                                                        <option value="formal">Trang trọng, chuyên nghiệp</option>
-                                                                        <option value="constructive">Xây dựng, chi tiết</option>
-                                                                    </select>
+                                                                        options={[
+                                                                            { value: "encouraging", label: "Động viên, khích lệ" },
+                                                                            { value: "formal", label: "Trang trọng, chuyên nghiệp" },
+                                                                            { value: "constructive", label: "Xây dựng, chi tiết" }
+                                                                        ]}
+                                                                        className="w-full"
+                                                                    />
                                                                 </div>
                                                             </div>
                                                         )}

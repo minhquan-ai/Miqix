@@ -8,9 +8,11 @@ import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import Link from 'next/link';
 import { Search, Sparkles, Bell, AlertTriangle, Calendar, Pin, Users, FileText, BookOpen } from 'lucide-react';
+import { cn } from "@/lib/utils";
 import AnnouncementCard from '@/components/AnnouncementCard';
 import AnnouncementComposer from '@/components/AnnouncementComposer';
 import { BaseModal } from '@/components/ui/BaseModal';
+import { ElegantSelect } from '@/components/ui/ElegantSelect';
 import { getAnnouncementStyle } from '@/utils/announcementStyle';
 import { FilterState, SortOption } from '@/components/StreamFilterSidebar';
 import { User, Assignment, Submission, Announcement } from '@/types';
@@ -26,8 +28,6 @@ interface StreamTabContentProps {
     students: any[];
     filters: FilterState;
     setFilters: (filters: FilterState) => void;
-    sortBy: SortOption;
-    setSortBy: (sort: SortOption) => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     onPostAnnouncement: () => Promise<void>;
@@ -44,8 +44,6 @@ export default function StreamTabContent({
     students,
     filters,
     setFilters,
-    sortBy,
-    setSortBy,
     searchQuery,
     setSearchQuery,
     onPostAnnouncement
@@ -115,12 +113,9 @@ export default function StreamTabContent({
             return true;
         })
         .sort((a, b) => {
-            if (sortBy === 'newest') {
-                if (a.isPinned && !b.isPinned) return -1;
-                if (!a.isPinned && b.isPinned) return 1;
-                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-            }
-            return 0;
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
     const displayedList = filteredAnnouncements.slice(0, displayCount);
@@ -139,11 +134,11 @@ export default function StreamTabContent({
 
     // Filter type options for teacher
     const filterTypes = [
-        { value: 'ALL', label: 'Tất cả', icon: null, activeColor: 'bg-blue-100 text-blue-700 ring-1 ring-blue-300' },
-        { value: 'NORMAL', label: 'Thông thường', icon: Sparkles, activeColor: 'bg-blue-100 text-blue-700 ring-1 ring-blue-300' },
-        { value: 'IMPORTANT', label: 'Quan trọng', icon: Bell, activeColor: 'bg-orange-100 text-orange-700 ring-1 ring-orange-300' },
-        { value: 'URGENT', label: 'Khẩn cấp', icon: AlertTriangle, activeColor: 'bg-red-100 text-red-700 ring-1 ring-red-300' },
-        { value: 'EVENT', label: 'Sự kiện', icon: Calendar, activeColor: 'bg-purple-100 text-purple-700 ring-1 ring-purple-300' },
+        { value: 'ALL', label: 'Tất cả', icon: null, activeColor: 'bg-white text-indigo-700 border-indigo-200 shadow-md ring-2 ring-indigo-50' },
+        { value: 'NORMAL', label: 'Thông thường', icon: Sparkles, activeColor: 'bg-blue-50 text-blue-700 border-blue-200 shadow-sm' },
+        { value: 'IMPORTANT', label: 'Quan trọng', icon: Bell, activeColor: 'bg-amber-50 text-amber-700 border-amber-200 shadow-sm' },
+        { value: 'URGENT', label: 'Khẩn cấp', icon: AlertTriangle, activeColor: 'bg-red-50 text-red-700 border-red-200 shadow-sm' },
+        { value: 'EVENT', label: 'Sự kiện', icon: Calendar, activeColor: 'bg-purple-50 text-purple-700 border-purple-200 shadow-sm' },
     ];
 
     return (
@@ -160,24 +155,24 @@ export default function StreamTabContent({
                 />
 
                 {/* Compact Filter Bar */}
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-gray-100 px-4 py-2.5 flex items-center gap-3 flex-wrap">
-                    {/* Search - Compact */}
-                    <div className="relative flex-1 min-w-[160px] max-w-[240px]">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <div className="relative z-30 bg-white rounded-2xl border border-gray-100 px-4 py-2 flex items-center gap-3 flex-wrap shadow-sm">
+                    {/* Search - Classes Page Vibe */}
+                    <div className="relative flex-1 min-w-[200px] group">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
                         <input
                             type="text"
-                            placeholder="Tìm kiếm..."
+                            placeholder="Tìm kiếm thông báo..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-8 pr-3 py-1.5 bg-gray-50/80 border-0 rounded-lg text-sm focus:outline-none focus:bg-white focus:ring-1 focus:ring-blue-500/30 transition-all"
+                            className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 placeholder:text-gray-400 transition-all font-medium"
                         />
                     </div>
 
                     {/* Divider */}
                     <div className="h-5 w-px bg-gray-200" />
 
-                    {/* Filter Pills - Compact */}
-                    <div className="flex items-center gap-1">
+                    {/* Filter Pills - Premium Style */}
+                    <div className="flex items-center gap-2 p-1 bg-gray-50/50 rounded-2xl border border-gray-100">
                         {filterTypes.map((ft) => {
                             const Icon = ft.icon;
                             const isActive = filters.type === ft.value;
@@ -185,43 +180,31 @@ export default function StreamTabContent({
                                 <button
                                     key={ft.value}
                                     onClick={() => setFilters({ ...filters, type: ft.value as any })}
-                                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all flex items-center gap-1 ${isActive
+                                    className={`px-4 py-2 rounded-xl text-[13px] font-bold transition-all flex items-center gap-2 border ${isActive
                                         ? ft.activeColor
-                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                        : 'text-gray-500 hover:text-gray-800 hover:bg-white border-transparent'
                                         }`}
                                 >
-                                    {Icon && <Icon className="w-3 h-3" />}
-                                    <span className="hidden sm:inline">{ft.label}</span>
+                                    {Icon && <Icon className={cn("w-3.5 h-3.5", isActive ? "animate-pulse" : "")} />}
+                                    <span>{ft.label}</span>
                                 </button>
                             );
                         })}
                     </div>
 
-                    {/* Divider */}
-                    <div className="h-5 w-px bg-gray-200 hidden sm:block" />
 
-                    {/* Pinned Toggle - Compact */}
+                    {/* Pinned Toggle - Premium */}
                     <button
                         onClick={() => setFilters({ ...filters, showPinnedOnly: !filters.showPinnedOnly })}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${filters.showPinnedOnly
-                            ? 'bg-amber-100 text-amber-700'
-                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold transition-all border ${filters.showPinnedOnly
+                            ? 'bg-amber-50 text-amber-700 border-amber-200 shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50/50 border-transparent'
                             }`}
                     >
-                        <Pin className="w-3 h-3" />
-                        <span className="hidden sm:inline">Ghim</span>
+                        <Pin className={cn("w-3.5 h-3.5", filters.showPinnedOnly ? "fill-amber-500 text-amber-500" : "")} />
+                        <span>Ghim</span>
                     </button>
 
-                    {/* Sort - Minimal */}
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as any)}
-                        className="px-2 py-1 bg-transparent border-0 rounded-md text-xs font-medium text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30 cursor-pointer hover:bg-gray-100 transition-all"
-                    >
-                        <option value="newest">Mới nhất</option>
-                        <option value="reactions">Nhiều ❤️</option>
-                        <option value="comments">Sôi nổi</option>
-                    </select>
                 </div>
 
                 {/* Announcements List */}
