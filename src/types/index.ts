@@ -146,7 +146,7 @@ export interface Reaction {
 
 export interface SocialEvent {
     id: string;
-    type: 'help_request' | 'submission';
+    type: 'help_request' | 'submission' | 'announcement' | 'assignment' | 'event' | 'general';
     userId: string;
     userName?: string;
     userAvatar?: string;

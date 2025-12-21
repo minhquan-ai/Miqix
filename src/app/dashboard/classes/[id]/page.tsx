@@ -43,8 +43,376 @@ import QuickActionModal from "@/components/QuickActionModal";
 import ClassInfoPanel from "@/components/ClassInfoPanel";
 import { InClassAssignmentCreator } from "@/components/features/InClassAssignmentCreator";
 import StudentOverviewTab from "@/components/features/StudentOverviewTab";
-import { AIPageWrapper } from "@/components/layout/AIPageWrapper";
-import { ClassAI } from "@/components/features/ai/ClassAI";
+
+function TabButton({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string }) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                "relative flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all duration-300 rounded-2xl whitespace-nowrap mb-[-2px]",
+                active
+                    ? "text-blue-600"
+                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+            )}
+        >
+            {active && (
+                <motion.div
+                    layoutId="activeClassTab"
+                    className="absolute inset-0 bg-blue-50/60 border-b-2 border-blue-600 z-0"
+                    initial={false}
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+                {icon && <span className={cn("transition-transform duration-300", active && "scale-110")}>{icon}</span>}
+                {label}
+            </span>
+        </button>
+    );
+}
+
+function FilterButton({ active, onClick, label, icon }: { active: boolean, onClick: () => void, label: string, icon?: React.ReactNode }) {
+    return (
+        <button
+            onClick={onClick}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${active
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                } `}
+        >
+            {icon}
+            {label}
+        </button>
+    );
+}
+
+function ClassworkTabContent({
+    assignments,
+    submissions,
+    students,
+    user,
+    searchQuery,
+    setSearchQuery,
+    onCreate
+}: {
+    assignments: Assignment[],
+    submissions: Submission[],
+    students: any[],
+    user: User,
+    searchQuery: string,
+    setSearchQuery: (s: string) => void,
+    onCreate?: () => void
+}) {
+    const [viewAllSection, setViewAllSection] = useState<{ title: string; assignments: Assignment[] } | null>(null);
+
+    // Filter Logic
+    const filteredAssignments = assignments.filter(a => {
+        if (searchQuery && !a.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+        return true;
+    });
+
+    const categorizedAssignments = useMemo(() => {
+        const result: { title: string; assignments: Assignment[]; icon: React.ReactNode; color: string }[] = [];
+
+        if (user.role === 'teacher') {
+            const drafts = filteredAssignments.filter(a => a.status === 'draft');
+            const needsGrading = filteredAssignments.filter(a => {
+                const subs = submissions.filter(s => s.assignmentId === a.id);
+                return subs.some(s => s.status === 'submitted');
+            });
+            const active = filteredAssignments.filter(a => a.status === 'open' && !needsGrading.includes(a) && !drafts.includes(a));
+            const closed = filteredAssignments.filter(a => a.status === 'closed');
+
+            if (needsGrading.length > 0) result.push({ title: "Cần chấm bài", assignments: needsGrading, icon: <CheckCircle className="w-5 h-5" />, color: "text-amber-600 bg-amber-50" });
+            if (active.length > 0) result.push({ title: "Đang mở", assignments: active, icon: <Clock className="w-5 h-5" />, color: "text-emerald-600 bg-emerald-50" });
+            if (drafts.length > 0) result.push({ title: "Bản nháp", assignments: drafts, icon: <FileEdit className="w-5 h-5" />, color: "text-gray-600 bg-gray-50" });
+            if (closed.length > 0) result.push({ title: "Đã đóng", assignments: closed, icon: <BookOpen className="w-5 h-5" />, color: "text-rose-600 bg-rose-50" });
+        } else {
+            const pending = filteredAssignments.filter(a => {
+                const sub = submissions.find(s => s.assignmentId === a.id);
+                return !sub;
+            }).sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+
+            const submitted = filteredAssignments.filter(a => {
+                const sub = submissions.find(s => s.assignmentId === a.id);
+                return sub?.status === 'submitted';
+            });
+
+            const graded = filteredAssignments.filter(a => {
+                const sub = submissions.find(s => s.assignmentId === a.id);
+                return sub?.status === 'graded';
+            });
+
+            if (pending.length > 0) result.push({ title: "Cần làm ngay", assignments: pending, icon: <Clock className="w-5 h-5" />, color: "text-blue-600 bg-blue-50" });
+            if (submitted.length > 0) result.push({ title: "Đã nộp bài", assignments: submitted, icon: <CheckCircle className="w-5 h-5" />, color: "text-amber-600 bg-amber-50" });
+            if (graded.length > 0) result.push({ title: "Đã có kết quả", assignments: graded, icon: <BookOpen className="w-5 h-5" />, color: "text-emerald-600 bg-emerald-50" });
+        }
+
+        return result;
+    }, [filteredAssignments, submissions, user.role]);
+
+    return (
+        <div className="space-y-12">
+            {/* Header / Search Bar */}
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div className="relative flex-[2] w-full group">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+                    <input
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Tìm kiếm bài tập..."
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 placeholder:text-gray-400 transition-all font-medium shadow-sm"
+                    />
+                </div>
+
+                {user.role === 'teacher' && onCreate && (
+                    <button
+                        onClick={onCreate}
+                        className="bg-gray-900 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-black hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2 shadow-md whitespace-nowrap active:scale-95"
+                    >
+                        <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Tạo bài tập</span>
+                    </button>
+                )}
+            </div>
+
+            {/* Categorized Sections */}
+            <div className="space-y-12">
+                {categorizedAssignments.map((section, idx) => (
+                    <motion.section
+                        key={section.title}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="space-y-6"
+                    >
+                        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                            <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-xl ${section.color}`}>
+                                    {section.icon}
+                                </div>
+                                <h2 className="text-xl font-bold text-gray-800">{section.title}</h2>
+                                <span className="bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-full font-bold">
+                                    {section.assignments.length}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-6 overflow-x-auto pb-4 -mx-2 px-2 no-scrollbar snap-x snap-mandatory">
+                            <AnimatePresence mode="popLayout">
+                                {section.assignments.slice(0, 5).map((assignment) => (
+                                    <div key={assignment.id} className="flex-none w-[280px] sm:w-[320px] snap-start">
+                                        <AssignmentCard assignment={assignment} user={user} submissions={submissions} students={students} />
+                                    </div>
+                                ))}
+                                {section.assignments.length > 5 && (
+                                    <motion.button
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() => setViewAllSection({ title: section.title, assignments: section.assignments })}
+                                        className="flex-none w-[200px] h-full min-h-[220px] flex flex-col items-center justify-center gap-3 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-6 text-gray-500 hover:bg-gray-100 hover:border-blue-300 hover:text-blue-600 transition-all group snap-start"
+                                    >
+                                        <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
+                                            <Plus className="w-6 h-6" />
+                                        </div>
+                                        <span className="font-bold">Xem tất cả ({section.assignments.length})</span>
+                                    </motion.button>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </motion.section>
+                ))}
+
+                {categorizedAssignments.length === 0 && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="py-16 flex flex-col items-center text-center text-gray-500"
+                    >
+                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 text-gray-400">
+                            <Search className="w-8 h-8" />
+                        </div>
+                        <p className="font-medium">Không tìm thấy bài tập nào</p>
+                    </motion.div>
+                )}
+            </div>
+
+            <SeeAllModal
+                section={viewAllSection}
+                onClose={() => setViewAllSection(null)}
+                user={user}
+                submissions={submissions}
+                students={students}
+            />
+        </div>
+    );
+}
+
+function SeeAllModal({
+    section,
+    onClose,
+    user,
+    submissions,
+    students
+}: {
+    section: { title: string; assignments: Assignment[] } | null;
+    onClose: () => void;
+    user: User;
+    submissions: Submission[];
+    students: any[];
+}) {
+    if (!section) return null;
+
+    return (
+        <AnimatePresence>
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={onClose}
+                    className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
+                />
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                    className="relative w-full max-w-6xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+                >
+                    <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                                <BookOpen className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900">{section.title}</h2>
+                                <p className="text-sm text-gray-500">Tổng số {section.assignments.length} bài tập</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600"
+                        >
+                            <Plus className="w-6 h-6 rotate-45" />
+                        </button>
+                    </div>
+
+                    <div className="p-6 overflow-y-auto bg-gray-50/30">
+                        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            {section.assignments.map((assignment) => (
+                                <AssignmentCard key={assignment.id} assignment={assignment} user={user} submissions={submissions} students={students} />
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+        </AnimatePresence>
+    );
+}
+
+function AssignmentCard({ assignment, user, submissions, students }: { assignment: Assignment, user: User, submissions: Submission[], students: any[] }) {
+    const submission = submissions.find(s => s.assignmentId === assignment.id);
+    const isSubmitted = submission?.status === 'submitted';
+    const isGraded = submission?.status === 'graded';
+    const submissionCount = submissions.filter(s => s.assignmentId === assignment.id).length;
+    const submissionRate = students.length > 0 ? (submissionCount / students.length) * 100 : 0;
+
+    // Urgency Logic
+    const dueDate = new Date(assignment.dueDate);
+    const now = new Date();
+    const daysLeft = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    const isLate = now > dueDate;
+    const isUrgent = daysLeft >= 0 && daysLeft <= 2;
+
+    const urgencyStyles = isLate && !isSubmitted && !isGraded
+        ? "border-rose-200 bg-rose-50/20 ring-1 ring-rose-100"
+        : isUrgent && !isSubmitted && !isGraded
+            ? "border-amber-200 bg-amber-50/20 ring-1 ring-amber-100"
+            : "border-gray-200/60 bg-white";
+
+    return (
+        <motion.div
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+        >
+            <Link href={user.role === 'teacher' ? `/dashboard/assignments/${assignment.id}/submissions` : `/dashboard/assignments/${assignment.id}`}>
+                <div className={`${urgencyStyles} group h-full border rounded-2xl p-5 shadow-sm hover:shadow-xl hover:border-blue-200/80 transition-all flex flex-col cursor-pointer relative overflow-hidden`}>
+                    {/* Hover Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-indigo-50/0 group-hover:from-blue-50/30 group-hover:to-indigo-50/30 transition-all duration-500" />
+
+                    <div className="relative flex justify-between items-start mb-4">
+                        {/* Icon with Gradient */}
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white shadow-lg group-hover:scale-105 transition-transform duration-300 ${isLate && !isSubmitted && !isGraded ? 'bg-gradient-to-br from-red-500 to-rose-600 shadow-red-200' : 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-200'}`}>
+                            <BookOpen className="w-6 h-6" />
+                        </div>
+
+                        {/* Status Badge */}
+                        <div className="flex gap-1">
+                            {user.role === 'teacher' && (
+                                <>
+                                    {assignment.status === 'draft' && <span className="bg-gray-100 text-gray-600 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-gray-200 uppercase tracking-wide">Nháp</span>}
+                                    {assignment.status === 'open' && <span className="bg-emerald-100 text-emerald-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-emerald-200 uppercase tracking-wide flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Đang mở</span>}
+                                    {assignment.status === 'closed' && <span className="bg-rose-100 text-rose-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-rose-200 uppercase tracking-wide">Đã đóng</span>}
+                                </>
+                            )}
+                            {user.role === 'student' && (
+                                <>
+                                    {isGraded && <span className="bg-emerald-100 text-emerald-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-emerald-200 uppercase tracking-wide">Đã chấm</span>}
+                                    {isSubmitted && !isGraded && <span className="bg-amber-100 text-amber-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-amber-200 uppercase tracking-wide">Đã nộp</span>}
+                                    {!isSubmitted && !isGraded && isLate && <span className="bg-red-100 text-red-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-red-200 uppercase tracking-wide">Quá hạn</span>}
+                                    {!isSubmitted && !isGraded && !isLate && <span className="bg-gray-100 text-gray-600 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-gray-200 uppercase tracking-wide">Chưa làm</span>}
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="relative flex-1 mb-4">
+                        <h3 className="font-bold text-lg text-gray-800 mb-1.5 group-hover:text-blue-600 transition-colors line-clamp-1">{assignment.title}</h3>
+                        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{assignment.description || "Không có mô tả"}</p>
+                    </div>
+
+                    <div className="relative pt-4 border-t border-gray-100 mt-auto">
+                        {/* Due Date */}
+                        <div className="flex items-center justify-between text-xs mb-3">
+                            <span className={`flex items-center gap-1.5 font-medium ${isUrgent || isLate ? 'text-red-600' : 'text-gray-500'}`}>
+                                <Clock className="w-3.5 h-3.5" />
+                                {isLate ? `Đã quá hạn ${formatDistanceToNow(dueDate, { locale: vi })}` :
+                                    isUrgent ? `Hết hạn ${formatDistanceToNow(dueDate, { addSuffix: true, locale: vi })}` :
+                                        new Date(assignment.dueDate).toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'numeric' })}
+                            </span>
+
+                            {/* Student: Points or specific status text */}
+                            {user.role === 'student' && assignment.maxScore && (
+                                <span className="font-semibold text-gray-600 bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">
+                                    {assignment.maxScore} điểm
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Teacher: Progress Bar */}
+                        {user.role === 'teacher' && (
+                            <div className="space-y-1.5">
+                                <div className="flex justify-between text-[11px] font-medium text-gray-500">
+                                    <span>Tiến độ nộp bài</span>
+                                    <span className="text-blue-600">{submissionCount}/{students.length}</span>
+                                </div>
+                                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
+                                        style={{ width: `${submissionRate}%` }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </Link>
+        </motion.div>
+    );
+}
+
 
 const formatSchedule = (scheduleStr: string | null | undefined) => {
     if (!scheduleStr) return 'Chưa có lịch';
@@ -414,15 +782,7 @@ export default function ClassDetailPage() {
     // --- TEACHER VIEW ---
     if (currentUser.role === 'teacher') {
         return (
-            <AIPageWrapper
-                renderAI={({ onClose }) => (
-                    <ClassAI
-                        onClose={onClose}
-                        user={currentUser}
-                        classes={classData ? [classData] : []}
-                    />
-                )}
-            >
+            <div className="flex-1 w-full h-full">
                 <div className="space-y-6 w-full h-full overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                     {/* Skip to Content Link for Accessibility */}
                     <a
@@ -695,21 +1055,13 @@ export default function ClassDetailPage() {
                         <BackToTopButton />
                     </div>
                 </div>
-            </AIPageWrapper>
+            </div>
         );
     }
 
     // --- STUDENT VIEW ---
     return (
-        <AIPageWrapper
-            renderAI={({ onClose }) => (
-                <ClassAI
-                    onClose={onClose}
-                    user={currentUser}
-                    classes={classData ? [classData] : []}
-                />
-            )}
-        >
+        <div className="flex-1 w-full h-full">
             <div className="space-y-6 w-full h-full overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                 {/* Class Info Panel for Students */}
                 <ClassInfoPanel
@@ -855,7 +1207,7 @@ export default function ClassDetailPage() {
                                                         <button
                                                             key={ft.value}
                                                             onClick={() => setFilters({ ...filters, type: ft.value as any })}
-                                                            className={`px - 3 py - 1.5 rounded - xl text - xs font - bold transition - all flex items - center gap - 1.5 border border - transparent ${isActive
+                                                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border border-transparent ${isActive
                                                                 ? ft.activeColor
                                                                 : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50/50'
                                                                 } `}
@@ -1174,378 +1526,10 @@ export default function ClassDetailPage() {
                             )
                         }
 
-                    </AnimatePresence >
+                    </AnimatePresence>
                 </div>
             </div>
-        </AIPageWrapper>
-    );
-}
-
-function TabButton({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string }) {
-    return (
-        <button
-            onClick={onClick}
-            className={cn(
-                "relative flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all duration-300 rounded-2xl whitespace-nowrap mb-[-2px]",
-                active
-                    ? "text-blue-600"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-            )}
-        >
-            {active && (
-                <motion.div
-                    layoutId="activeClassTab"
-                    className="absolute inset-0 bg-blue-50/60 border-b-2 border-blue-600 z-0"
-                    initial={false}
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-            )}
-            <span className="relative z-10 flex items-center gap-2">
-                {icon && <span className={cn("transition-transform duration-300", active && "scale-110")}>{icon}</span>}
-                {label}
-            </span>
-        </button>
-    );
-}
-
-function FilterButton({ active, onClick, label, icon }: { active: boolean, onClick: () => void, label: string, icon?: React.ReactNode }) {
-    return (
-        <button
-            onClick={onClick}
-            className={`flex items - center gap - 2 px - 3 py - 1.5 rounded - lg text - sm font - medium transition - all whitespace - nowrap ${active
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-                } `}
-        >
-            {icon}
-            {label}
-        </button>
-    );
-}
-
-function ClassworkTabContent({
-    assignments,
-    submissions,
-    students,
-    user,
-    searchQuery,
-    setSearchQuery,
-    onCreate
-}: {
-    assignments: Assignment[],
-    submissions: Submission[],
-    students: any[],
-    user: User,
-    searchQuery: string,
-    setSearchQuery: (s: string) => void,
-    onCreate?: () => void
-}) {
-    const [viewAllSection, setViewAllSection] = useState<{ title: string; assignments: Assignment[] } | null>(null);
-
-    // Filter Logic
-    const filteredAssignments = assignments.filter(a => {
-        if (searchQuery && !a.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-        return true;
-    });
-
-    const categorizedAssignments = useMemo(() => {
-        const result: { title: string; assignments: Assignment[]; icon: React.ReactNode; color: string }[] = [];
-
-        if (user.role === 'teacher') {
-            const drafts = filteredAssignments.filter(a => a.status === 'draft');
-            const needsGrading = filteredAssignments.filter(a => {
-                const subs = submissions.filter(s => s.assignmentId === a.id);
-                return subs.some(s => s.status === 'submitted');
-            });
-            const active = filteredAssignments.filter(a => a.status === 'open' && !needsGrading.includes(a) && !drafts.includes(a));
-            const closed = filteredAssignments.filter(a => a.status === 'closed');
-
-            if (needsGrading.length > 0) result.push({ title: "Cần chấm bài", assignments: needsGrading, icon: <CheckCircle className="w-5 h-5" />, color: "text-amber-600 bg-amber-50" });
-            if (active.length > 0) result.push({ title: "Đang mở", assignments: active, icon: <Clock className="w-5 h-5" />, color: "text-emerald-600 bg-emerald-50" });
-            if (drafts.length > 0) result.push({ title: "Bản nháp", assignments: drafts, icon: <FileEdit className="w-5 h-5" />, color: "text-gray-600 bg-gray-50" });
-            if (closed.length > 0) result.push({ title: "Đã đóng", assignments: closed, icon: <BookOpen className="w-5 h-5" />, color: "text-rose-600 bg-rose-50" });
-        } else {
-            const pending = filteredAssignments.filter(a => {
-                const sub = submissions.find(s => s.assignmentId === a.id);
-                return !sub;
-            }).sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
-
-            const submitted = filteredAssignments.filter(a => {
-                const sub = submissions.find(s => s.assignmentId === a.id);
-                return sub?.status === 'submitted';
-            });
-
-            const graded = filteredAssignments.filter(a => {
-                const sub = submissions.find(s => s.assignmentId === a.id);
-                return sub?.status === 'graded';
-            });
-
-            if (pending.length > 0) result.push({ title: "Cần làm ngay", assignments: pending, icon: <Clock className="w-5 h-5" />, color: "text-blue-600 bg-blue-50" });
-            if (submitted.length > 0) result.push({ title: "Đã nộp bài", assignments: submitted, icon: <CheckCircle className="w-5 h-5" />, color: "text-amber-600 bg-amber-50" });
-            if (graded.length > 0) result.push({ title: "Đã có kết quả", assignments: graded, icon: <BookOpen className="w-5 h-5" />, color: "text-emerald-600 bg-emerald-50" });
-        }
-
-        return result;
-    }, [filteredAssignments, submissions, user.role]);
-
-    return (
-        <div className="space-y-12">
-            {/* Header / Search Bar */}
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <div className="relative flex-[2] w-full group">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
-                    <input
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Tìm kiếm bài tập..."
-                        className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 placeholder:text-gray-400 transition-all font-medium shadow-sm"
-                    />
-                </div>
-
-                {user.role === 'teacher' && onCreate && (
-                    <button
-                        onClick={onCreate}
-                        className="bg-gray-900 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-black hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2 shadow-md whitespace-nowrap active:scale-95"
-                    >
-                        <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Tạo bài tập</span>
-                    </button>
-                )}
-            </div>
-
-            {/* Categorized Sections */}
-            <div className="space-y-12">
-                {categorizedAssignments.map((section, idx) => (
-                    <motion.section
-                        key={section.title}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="space-y-6"
-                    >
-                        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                            <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-xl ${section.color}`}>
-                                    {section.icon}
-                                </div>
-                                <h2 className="text-xl font-bold text-gray-800">{section.title}</h2>
-                                <span className="bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-full font-bold">
-                                    {section.assignments.length}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-6 overflow-x-auto pb-4 -mx-2 px-2 no-scrollbar snap-x snap-mandatory">
-                            <AnimatePresence mode="popLayout">
-                                {section.assignments.slice(0, 5).map((assignment) => (
-                                    <div key={assignment.id} className="flex-none w-[280px] sm:w-[320px] snap-start">
-                                        <AssignmentCard assignment={assignment} user={user} submissions={submissions} students={students} />
-                                    </div>
-                                ))}
-                                {section.assignments.length > 5 && (
-                                    <motion.button
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        onClick={() => setViewAllSection({ title: section.title, assignments: section.assignments })}
-                                        className="flex-none w-[200px] h-full min-h-[220px] flex flex-col items-center justify-center gap-3 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-6 text-gray-500 hover:bg-gray-100 hover:border-blue-300 hover:text-blue-600 transition-all group snap-start"
-                                    >
-                                        <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
-                                            <Plus className="w-6 h-6" />
-                                        </div>
-                                        <span className="font-bold">Xem tất cả ({section.assignments.length})</span>
-                                    </motion.button>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    </motion.section>
-                ))}
-
-                {categorizedAssignments.length === 0 && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="py-16 flex flex-col items-center text-center text-gray-500"
-                    >
-                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 text-gray-400">
-                            <Search className="w-8 h-8" />
-                        </div>
-                        <p className="font-medium">Không tìm thấy bài tập nào</p>
-                    </motion.div>
-                )}
-            </div>
-
-            <SeeAllModal
-                section={viewAllSection}
-                onClose={() => setViewAllSection(null)}
-                user={user}
-                submissions={submissions}
-                students={students}
-            />
         </div>
     );
 }
 
-function SeeAllModal({
-    section,
-    onClose,
-    user,
-    submissions,
-    students
-}: {
-    section: { title: string; assignments: Assignment[] } | null;
-    onClose: () => void;
-    user: User;
-    submissions: Submission[];
-    students: any[];
-}) {
-    if (!section) return null;
-
-    return (
-        <AnimatePresence>
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onClick={onClose}
-                    className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
-                />
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="relative w-full max-w-6xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
-                >
-                    <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
-                                <BookOpen className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-bold text-gray-900">{section.title}</h2>
-                                <p className="text-sm text-gray-500">Tổng số {section.assignments.length} bài tập</p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={onClose}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600"
-                        >
-                            <Plus className="w-6 h-6 rotate-45" />
-                        </button>
-                    </div>
-
-                    <div className="p-6 overflow-y-auto bg-gray-50/30">
-                        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            {section.assignments.map((assignment) => (
-                                <AssignmentCard key={assignment.id} assignment={assignment} user={user} submissions={submissions} students={students} />
-                            ))}
-                        </div>
-                    </div>
-                </motion.div>
-            </div>
-        </AnimatePresence>
-    );
-}
-
-function AssignmentCard({ assignment, user, submissions, students }: { assignment: Assignment, user: User, submissions: Submission[], students: any[] }) {
-    const submission = submissions.find(s => s.assignmentId === assignment.id);
-    const isSubmitted = submission?.status === 'submitted';
-    const isGraded = submission?.status === 'graded';
-    const submissionCount = submissions.filter(s => s.assignmentId === assignment.id).length;
-    const submissionRate = students.length > 0 ? (submissionCount / students.length) * 100 : 0;
-
-    // Urgency Logic
-    const dueDate = new Date(assignment.dueDate);
-    const now = new Date();
-    const daysLeft = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    const isLate = now > dueDate;
-    const isUrgent = daysLeft >= 0 && daysLeft <= 2;
-
-    const urgencyStyles = isLate && !isSubmitted && !isGraded
-        ? "border-rose-200 bg-rose-50/20 ring-1 ring-rose-100"
-        : isUrgent && !isSubmitted && !isGraded
-            ? "border-amber-200 bg-amber-50/20 ring-1 ring-amber-100"
-            : "border-gray-200/60 bg-white";
-
-    return (
-        <motion.div
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-        >
-            <Link href={user.role === 'teacher' ? `/dashboard/assignments/${assignment.id}/submissions` : `/dashboard/assignments/${assignment.id}`}>
-                <div className={`${urgencyStyles} group h-full border rounded-2xl p-5 shadow-sm hover:shadow-xl hover:border-blue-200/80 transition-all flex flex-col cursor-pointer relative overflow-hidden`}>
-                    {/* Hover Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-indigo-50/0 group-hover:from-blue-50/30 group-hover:to-indigo-50/30 transition-all duration-500" />
-
-                    <div className="relative flex justify-between items-start mb-4">
-                        {/* Icon with Gradient */}
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-white shadow-lg group-hover:scale-105 transition-transform duration-300 ${isLate && !isSubmitted && !isGraded ? 'bg-gradient-to-br from-red-500 to-rose-600 shadow-red-200' : 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-200'}`}>
-                            <BookOpen className="w-6 h-6" />
-                        </div>
-
-                        {/* Status Badge */}
-                        <div className="flex gap-1">
-                            {user.role === 'teacher' && (
-                                <>
-                                    {assignment.status === 'draft' && <span className="bg-gray-100 text-gray-600 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-gray-200 uppercase tracking-wide">Nháp</span>}
-                                    {assignment.status === 'open' && <span className="bg-emerald-100 text-emerald-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-emerald-200 uppercase tracking-wide flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Đang mở</span>}
-                                    {assignment.status === 'closed' && <span className="bg-rose-100 text-rose-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-rose-200 uppercase tracking-wide">Đã đóng</span>}
-                                </>
-                            )}
-                            {user.role === 'student' && (
-                                <>
-                                    {isGraded && <span className="bg-emerald-100 text-emerald-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-emerald-200 uppercase tracking-wide">Đã chấm</span>}
-                                    {isSubmitted && !isGraded && <span className="bg-amber-100 text-amber-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-amber-200 uppercase tracking-wide">Đã nộp</span>}
-                                    {!isSubmitted && !isGraded && isLate && <span className="bg-red-100 text-red-700 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-red-200 uppercase tracking-wide">Quá hạn</span>}
-                                    {!isSubmitted && !isGraded && !isLate && <span className="bg-gray-100 text-gray-600 text-[11px] px-2.5 py-1 rounded-full font-semibold border border-gray-200 uppercase tracking-wide">Chưa làm</span>}
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="relative flex-1 mb-4">
-                        <h3 className="font-bold text-lg text-gray-800 mb-1.5 group-hover:text-blue-600 transition-colors line-clamp-1">{assignment.title}</h3>
-                        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{assignment.description || "Không có mô tả"}</p>
-                    </div>
-
-                    <div className="relative pt-4 border-t border-gray-100 mt-auto">
-                        {/* Due Date */}
-                        <div className="flex items-center justify-between text-xs mb-3">
-                            <span className={`flex items-center gap-1.5 font-medium ${isUrgent || isLate ? 'text-red-600' : 'text-gray-500'}`}>
-                                <Clock className="w-3.5 h-3.5" />
-                                {isLate ? `Đã quá hạn ${formatDistanceToNow(dueDate, { locale: vi })}` :
-                                    isUrgent ? `Hết hạn ${formatDistanceToNow(dueDate, { addSuffix: true, locale: vi })}` :
-                                        new Date(assignment.dueDate).toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'numeric' })}
-                            </span>
-
-                            {/* Student: Points or specific status text */}
-                            {user.role === 'student' && assignment.maxScore && (
-                                <span className="font-semibold text-gray-600 bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">
-                                    {assignment.maxScore} điểm
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Teacher: Progress Bar */}
-                        {user.role === 'teacher' && (
-                            <div className="space-y-1.5">
-                                <div className="flex justify-between text-[11px] font-medium text-gray-500">
-                                    <span>Tiến độ nộp bài</span>
-                                    <span className="text-blue-600">{submissionCount}/{students.length}</span>
-                                </div>
-                                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
-                                        style={{ width: `${submissionRate}%` }}
-                                    />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </Link>
-        </motion.div>
-    );
-}

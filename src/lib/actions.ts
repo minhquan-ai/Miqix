@@ -1209,11 +1209,11 @@ export async function getAttendanceHistoryAction(classId: string): Promise<{
         const totalStudents = enrollments.length;
 
         // Map sessions to summary
-        const sessionSummaries = sessions.map((s: typeof db.classSession.$inferResult & { attendanceRecords: (typeof db.attendanceRecord.$inferResult & { student: typeof db.user.$inferResult })[] }) => {
-            const presentCount = s.attendanceRecords.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'present').length;
-            const absentCount = s.attendanceRecords.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'absent').length;
-            const lateCount = s.attendanceRecords.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'late').length;
-            const excusedCount = s.attendanceRecords.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'excused').length;
+        const sessionSummaries = sessions.map((s: any) => {
+            const presentCount = s.attendanceRecords.filter((r: any) => r.status === 'present').length;
+            const absentCount = s.attendanceRecords.filter((r: any) => r.status === 'absent').length;
+            const lateCount = s.attendanceRecords.filter((r: any) => r.status === 'late').length;
+            const excusedCount = s.attendanceRecords.filter((r: any) => r.status === 'excused').length;
             return {
                 id: s.id,
                 date: s.date.toISOString(),
@@ -1317,21 +1317,21 @@ export async function exportGradesAction(classId: string): Promise<{
         // Get all submissions
         const submissions = await db.submission.findMany({
             where: {
-                assignmentId: { in: assignments.map((a: typeof db.assignment.$inferResult) => a.id) },
-                studentId: { in: enrollments.map((e: typeof db.classEnrollment.$inferResult) => e.userId) }
+                assignmentId: { in: assignments.map((a: any) => a.id) },
+                studentId: { in: enrollments.map((e: any) => e.userId) }
             }
         });
 
         // Filter graded submissions and group by student
-        const gradedSubmissions = submissions.filter((sub: typeof db.submission.$inferResult) => sub.status === 'graded');
+        const gradedSubmissions = submissions.filter((sub: any) => sub.status === 'graded');
 
         // Build headers
-        const headers = ['STT', 'Họ và tên', 'Email', ...assignments.map((a: typeof db.assignment.$inferResult) => a.title), 'Điểm TB'];
+        const headers = ['STT', 'Họ và tên', 'Email', ...assignments.map((a: any) => a.title), 'Điểm TB'];
 
         // Build rows
-        const rows = enrollments.map((enr: typeof db.classEnrollment.$inferResult & { user: typeof db.user.$inferResult }) => {
-            const studentGrades = assignments.map((assignment: typeof db.assignment.$inferResult) => {
-                const sub = submissions.find((s: typeof db.submission.$inferResult) => s.assignmentId === assignment.id && s.studentId === enr.userId);
+        const rows = enrollments.map((enr: any) => {
+            const studentGrades = assignments.map((assignment: any) => {
+                const sub = submissions.find((s: any) => s.assignmentId === assignment.id && s.studentId === enr.userId);
                 return {
                     assignmentTitle: assignment.title,
                     score: sub?.score ?? null,
@@ -1630,10 +1630,10 @@ export async function getAttendanceStatsAction(classId: string) {
 
     if (records.length === 0) return { attendanceRate: 100 }; // Default if no data
 
-    const presentCount = records.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'PRESENT').length;
-    const absentCount = records.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'ABSENT').length;
-    const lateCount = records.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'LATE').length;
-    const excusedCount = records.filter((r: typeof db.attendanceRecord.$inferResult) => r.status === 'EXCUSED').length; // eslint-disable-line @typescript-eslint/no-unused-vars
+    const presentCount = records.filter((r: any) => r.status === 'PRESENT').length;
+    const absentCount = records.filter((r: any) => r.status === 'ABSENT').length;
+    const lateCount = records.filter((r: any) => r.status === 'LATE').length;
+    const excusedCount = records.filter((r: any) => r.status === 'EXCUSED').length; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     // We count Present and Late as "Attended" (maybe Late counts as 0.5? For now let's say 1)
     // Actually, usually Rate = (Present + Late) / Total
@@ -1822,7 +1822,7 @@ export async function getClassAnnouncementsAction(classId: string) {
         }
     });
 
-    return announcements.map((ann: typeof db.announcement.$inferResult & { teacher: typeof db.user.$inferResult | null; reactions: typeof db.reaction.$inferResult[]; comments: (typeof db.comment.$inferResult & { user: typeof db.user.$inferResult | null })[] }) => ({
+    return announcements.map((ann: any & { teacher: any | null; reactions: any[]; comments: (any & { user: any | null })[] }) => ({
         id: ann.id,
         classId: ann.classId,
         teacherId: ann.teacherId,
@@ -1835,8 +1835,8 @@ export async function getClassAnnouncementsAction(classId: string) {
         updatedAt: ann.updatedAt.toISOString(),
         type: (ann.type?.toUpperCase() || 'NORMAL') as 'NORMAL' | 'URGENT' | 'EVENT', // eslint-disable-line @typescript-eslint/no-explicit-any
         attachments: ann.attachments || '[]',
-        reactions: ann.reactions.map((r: typeof db.reaction.$inferResult) => ({ userId: r.userId, type: r.type as 'respect' | 'challenge' })), // eslint-disable-line @typescript-eslint/no-explicit-any
-        comments: ann.comments.map((c: typeof db.comment.$inferResult & { user: typeof db.user.$inferResult | null }) => ({
+        reactions: ann.reactions.map((r: any) => ({ userId: r.userId, type: r.type as 'respect' | 'challenge' })), // eslint-disable-line @typescript-eslint/no-explicit-any
+        comments: ann.comments.map((c: any & { user: any | null }) => ({
             id: c.id,
             userId: c.userId,
             userName: c.user?.name || "Người dùng",

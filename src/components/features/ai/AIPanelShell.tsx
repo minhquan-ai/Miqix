@@ -25,7 +25,7 @@ export function AIPanelShell({
             className
         )}>
             {/* Header */}
-            <div className="p-4 flex items-center justify-between bg-white z-10 shrink-0 border-b border-gray-50">
+            <div className="py-6 px-4 flex items-center justify-between bg-white z-10 shrink-0 border-b border-gray-50">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-indigo-50/50 rounded-xl text-indigo-600">
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}

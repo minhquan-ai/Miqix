@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, Bot, ArrowRight, Loader2 } from "lucide-react";
+import { Sparkles, Bot, ArrowRight, Loader2, ChevronDown } from "lucide-react";
 import { AIPanelShell } from "./AIPanelShell";
 import { motion } from "framer-motion";
 import { MarkdownText } from "@/components/ui/MarkdownText";
@@ -75,12 +75,10 @@ export function ClassAI({ onClose, user, classes }: ClassAIProps) {
             {/* Container: flex flex-col h-full để empty state có thể căn giữa */}
             <div
                 ref={messagesContainerRef}
-                className={`flex-1 flex flex-col p-4 space-y-6 bg-white scrollbar-thin scrollbar-thumb-gray-100 ${messages.length > 0 ? 'overflow-y-auto' : 'overflow-hidden'}`}
+                className={`flex-1 flex flex-col px-6 py-4 space-y-6 bg-white scrollbar-thin scrollbar-thumb-gray-100 ${messages.length > 0 ? 'overflow-y-auto' : 'overflow-hidden'}`}
             >
                 {messages.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-full text-center space-y-6 opacity-90">
-                        {/* Spacer reduced to better center content */}
-                        <div className="h-4 shrink-0" />
+                    <div className="flex flex-col items-center justify-center h-full text-center space-y-8 opacity-90 pb-20">
 
                         <div className="relative">
                             <motion.div
@@ -104,7 +102,7 @@ export function ClassAI({ onClose, user, classes }: ClassAIProps) {
                             </p>
                         </div>
 
-                        <div className="flex flex-wrap justify-center gap-2 max-w-[280px]">
+                        <div className="flex flex-wrap justify-center gap-2 w-full px-4">
                             {user?.role === 'student' ? (
                                 <>
                                     <QuickPromptBtn text="Bài tập sắp tới" onClick={() => setInput("Tôi có bài tập nào sắp đến hạn không?")} />
@@ -163,7 +161,7 @@ export function ClassAI({ onClose, user, classes }: ClassAIProps) {
             </div>
 
             {/* Specialized Capsule Input Area - Styled matched with ScheduleAI */}
-            <div className="pt-3 px-4 bg-white/50 backdrop-blur-sm pb-8">
+            <div className="px-6 pt-4 bg-white/50 backdrop-blur-sm pb-10">
                 <div className="bg-white rounded-[2rem] border border-gray-200 shadow-xl px-2 py-2 transition-all focus-within:ring-2 focus-within:ring-teal-100 focus-within:border-teal-200 relative">
 
                     {/* Main Input Part */}
@@ -189,6 +187,7 @@ export function ClassAI({ onClose, user, classes }: ClassAIProps) {
                             >
                                 <Bot className="w-3.5 h-3.5" />
                                 <span className="text-[11px] font-bold text-gray-600">Bình thường</span>
+                                <ChevronDown className="w-3 h-3 text-gray-400" />
                             </button>
                         </div>
 

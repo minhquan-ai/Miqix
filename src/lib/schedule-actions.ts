@@ -145,7 +145,7 @@ export async function getAggregatedScheduleAction(weekStartStr?: string) {
     const weekEnd = addDays(weekStart, 7);
 
     try {
-        let classes = [];
+        let classes: any[] = [];
         if (user.role === 'teacher') {
             classes = await db.class.findMany({
                 where: { teacherId: user.id },
