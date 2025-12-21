@@ -43,16 +43,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
     const toaster = (
         <div className="fixed bottom-6 right-6 z-[999999] flex flex-col gap-2.5 pointer-events-none">
-            <AnimatePresence>
-                {toasts.map((toast) => (
-                    <motion.div
-                        key={toast.id}
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, x: 20 }}
-                        transition={{ type: "spring", damping: 20, stiffness: 350 }}
-                        layout
-                        className={`
+            {/* <AnimatePresence> */}
+            {toasts.map((toast) => (
+                <motion.div
+                    key={toast.id}
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, x: 20 }}
+                    transition={{ type: "spring", damping: 20, stiffness: 350 }}
+                    layout
+                    className={`
                             pointer-events-auto relative flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-sm
                             rounded-xl border shadow-[0_15px_30px_-5px_rgba(0,0,0,0.2)] 
                             backdrop-blur-xl transition-all
@@ -61,42 +61,42 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                             ${toast.type === 'info' ? 'bg-white/95 border-sky-500/20 text-sky-900' : ''}
                             ${toast.type === 'warning' ? 'bg-amber-50/95 border-amber-500/30 text-amber-900' : ''}
                         `}
-                    >
-                        {/* Status Icon - Smaller */}
-                        <div className={`
+                >
+                    {/* Status Icon - Smaller */}
+                    <div className={`
                             w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
                             ${toast.type === 'success' ? 'bg-emerald-100 text-emerald-600' : ''}
                             ${toast.type === 'error' ? 'bg-red-100 text-red-600' : ''}
                             ${toast.type === 'info' ? 'bg-sky-100 text-sky-600' : ''}
                             ${toast.type === 'warning' ? 'bg-amber-100 text-amber-600' : ''}
                         `}>
-                            {toast.type === 'success' && <CheckCircle className="w-5 h-5" />}
-                            {toast.type === 'error' && <AlertCircle className="w-5 h-5" />}
-                            {toast.type === 'info' && <Info className="w-5 h-5" />}
-                            {toast.type === 'warning' && <AlertTriangle className="w-5 h-5" />}
-                        </div>
+                        {toast.type === 'success' && <CheckCircle className="w-5 h-5" />}
+                        {toast.type === 'error' && <AlertCircle className="w-5 h-5" />}
+                        {toast.type === 'info' && <Info className="w-5 h-5" />}
+                        {toast.type === 'warning' && <AlertTriangle className="w-5 h-5" />}
+                    </div>
 
-                        <div className="flex-1 min-w-0 pr-2">
-                            <p className="text-xs font-bold leading-tight">{toast.message}</p>
-                        </div>
+                    <div className="flex-1 min-w-0 pr-2">
+                        <p className="text-xs font-bold leading-tight">{toast.message}</p>
+                    </div>
 
-                        <button
-                            onClick={() => removeToast(toast.id)}
-                            className="p-1 hover:bg-black/5 rounded-md transition-colors"
-                        >
-                            <X className="w-3.5 h-3.5 opacity-30 hover:opacity-100" />
-                        </button>
+                    <button
+                        onClick={() => removeToast(toast.id)}
+                        className="p-1 hover:bg-black/5 rounded-md transition-colors"
+                    >
+                        <X className="w-3.5 h-3.5 opacity-30 hover:opacity-100" />
+                    </button>
 
-                        {/* Animated background bar - Thinner */}
-                        <div className="absolute left-0 top-0 bottom-0 w-1 overflow-hidden rounded-l-xl">
-                            <div className={`w-full h-full ${toast.type === 'success' ? 'bg-emerald-500' :
-                                    toast.type === 'error' ? 'bg-red-500' :
-                                        toast.type === 'info' ? 'bg-sky-500' : 'bg-amber-500'
-                                }`} />
-                        </div>
-                    </motion.div>
-                ))}
-            </AnimatePresence>
+                    {/* Animated background bar - Thinner */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1 overflow-hidden rounded-l-xl">
+                        <div className={`w-full h-full ${toast.type === 'success' ? 'bg-emerald-500' :
+                            toast.type === 'error' ? 'bg-red-500' :
+                                toast.type === 'info' ? 'bg-sky-500' : 'bg-amber-500'
+                            }`} />
+                    </div>
+                </motion.div>
+            ))}
+            {/* </AnimatePresence> */}
         </div>
     );
 
