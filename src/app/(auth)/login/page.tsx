@@ -29,7 +29,7 @@ function LoginForm() {
                     <GraduationCap className="w-6 h-6" />
                 </div>
                 <h1 className="text-2xl font-bold">Đăng nhập</h1>
-                <p className="text-muted-foreground mt-2">Chào mừng bạn quay trở lại với Ergonix</p>
+                <p className="text-muted-foreground mt-2">Chào mừng bạn quay trở lại với Miqix</p>
             </div>
 
             {/* Success message after registration */}
@@ -109,6 +109,33 @@ function LoginForm() {
                         Đăng ký ngay
                     </Link>
                 </p>
+            </div>
+
+            {/* Quick Demo Login Buttons */}
+            <div className="mt-8 pt-6 border-t border-border">
+                <p className="text-xs text-muted-foreground text-center mb-3 uppercase tracking-wider font-semibold">Tài khoản Demo</p>
+                <div className="grid grid-cols-2 gap-3">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setEmail("teacher@ergonix.edu.vn");
+                            setPassword("password123");
+                        }}
+                        className="flex items-center justify-center p-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200 transition-colors text-xs font-bold uppercase tracking-wide"
+                    >
+                        Giáo viên
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setEmail("student1@ergonix.edu.vn");
+                            setPassword("password123");
+                        }}
+                        className="flex items-center justify-center p-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg border border-emerald-200 transition-colors text-xs font-bold uppercase tracking-wide"
+                    >
+                        Học sinh
+                    </button>
+                </div>
             </div>
         </div>
     );

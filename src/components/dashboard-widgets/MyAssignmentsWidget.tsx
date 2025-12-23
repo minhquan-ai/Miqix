@@ -41,7 +41,7 @@ export default function MyAssignmentsWidget({ analytics, classId }: MyAssignment
                         {pendingAssignments.slice(0, 3).map((assignment) => (
                             <Link
                                 key={assignment.id}
-                                href={`/dashboard/classes/${assignment.classId}/assignments/${assignment.id}`}
+                                href={`/assignments/${assignment.id}`}
                                 className={`block p-3 rounded-xl border transition-all hover:shadow-md ${assignment.urgent
                                     ? "bg-gradient-to-r from-red-50 to-orange-50 border-red-200 hover:border-red-300"
                                     : "bg-white border-gray-200 hover:border-blue-300"

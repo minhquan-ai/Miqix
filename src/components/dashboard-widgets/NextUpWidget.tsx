@@ -47,7 +47,7 @@ export default function NextUpWidget({ assignments }: NextUpWidgetProps) {
                 </div>
 
                 <Link
-                    href={`/dashboard/assignments/${nextAssignment.id}`}
+                    href={`/assignments/${nextAssignment.id}`}
                     className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-bold text-center hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 group"
                 >
                     Làm bài ngay

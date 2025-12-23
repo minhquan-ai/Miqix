@@ -23,6 +23,7 @@ interface StudentOverviewTabProps {
     assignments: Assignment[];
     submissions: Submission[];
     students: any[];
+    attendanceRate?: number;
 }
 
 export default function StudentOverviewTab({
@@ -32,7 +33,8 @@ export default function StudentOverviewTab({
     announcements,
     assignments,
     submissions,
-    students
+    students,
+    attendanceRate = 100
 }: StudentOverviewTabProps) {
     const [greeting, setGreeting] = useState('');
     const [currentTime, setCurrentTime] = useState(0);
@@ -105,6 +107,11 @@ export default function StudentOverviewTab({
 
                 {/* Compact Stats Row */}
                 <div className="flex items-center gap-3">
+                    <div className="px-4 py-2 bg-white border border-gray-100 rounded-xl shadow-sm text-center min-w-[100px]">
+                        <div className="text-2xl font-bold text-emerald-600">{attendanceRate}%</div>
+                        <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Chuyên cần</div>
+                    </div>
+                    <div className="w-px h-8 bg-gray-200 hidden md:block"></div>
                     <div className="px-4 py-2 bg-white border border-gray-100 rounded-xl shadow-sm text-center min-w-[100px]">
                         <div className="text-2xl font-bold text-indigo-600">{completionRate}%</div>
                         <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Hoàn thành</div>

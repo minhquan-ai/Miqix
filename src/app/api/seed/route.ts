@@ -66,28 +66,112 @@ export async function GET() {
             });
         }
 
-        // 5. Create Assignments (use classIds as JSON string)
+        // 5. Create Assignments with rich formatted content
         const assignment1 = await db.assignment.create({
             data: {
-                title: 'Bài tập về nhà: Đạo hàm',
-                description: 'Làm bài tập 1 đến 10 trang 45 SGK. Chụp ảnh nộp lại.',
+                title: 'Bài tập về nhà: Đạo hàm và Ứng dụng',
+                description: `**MỤC TIÊU BÀI TẬP**
+Củng cố kiến thức về đạo hàm và vận dụng vào các bài toán thực tế.
+
+---
+
+**PHẦN 1: LÝ THUYẾT** (3 điểm)
+
+1. Nêu định nghĩa đạo hàm của hàm số tại một điểm.
+2. Viết công thức đạo hàm của các hàm số cơ bản: $x^n$, $\\sin x$, $\\cos x$, $e^x$, $\\ln x$.
+3. Phát biểu quy tắc đạo hàm của tích và thương.
+
+---
+
+**PHẦN 2: BÀI TẬP TÍNH TOÁN** (5 điểm)
+
+Tính đạo hàm của các hàm số sau:
+
+a) $y = 3x^4 - 2x^3 + 5x - 7$
+b) $y = \\sqrt{2x + 1}$
+c) $y = \\frac{x^2 + 1}{x - 1}$
+d) $y = e^{2x} \\cdot \\sin(3x)$
+e) $y = \\ln(x^2 + 4x + 5)$
+
+---
+
+**PHẦN 3: ỨNG DỤNG** (2 điểm)
+
+Một vật chuyển động theo phương trình $s(t) = t^3 - 6t^2 + 9t + 2$ (mét), với $t$ tính bằng giây.
+
+a) Tính vận tốc của vật tại thời điểm $t = 2s$.
+b) Tìm thời điểm vật đạt vận tốc bằng 0.
+
+---
+
+**YÊU CẦU NỘP BÀI**
+✅ Làm bài trên giấy A4, trình bày rõ ràng
+✅ Chụp ảnh hoặc scan và nộp file PDF/ảnh
+✅ Deadline: **Chủ nhật, 23:59**
+
+*Chúc các em làm bài tốt!* 📚`,
                 dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 classIds: JSON.stringify([mathClass.id]),
                 teacherId: teacher.id,
                 type: 'homework',
-                xpReward: 100
+                xpReward: 100,
+                maxScore: 10
             }
         });
 
         const assignment2 = await db.assignment.create({
             data: {
-                title: 'Kiểm tra 15 phút: Tích phân',
-                description: 'Làm bài trên giấy và nộp ngay tại lớp.',
-                dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+                title: 'Dự án nhóm: Ứng dụng Toán học trong Kinh tế',
+                description: `**THÔNG TIN DỰ ÁN**
+📌 **Loại:** Bài tập nhóm (3-4 thành viên)
+📌 **Thời hạn:** 2 tuần
+📌 **Điểm tối đa:** 100 điểm
+
+---
+
+**MÔ TẢ**
+
+Nghiên cứu và trình bày một ứng dụng cụ thể của Toán học (Đạo hàm, Tích phân, Ma trận...) trong lĩnh vực Kinh tế hoặc Tài chính.
+
+---
+
+**YÊU CẦU**
+
+**1. BÁO CÁO VIẾT** (50 điểm)
+- Độ dài: 5-10 trang A4
+- Nội dung bắt buộc:
+  • Giới thiệu vấn đề nghiên cứu
+  • Cơ sở lý thuyết toán học
+  • Ví dụ thực tế với số liệu cụ thể
+  • Kết luận và nhận xét
+
+**2. THUYẾT TRÌNH** (30 điểm)
+- Thời lượng: 10-15 phút/nhóm
+- Slides PowerPoint hoặc Canva
+- Tất cả thành viên đều phải trình bày
+
+**3. ĐÁNH GIÁ CHÉO** (20 điểm)
+- Mỗi nhóm đánh giá 2 nhóm khác
+- Sử dụng rubric được cung cấp
+
+---
+
+**GỢI Ý CHỦ ĐỀ**
+💡 Mô hình tăng trưởng kinh tế
+💡 Tối ưu hóa lợi nhuận doanh nghiệp
+💡 Phân tích rủi ro đầu tư
+💡 Dự báo xu hướng thị trường
+
+---
+
+**LIÊN HỆ**
+Nếu có thắc mắc, các em liên hệ cô qua Zalo hoặc email: teacher@ergonix.edu`,
+                dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
                 classIds: JSON.stringify([mathClass.id]),
                 teacherId: teacher.id,
-                type: 'quiz',
-                xpReward: 50
+                type: 'project',
+                xpReward: 200,
+                maxScore: 100
             }
         });
 

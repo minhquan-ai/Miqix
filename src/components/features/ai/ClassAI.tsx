@@ -94,7 +94,7 @@ export function ClassAI({ onClose, user, classes }: ClassAIProps) {
                         </div>
 
                         <div className="space-y-2">
-                            <h2 className="font-extrabold text-gray-900 text-xl tracking-tight">Chào bạn, mình là Ergonix AI!</h2>
+                            <h2 className="font-extrabold text-gray-900 text-xl tracking-tight">Chào bạn, mình là Miqix AI!</h2>
                             <p className="text-gray-400 text-sm font-medium">
                                 {user?.role === 'student'
                                     ? "Bạn cần hỗ trợ gì cho bài tập và lớp học hôm nay?"

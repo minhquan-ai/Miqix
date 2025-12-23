@@ -7,7 +7,7 @@ import { vi } from 'date-fns/locale';
 import Link from 'next/link';
 import {
     Calendar, Users, BookOpen, CheckCircle2,
-    Plus, MessageCircle, Clock, ChevronRight, FileText
+    Plus, MessageCircle, Clock, ChevronRight, FileText, UserPlus
 } from 'lucide-react';
 import { User, Assignment, Submission, Announcement } from '@/types';
 
@@ -19,6 +19,8 @@ interface TeacherClassOverviewProps {
     assignments: Assignment[];
     submissions: Submission[];
     students: any[];
+    pendingStudents?: any[];
+    attendanceRate?: number;
     onCreateAssignment: () => void;
     onPostAnnouncement: () => void;
 }
@@ -31,6 +33,8 @@ export default function TeacherClassOverview({
     assignments,
     submissions,
     students,
+    pendingStudents = [],
+    attendanceRate = 100,
     onCreateAssignment,
     onPostAnnouncement
 }: TeacherClassOverviewProps) {
@@ -116,8 +120,8 @@ export default function TeacherClassOverview({
                             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{gradedSubmissions.length}</p>
-                            <p className="text-xs text-gray-500">Đã chấm</p>
+                            <p className="text-2xl font-bold text-gray-900">{attendanceRate}%</p>
+                            <p className="text-xs text-gray-500">Chuyên cần</p>
                         </div>
                     </div>
                 </div>
@@ -204,6 +208,33 @@ export default function TeacherClassOverview({
 
                 {/* Right Column */}
                 <div className="space-y-6">
+                    {/* Pending Enrollments Widget */}
+                    {pendingStudents.length > 0 && (
+                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-100 animate-pulse-slow">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+                                        <UserPlus className="w-6 h-6 text-amber-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-bold text-gray-900">
+                                            {pendingStudents.length} yêu cầu tham gia
+                                        </p>
+                                        <p className="text-sm text-gray-600">
+                                            Học sinh mới đang chờ duyệt
+                                        </p>
+                                    </div>
+                                </div>
+                                <Link
+                                    href={`/dashboard/classes/${classId}?tab=people`}
+                                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                >
+                                    Duyệt ngay
+                                </Link>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Recent Announcements */}
                     <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
                         <div className="flex items-center justify-between mb-4">

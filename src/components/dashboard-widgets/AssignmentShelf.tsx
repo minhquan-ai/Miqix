@@ -73,7 +73,7 @@ const AssignmentShelf: React.FC<AssignmentShelfProps> = ({ title, assignments, c
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
                     >
-                        <Link href={`/dashboard/assignments/${assignment.classId}/${assignment.id}`}>
+                        <Link href={`/assignments/${assignment.id}`}>
                             <div className={`h-full bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-indigo-100 transition-all cursor-pointer group/card relative overflow-hidden`}>
                                 {/* Hover Gradient Overlay */}
                                 <div className={`absolute inset-0 bg-gradient-to-br from-white to-${color}-50 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 pointer-events-none`} />

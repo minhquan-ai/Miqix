@@ -92,16 +92,17 @@ export async function getStudentDashboardAnalyticsAction(): Promise<StudentAnaly
             };
         });
 
+    const { getStudentAttendanceStatsAction } = await import("@/lib/attendance-actions");
+    const attendanceStats = await getStudentAttendanceStatsAction(classIds[0] || "", userId);
+
     return {
         myAverageScore,
         mySubmissionRate,
-        myAttendanceRate: 95, // TODO: Implement attendance
-        // myRank, totalStudents, and percentile are not part of StudentAnalytics interface currently
+        myAttendanceRate: attendanceStats.rate,
         classAverageScore: 7.5, // Mock
         aboveAverage: myAverageScore >= 7.5,
         pendingAssignments,
         ungradedSubmissions,
-        // perfectScoreCount and onTimeStreak are also not part of interface
     };
 }
 
@@ -246,10 +247,13 @@ export async function getTeacherDashboardAnalyticsAction(): Promise<ClassAnalyti
         else gradeDistribution[4].count++;
     });
 
+    const { getClassAttendanceStatsAction } = await import("@/lib/attendance-actions");
+    const classAttendance = await getClassAttendanceStatsAction(classIds[0] || "");
+
     return {
         averageScore,
         submissionRate,
-        attendanceRate: completionRate, // Use completion rate as proxy until attendance is implemented
+        attendanceRate: classAttendance.rate,
         completionRate,
         scoreTrend: 'up',
         submissionTrend: 'stable',

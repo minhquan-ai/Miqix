@@ -24,8 +24,9 @@ import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import { fadeInUp, staggerContainer, pageTransition } from "@/utils/motionConfig";
 import Link from "next/link";
 import { ClassDashboardSkeleton as ClassPageSkeleton } from "@/components/skeletons/ClassPageSkeletons";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CalendarCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import AttendanceManager from "@/components/features/AttendanceManager";
 
 
 // import { toast } from "react-hot-toast";
@@ -454,6 +455,8 @@ export default function ClassDetailPage() {
     const [pendingStudents, setPendingStudents] = useState<any[]>([]);
     const [assignments, setAssignments] = useState<Assignment[]>([]);
     const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [myAttendanceRate, setMyAttendanceRate] = useState<number>(100);
+    const [classAttendanceRate, setClassAttendanceRate] = useState<number>(100);
 
     const [announcements, setAnnouncements] = useState<any[]>([]);
     const [filterType, setFilterType] = useState("ALL");
@@ -463,7 +466,7 @@ export default function ClassDetailPage() {
     const [loading, setLoading] = useState(true);
     const { showToast } = useToast();
     const [copied, setCopied] = useState(false);
-    const [activeTab, setActiveTab] = useState<"dashboard" | "stream" | "classwork" | "people" | "settings" | "resources" | "schedule">("dashboard");
+    const [activeTab, setActiveTab] = useState<"dashboard" | "stream" | "classwork" | "people" | "settings" | "resources" | "schedule" | "attendance">("dashboard");
     const [peopleSubTab, setPeopleSubTab] = useState<'roster' | 'attendance'>('roster');
     const [showMenu, setShowMenu] = useState(false);
     const [resources, setResources] = useState<any[]>([]);
@@ -498,7 +501,7 @@ export default function ClassDetailPage() {
     // Read tab from URL query params
     useEffect(() => {
         const tab = searchParams.get('tab');
-        if (tab && ['dashboard', 'stream', 'classwork', 'people', 'settings', 'resources', 'schedule'].includes(tab)) {
+        if (tab && ['dashboard', 'stream', 'classwork', 'people', 'settings', 'resources', 'schedule', 'attendance'].includes(tab)) {
             setActiveTab(tab as typeof activeTab);
         }
     }, [searchParams]);
@@ -667,6 +670,11 @@ export default function ClassDetailPage() {
                         classSubmissions.push(...subs);
                     }
                     setSubmissions(classSubmissions);
+
+                    // Fetch class attendance
+                    const { getClassAttendanceStatsAction } = await import("@/lib/attendance-actions");
+                    const classStats = await getClassAttendanceStatsAction(classId);
+                    setClassAttendanceRate(classStats.rate);
                 } else {
                     // For student, only load their own submissions
                     const mySubmissions: Submission[] = [];
@@ -684,6 +692,11 @@ export default function ClassDetailPage() {
                         setMyEnrollmentId(currentEnrollment.id);
                         setMyRole(currentEnrollment.role);
                     }
+
+                    // Fetch attendance
+                    const { getStudentAttendanceStatsAction } = await import("@/lib/attendance-actions");
+                    const stats = await getStudentAttendanceStatsAction(classId, user.id);
+                    setMyAttendanceRate(stats.rate);
                 }
 
 
@@ -902,6 +915,9 @@ export default function ClassDetailPage() {
                         <TabButton active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={<LayoutDashboard className="w-4 h-4" />} label="Tổng quan" />
                         <TabButton active={activeTab === 'stream'} onClick={() => setActiveTab('stream')} icon={<MessageSquare className="w-4 h-4" />} label="Bảng tin" />
                         <TabButton active={activeTab === 'schedule'} onClick={() => setActiveTab('schedule')} icon={<Calendar className="w-4 h-4" />} label="Thời khóa biểu" />
+                        {currentUser.role === 'teacher' && (
+                            <TabButton active={activeTab === 'attendance'} onClick={() => setActiveTab('attendance')} icon={<CalendarCheck className="w-4 h-4" />} label="Điểm danh" />
+                        )}
                         <TabButton active={activeTab === 'classwork'} onClick={() => setActiveTab('classwork')} icon={<BookOpen className="w-4 h-4" />} label="Bài tập" />
                         <TabButton active={activeTab === 'resources'} onClick={() => setActiveTab('resources')} icon={<FolderOpen className="w-4 h-4" />} label="Tài liệu" />
                         <TabButton active={activeTab === 'people'} onClick={() => setActiveTab('people')} icon={<Users className="w-4 h-4" />} label="Mọi người" />
@@ -928,6 +944,8 @@ export default function ClassDetailPage() {
                                         assignments={assignments}
                                         submissions={submissions}
                                         students={students}
+                                        pendingStudents={pendingStudents}
+                                        attendanceRate={classAttendanceRate}
                                         onCreateAssignment={() => setShowInClassAssignment(true)}
                                         onPostAnnouncement={() => {
                                             // Switch to stream tab and maybe focus input?
@@ -983,6 +1001,22 @@ export default function ClassDetailPage() {
                                         classData={classData}
                                         currentUser={currentUser}
                                         onUpdateClass={(updated: any) => setClassData(prev => prev ? { ...prev, ...updated } : null)}
+                                    />
+                                </motion.div>
+                            )}
+
+                            {activeTab === 'attendance' && currentUser.role === 'teacher' && (
+                                <motion.div
+                                    key="attendance"
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                    variants={pageTransition}
+                                    className="w-full"
+                                >
+                                    <AttendanceManager
+                                        classId={classId}
+                                        students={students}
                                     />
                                 </motion.div>
                             )}
@@ -1144,6 +1178,7 @@ export default function ClassDetailPage() {
                                     assignments={assignments}
                                     submissions={submissions}
                                     students={students}
+                                    attendanceRate={myAttendanceRate}
                                 />
                             </motion.div>
                         )}

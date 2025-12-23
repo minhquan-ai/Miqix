@@ -148,7 +148,7 @@ export function ScheduleAI({ onClose, weekStartStr, onEventAdded }: ScheduleAIPr
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <h2 className="font-extrabold text-gray-900 text-xl tracking-tight">Chào bạn, mình là Ergonix AI!</h2>
+                            <h2 className="font-extrabold text-gray-900 text-xl tracking-tight">Chào bạn, mình là Miqix AI!</h2>
                             <p className="text-gray-400 text-sm font-medium">Bạn cần hỗ trợ gì cho lịch trình hôm nay?</p>
                         </div>
                     </div>

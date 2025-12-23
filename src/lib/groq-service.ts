@@ -19,12 +19,12 @@ export const AIService = {
                     "Authorization": `Bearer ${openRouterKey}`,
                     "Content-Type": "application/json",
                     "HTTP-Referer": "https://ergonix.vn",
-                    "X-Title": "Ergonix Assistant"
+                    "X-Title": "Miqix Assistant"
                 },
                 body: JSON.stringify({
                     model: OPENROUTER_MODEL,
                     messages: [
-                        { role: "system", content: systemPrompt || "Bạn là Ergonix AI." },
+                        { role: "system", content: systemPrompt || "Bạn là Miqix AI." },
                         { role: "user", content: prompt }
                     ],
                     // Toggle reasoning based on user choice

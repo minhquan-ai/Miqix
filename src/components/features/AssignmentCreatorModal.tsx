@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCurrentUserAction, getAssignmentsAction, createAssignmentAction, getClassesAction } from "@/lib/actions";
 import { Class, User, FileAttachment, RubricItem, AISettings } from "@/types";
-import { ArrowLeft, BookOpen, Calendar, FileText, Plus, Paperclip, AlertCircle, Settings, Sparkles, CheckCircle2, Users, Clock, X, ChevronRight, Loader2, Zap } from "lucide-react";
+import { ArrowLeft, BookOpen, Calendar, FileText, Plus, Paperclip, AlertCircle, Settings, Sparkles, CheckCircle2, Users, Clock, X, ChevronRight, Loader2, Zap, Calculator } from "lucide-react";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { AIQuizGenerator } from "@/components/features/AIQuizGenerator";
 import { RubricBuilder } from "@/components/features/RubricBuilder";
@@ -15,6 +15,8 @@ import { useToast } from "@/components/ui/Toast";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { refineAssignmentAction } from "@/lib/ai-actions";
 import { ElegantSelect } from "@/components/ui/ElegantSelect";
+import { MathHelper } from "@/components/ui/MathHelper";
+import { useSubject } from "@/contexts/SubjectContext";
 
 interface AssignmentCreatorModalProps {
     isOpen: boolean;
@@ -30,6 +32,7 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
     const [loading, setLoading] = useState(true);
     const [showAI, setShowAI] = useState(false);
     const [showClassSelection, setShowClassSelection] = useState(false);
+    const [showMathHelper, setShowMathHelper] = useState(false);
     // AI data
     const [aiParams, setAiParams] = useState({});
     const [submitting, setSubmitting] = useState(false);
@@ -38,10 +41,12 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
     const [mounted, setMounted] = useState(false);
     const { showToast } = useToast();
 
+    const { primarySubject } = useSubject();
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
-        subject: "Toán",
+        subject: primarySubject ? primarySubject.name : "Toán",
         type: "exercise" as "exercise" | "test" | "project",
         dueDate: "",
         maxScore: 10,
@@ -264,6 +269,29 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
                                 </div>
                             ) : user ? (
                                 <>
+                                    {/* Header with Live Title */}
+                                    <div className="px-6 pt-5 pb-4 border-b border-gray-100 bg-gradient-to-r from-gray-50/80 to-white">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20">
+                                                <Plus className="w-6 h-6 text-white" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h2 className="text-lg font-bold text-gray-900 truncate">
+                                                    {formData.title || 'Tạo bài tập mới'}
+                                                </h2>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {formData.subject} • {formData.type === 'exercise' ? 'Bài tập' : formData.type === 'test' ? 'Kiểm tra' : 'Dự án'}
+                                                </p>
+                                            </div>
+                                            {formData.dueDate && (
+                                                <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium">
+                                                    <Clock className="w-3.5 h-3.5" />
+                                                    {new Date(formData.dueDate).toLocaleDateString('vi-VN')}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
                                     {/* Scrollable Form Content */}
                                     <div className="flex-1 overflow-y-auto p-6 space-y-6">
                                         {/* Progress Bar - Refined */}
@@ -362,45 +390,30 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
                                                     </div>
 
                                                     <div className="space-y-2">
-                                                        <label className="text-sm font-medium">Loại bài tập</label>
-                                                        <div className="grid grid-cols-3 gap-3">
-                                                            {[
-                                                                { id: 'exercise', label: 'Bài tập', icon: '📝' },
-                                                                { id: 'test', label: 'Kiểm tra', icon: '📋' },
-                                                                { id: 'project', label: 'Dự án', icon: '🎯' }
-                                                            ].map(type => (
-                                                                <button
-                                                                    key={type.id}
-                                                                    type="button"
-                                                                    onClick={() => setFormData({ ...formData, type: type.id as any })}
-                                                                    className={`p-4 rounded-xl border text-center transition-all ${formData.type === type.id
-                                                                        ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                                                                        : 'border-border hover:bg-muted/50'
-                                                                        }`}
-                                                                >
-                                                                    <div className="text-2xl mb-1">{type.icon}</div>
-                                                                    <div className={`text-sm font-medium ${formData.type === type.id ? 'text-primary' : ''}`}>
-                                                                        {type.label}
-                                                                    </div>
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="space-y-2">
                                                         <label className="text-sm font-medium flex items-center gap-2">
                                                             <FileText className="w-4 h-4 text-muted-foreground" />
                                                             Mô tả chi tiết <span className="text-red-500">*</span>
                                                         </label>
 
-                                                        <textarea
-                                                            required
-                                                            rows={6}
-                                                            value={formData.description}
-                                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                                            className="w-full px-4 py-3 rounded-xl border border-input bg-background resize-none transition-all focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                                                            placeholder="Nhập nội dung bài tập, hướng dẫn làm bài..."
-                                                        />
+                                                        <div className="border border-input rounded-xl overflow-hidden bg-background focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
+                                                            <textarea
+                                                                required
+                                                                rows={10}
+                                                                value={formData.description}
+                                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                                                className="w-full px-4 py-3 bg-transparent resize-none transition-all focus:outline-none"
+                                                                placeholder="Nhập nội dung bài tập, hướng dẫn làm bài...
+
+💡 Sử dụng 'Công cụ hỗ trợ' ở bên phải để:
+   • Chèn công thức toán học
+   • Tạo đề thi tự động bằng AI
+   • Làm đẹp nội dung với AI"
+                                                            />
+                                                            <div className="px-4 py-2 bg-muted/30 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
+                                                                <span>Xem công cụ hỗ trợ ở panel bên phải →</span>
+                                                                <span>{formData.description.length} ký tự</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
                                                     {showAI && (
@@ -543,12 +556,53 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
                                                         />
                                                     </div>
 
+                                                    {/* Rubric - Optional with Toggle */}
                                                     <div className="space-y-3">
-                                                        <label className="text-sm font-medium">📊 Tiêu chí chấm điểm (Rubric)</label>
-                                                        <RubricBuilder
-                                                            value={formData.rubric}
-                                                            onChange={(newRubric) => setFormData({ ...formData, rubric: newRubric })}
-                                                        />
+                                                        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10 border border-emerald-100 dark:border-emerald-800 rounded-xl">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
+                                                                    <span className="text-lg">📊</span>
+                                                                </div>
+                                                                <div>
+                                                                    <h3 className="font-medium text-gray-900 dark:text-gray-100">Tiêu chí chấm điểm (Rubric)</h3>
+                                                                    <p className="text-sm text-muted-foreground">Tùy chọn - AI sẽ chấm dựa trên tiêu chí này</p>
+                                                                </div>
+                                                            </div>
+                                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={formData.rubric.length > 0}
+                                                                    onChange={(e) => {
+                                                                        if (!e.target.checked) {
+                                                                            setFormData({ ...formData, rubric: [] });
+                                                                        } else {
+                                                                            setFormData({
+                                                                                ...formData,
+                                                                                rubric: [{ id: `rubric_${Date.now()}`, criteria: '', maxPoints: 10, description: '' }]
+                                                                            });
+                                                                        }
+                                                                    }}
+                                                                    className="sr-only peer"
+                                                                />
+                                                                <div className="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-emerald-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500" />
+                                                            </label>
+                                                        </div>
+
+                                                        <AnimatePresence>
+                                                            {formData.rubric.length > 0 && (
+                                                                <motion.div
+                                                                    initial={{ opacity: 0, height: 0 }}
+                                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                                    exit={{ opacity: 0, height: 0 }}
+                                                                    transition={{ duration: 0.2 }}
+                                                                >
+                                                                    <RubricBuilder
+                                                                        value={formData.rubric}
+                                                                        onChange={(newRubric) => setFormData({ ...formData, rubric: newRubric })}
+                                                                    />
+                                                                </motion.div>
+                                                            )}
+                                                        </AnimatePresence>
                                                     </div>
                                                 </div>
                                             )}
@@ -674,113 +728,186 @@ export function AssignmentCreatorModal({ isOpen, onClose, onSuccess, preSelected
                             ) : null}
                         </motion.div>
 
-                        {/* Right Column: 2 Separate Cards */}
-                        <div className="lg:col-span-5 flex flex-col gap-4">
-                            {/* Card 2: Tips */}
+                        {/* Right Column: Single Unified Card */}
+                        <div className="lg:col-span-5">
                             <motion.div
                                 initial={{ opacity: 0, y: 35, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 15, scale: 0.98 }}
-                                className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.12)] border border-white/80 p-5"
+                                className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.12)] border border-white/80 overflow-hidden h-full flex flex-col"
                             >
-                                {/* Close button */}
-                                <div className="flex items-center justify-between mb-4">
+                                {/* Header with close button */}
+                                <div className="flex items-center justify-between px-5 py-3 border-b border-border/50 bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
                                     <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center">
-                                            <span className="text-base">💡</span>
+                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+                                            <Calculator className="w-4 h-4 text-white" />
                                         </div>
-                                        <h3 className="font-semibold text-gray-800">Mẹo hữu ích</h3>
+                                        <div>
+                                            <h3 className="font-semibold text-gray-800">Công cụ hỗ trợ</h3>
+                                            <p className="text-[10px] text-muted-foreground">Chọn mẫu hoặc chèn công thức</p>
+                                        </div>
                                     </div>
                                     <motion.button
                                         onClick={onClose}
-                                        className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                                        className="p-2 hover:bg-white/50 rounded-xl transition-colors"
                                         whileHover={{ scale: 1.1 }}
                                         whileTap={{ scale: 0.95 }}
                                     >
                                         <X className="w-4 h-4 text-gray-400" />
                                     </motion.button>
                                 </div>
-                                <ul className="text-sm text-gray-500 space-y-2.5">
-                                    <motion.li
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.2 }}
-                                        className="flex items-start gap-2"
-                                    >
-                                        <span className="text-primary mt-0.5">•</span>
-                                        <span>Tiêu đề ngắn gọn, rõ ràng giúp học sinh dễ nhận biết.</span>
-                                    </motion.li>
-                                    <motion.li
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.3 }}
-                                        className="flex items-start gap-2"
-                                    >
-                                        <span className="text-primary mt-0.5">•</span>
-                                        <span>Mô tả chi tiết yêu cầu, hướng dẫn làm bài cụ thể.</span>
-                                    </motion.li>
-                                    <motion.li
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.4 }}
-                                        className="flex items-start gap-2"
-                                    >
-                                        <span className="text-primary mt-0.5">•</span>
-                                        <span>Thử tính năng tạo bài bằng AI để tiết kiệm thời gian.</span>
-                                    </motion.li>
-                                </ul>
-                            </motion.div>
 
-                            {/* Card 3: Progress */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 35, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 15, scale: 0.98 }}
-                                className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.12)] border border-white/80 p-5 flex-1"
-                            >
-                                <div className="flex items-center gap-2.5 mb-5">
-                                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-                                        <BookOpen className="w-4 h-4 text-primary" />
-                                    </div>
-                                    <h3 className="font-semibold text-gray-800">Tiến trình</h3>
-                                </div>
-                                <div className="space-y-3">
-                                    {steps.map((s, index) => (
-                                        <motion.div
-                                            key={s.id}
-                                            className="flex items-center gap-3"
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.2 + index * 0.08 }}
+                                {/* Tab Navigation */}
+                                <div className="flex border-b border-border/50">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMathHelper(false)}
+                                        className={`flex-1 px-4 py-2.5 text-sm font-medium transition-all ${!showMathHelper
+                                            ? 'text-primary border-b-2 border-primary bg-primary/5'
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                                            }`}
+                                    >
+                                        📋 Mẫu & Công cụ
+                                    </button>
+                                    {(!primarySubject || primarySubject.features.mathHelper) && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowMathHelper(true)}
+                                            className={`flex-1 px-4 py-2.5 text-sm font-medium transition-all ${showMathHelper
+                                                ? 'text-primary border-b-2 border-primary bg-primary/5'
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                                                }`}
                                         >
-                                            <motion.div
-                                                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300 ${step > s.id
-                                                    ? 'bg-green-100 text-green-600'
-                                                    : step === s.id
-                                                        ? 'bg-primary text-white'
-                                                        : 'bg-gray-100 text-gray-400'
-                                                    }`}
-                                                animate={{
-                                                    scale: step === s.id ? 1.1 : 1,
-                                                }}
-                                                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                                            >
-                                                {step > s.id ? (
-                                                    <motion.span
-                                                        initial={{ scale: 0 }}
-                                                        animate={{ scale: 1 }}
-                                                        transition={{ type: "spring", stiffness: 500 }}
+                                            📐 Công thức toán
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Content Area */}
+                                <div className="flex-1 overflow-y-auto">
+                                    {!showMathHelper ? (
+                                        /* Templates & Tools View */
+                                        <div className="p-4 space-y-3">
+                                            {/* Assignment Templates */}
+                                            <div>
+                                                <p className="text-xs font-medium text-muted-foreground mb-2">Chọn mẫu bài tập:</p>
+                                                <div className="space-y-2">
+                                                    {[
+                                                        {
+                                                            icon: '📝',
+                                                            title: 'Bài tập về nhà',
+                                                            template: {
+                                                                title: 'Bài tập về nhà - ',
+                                                                description: '## Mục tiêu\n- Ôn tập kiến thức đã học\n\n## Yêu cầu\n1. Hoàn thành các bài tập sau\n2. Trình bày rõ ràng, sạch đẹp\n\n## Nội dung\n\n',
+                                                                type: 'exercise' as const
+                                                            }
+                                                        },
+                                                        {
+                                                            icon: '📋',
+                                                            title: 'Kiểm tra 15 phút',
+                                                            template: {
+                                                                title: 'Kiểm tra 15 phút - ',
+                                                                description: '# KIỂM TRA 15 PHÚT\n\n**Thời gian:** 15 phút\n**Điểm:** 10 điểm\n\n---\n\n## Câu 1 (3 điểm)\n\n\n## Câu 2 (3 điểm)\n\n\n## Câu 3 (4 điểm)\n\n',
+                                                                type: 'test' as const,
+                                                                maxScore: 10
+                                                            }
+                                                        },
+                                                        {
+                                                            icon: '🎯',
+                                                            title: 'Dự án nhóm',
+                                                            template: {
+                                                                title: 'Dự án - ',
+                                                                description: '# DỰ ÁN NHÓM\n\n## Mô tả dự án\n\n\n## Yêu cầu\n- Làm việc theo nhóm 3-5 người\n- Nộp báo cáo + sản phẩm\n\n## Tiêu chí đánh giá\n- Nội dung: 40%\n- Sáng tạo: 30%\n- Trình bày: 30%\n\n## Deadline\n',
+                                                                type: 'project' as const
+                                                            }
+                                                        }
+                                                    ].map((item, idx) => (
+                                                        <button
+                                                            key={idx}
+                                                            type="button"
+                                                            onClick={() => setFormData({
+                                                                ...formData,
+                                                                ...item.template
+                                                            })}
+                                                            className={`w-full flex items-center gap-3 p-2.5 rounded-xl border transition-all text-left ${formData.type === item.template.type
+                                                                ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                                                                : 'border-gray-100 hover:border-primary/30 hover:bg-primary/5'
+                                                                }`}
+                                                        >
+                                                            <span className="text-lg">{item.icon}</span>
+                                                            <span className={`text-sm font-medium ${formData.type === item.template.type ? 'text-primary' : 'text-gray-700'
+                                                                }`}>
+                                                                {item.title}
+                                                            </span>
+                                                            {formData.type === item.template.type && (
+                                                                <CheckCircle2 className="w-4 h-4 text-primary ml-auto" />
+                                                            )}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Divider */}
+                                            <div className="border-t border-border/50 my-2"></div>
+
+                                            {/* AI Tools */}
+                                            <div>
+                                                <p className="text-xs font-medium text-muted-foreground mb-2">Công cụ AI:</p>
+                                                <div className="space-y-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowAI(true)}
+                                                        className="w-full flex items-center gap-3 p-2.5 rounded-xl border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-100/70 transition-all text-left"
                                                     >
-                                                        ✓
-                                                    </motion.span>
-                                                ) : s.id}
-                                            </motion.div>
-                                            <span className={`text-sm font-medium transition-colors duration-200 ${step > s.id ? 'text-green-600' : step === s.id ? 'text-primary' : 'text-gray-400'
-                                                }`}>
-                                                {s.title}
-                                            </span>
-                                        </motion.div>
-                                    ))}
+                                                        <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
+                                                            <Zap className="w-4 h-4 text-white" />
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-sm font-medium text-emerald-700 block">Tạo đề thi AI</span>
+                                                            <span className="text-[10px] text-emerald-600/70">Tự động sinh câu hỏi</span>
+                                                        </div>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleRefineDescription}
+                                                        disabled={!formData.description.trim() || isPolishing}
+                                                        className="w-full flex items-center gap-3 p-2.5 rounded-xl border border-purple-100 bg-purple-50/50 hover:bg-purple-100/70 transition-all text-left disabled:opacity-50"
+                                                    >
+                                                        <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
+                                                            {isPolishing ? (
+                                                                <Loader2 className="w-4 h-4 text-white animate-spin" />
+                                                            ) : (
+                                                                <Sparkles className="w-4 h-4 text-white" />
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-sm font-medium text-purple-700 block">AI làm đẹp nội dung</span>
+                                                            <span className="text-[10px] text-purple-600/70">Cải thiện văn phong</span>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Quick Tip */}
+                                            <div className="p-3 bg-amber-50/50 rounded-xl border border-amber-100 mt-2">
+                                                <p className="text-xs text-amber-700">
+                                                    💡 Chuyển sang tab <strong>"Công thức toán"</strong> để chèn ký hiệu!
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        /* Math Helper View */
+                                        <MathHelper
+                                            onInsert={(char) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    description: formData.description + char
+                                                });
+                                            }}
+                                            onClose={() => setShowMathHelper(false)}
+                                        />
+                                    )}
                                 </div>
                             </motion.div>
                         </div>

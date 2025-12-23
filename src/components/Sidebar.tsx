@@ -191,6 +191,8 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
     ];
 
     const quickActions: SidebarItemType[] = [
+        /* 
+        // Temporarily hidden for demo
         {
             id: 'notifications',
             label: 'Thông báo',
@@ -209,6 +211,7 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
             badgeColor: 'blue',
             role: 'all'
         }
+        */
     ];
 
     const personalItems: SidebarItemType[] = [

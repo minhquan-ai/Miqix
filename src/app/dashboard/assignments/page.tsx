@@ -330,7 +330,7 @@ function AssignmentCard({ assignment, user, submissions }: { assignment: Assignm
             : "border-gray-100 bg-white";
 
     return (
-        <Link href={user.role === 'teacher' ? `/dashboard/assignments/${assignment.id}/submissions` : `/dashboard/assignments/${assignment.id}`}>
+        <Link href={user.role === 'teacher' ? `/dashboard/assignments/${assignment.id}/submissions` : `/assignments/${assignment.id}`}>
             <div className={`${urgencyStyles} rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all h-full flex flex-col cursor-pointer group relative overflow-hidden border`}>
                 <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
                 <div className="flex justify-between items-start mb-4">

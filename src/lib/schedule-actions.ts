@@ -324,7 +324,7 @@ export async function analyzeScheduleAIAction(weekStartStr: string, query?: stri
         ? `LỊCH SỬ TRÒ CHUYỆN (RẤT QUAN TRỌNG - ĐỌC KỸ ĐỂ HIỂU NGỮ CẢNH):\n${history.map(m => `${m.role === 'user' ? 'Người dùng' : 'AI'}: ${m.content}`).join("\n")}`
         : "";
 
-    const systemPrompt = `Bạn là Trợ lý Lịch biểu Ergonix (Ergonix AI).
+    const systemPrompt = `Bạn là Trợ lý Lịch biểu Miqix (Miqix AI).
 Nhiệm vụ: Trả lời câu hỏi về lịch trình dựa trên dữ liệu sự kiện và lịch sử trò chuyện.
 
 CHẾ ĐỘ HOẠT ĐỘNG: ${mode === 'edit' ? "**CHỈNH SỬA (EDIT)**" : "**TRÒ CHUYỆN (CHAT)**"}

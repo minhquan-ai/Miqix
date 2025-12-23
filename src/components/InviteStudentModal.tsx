@@ -76,7 +76,7 @@ export default function InviteStudentModal({ isOpen, onClose, classId, onSuccess
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
                                 </div>
-                                <p className="mt-2 text-xs text-gray-500">Học sinh phải có tài khoản Ergonix với email này.</p>
+                                <p className="mt-2 text-xs text-gray-500">Học sinh phải có tài khoản Miqix với email này.</p>
                             </div>
 
                             {error && (

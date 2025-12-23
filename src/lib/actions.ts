@@ -59,7 +59,6 @@ export async function getCurrentUserAction(role?: 'teacher' | 'student'): Promis
 export async function getAssignmentsAction(classId?: string): Promise<Assignment[]> {
     const where: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
     if (classId) {
-        // Handle legacy classIds JSON string or new relation
         where.OR = [
             { classIds: { contains: classId } },
             { assignmentClasses: { some: { classId } } }
@@ -74,22 +73,39 @@ export async function getAssignmentsAction(classId?: string): Promise<Assignment
         }
     });
 
-    return assignments.map((a: any) => ({
-        id: a.id,
-        title: a.title,
-        description: a.description,
-        dueDate: a.dueDate.toISOString(),
-        teacherId: a.teacherId,
-        status: a.status as 'draft' | 'open' | 'closed',
-        type: a.type as 'exercise' | 'test' | 'project',
-        subject: a.subject || undefined,
-        maxScore: a.maxScore || undefined,
-        attachments: sanitizeAttachments(a.attachments),
-        isPhysical: a.isPhysical,
-        classIds: a.classIds ? JSON.parse(a.classIds) : [], // Legacy support
-        aiSettings: a.aiSettings ? JSON.parse(a.aiSettings) : undefined,
-        rubric: a.rubric ? JSON.parse(a.rubric) : undefined
-    }));
+    return assignments.map((a: any) => {
+        let description = a.description;
+        let attachments = sanitizeAttachments(a.attachments);
+
+        if (a.title === "Báo cáo thí nghiệm Điện") {
+            const repeatLines = Array.from({ length: 80 }, (_, i) => `Bước ${i + 4}: Tiến hành kiểm tra sai số của phép đo lần thứ ${i + 1} bằng cách lặp lại quy trình ổn định dòng điện.`).join("\n");
+            description = `# Hướng dẫn chi tiết: Báo cáo Thí nghiệm Điện xoay chiều (Nâng cao)\n\n## 1. Mục tiêu thí nghiệm\nNghiên cứu đặc tính của đoạn mạch RLC nối tiếp và hiện tượng cộng hưởng điện trong mạch xoay chiều.\n\n## 2. Thiết bị cần thiết\n| Tên thiết bị | Số lượng |\n| :--- | :--- |\n| Biến thế nguồn | 01 |\n| Đồng hồ đo điện | 02 |\n\n## 3. Quy trình thực hiện\n\n### 3.1. Lắp mạch điện\nLắp mạch điện theo sơ đồ SGK.\n\n### 3.2. Đo đạc dữ liệu\n1. Thay đổi R từ 100 đến 500 Ohm.\n\n\n\nDưới đây là nội dung test scroll cực dài:\n${repeatLines}`;
+
+            if (!attachments || attachments.length === 0) {
+                attachments = [
+                    { id: 'att-1', name: 'So_do_mach_dien.png', url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=500', type: 'image/png', size: 512000, uploadedAt: new Date().toISOString() },
+                    { id: 'att-2', name: 'Mau_bao_cao.docx', url: '#', type: 'application/msword', size: 1024000, uploadedAt: new Date().toISOString() }
+                ];
+            }
+        }
+
+        return {
+            id: a.id,
+            title: a.title,
+            description: description,
+            dueDate: a.dueDate.toISOString(),
+            teacherId: a.teacherId,
+            status: a.status as 'draft' | 'open' | 'closed',
+            type: a.type as 'exercise' | 'test' | 'project',
+            subject: a.subject || undefined,
+            maxScore: a.maxScore || undefined,
+            attachments: attachments,
+            isPhysical: a.isPhysical,
+            classIds: a.classIds ? JSON.parse(a.classIds) : [], // Legacy support
+            aiSettings: a.aiSettings ? JSON.parse(a.aiSettings) : undefined,
+            rubric: a.rubric ? JSON.parse(a.rubric) : undefined
+        };
+    });
 }
 
 export async function getAssignmentByIdAction(id: string): Promise<Assignment | null> {
@@ -99,17 +115,32 @@ export async function getAssignmentByIdAction(id: string): Promise<Assignment | 
 
     if (!a) return null;
 
+    let description = a.description;
+    let attachments = sanitizeAttachments(a.attachments);
+
+    if (a.title === "Báo cáo thí nghiệm Điện") {
+        const repeatLines = Array.from({ length: 80 }, (_, i) => `Bước ${i + 4}: Tiến hành kiểm tra sai số của phép đo lần thứ ${i + 1} bằng cách lặp lại quy trình ổn định dòng điện.`).join("\n");
+        description = `# Hướng dẫn chi tiết: Báo cáo Thí nghiệm Điện xoay chiều (Nâng cao)\n\n## 1. Mục tiêu thí nghiệm\nNghiên cứu đặc tính của đoạn mạch RLC nối tiếp và hiện tượng cộng hưởng điện trong mạch xoay chiều.\n\n## 2. Thiết bị cần thiết\n| Tên thiết bị | Số lượng |\n| :--- | :--- |\n| Biến thế nguồn | 01 |\n| Đồng hồ đo điện | 02 |\n\n## 3. Quy trình thực hiện\n\n### 3.1. Lắp mạch điện\nLắp mạch điện theo sơ đồ SGK.\n\n### 3.2. Đo đạc dữ liệu\n1. Thay đổi R từ 100 đến 500 Ohm.\n\n\n\nDưới đây là nội dung test scroll cực dài:\n${repeatLines}`;
+
+        if (!attachments || attachments.length === 0) {
+            attachments = [
+                { id: 'att-1', name: 'So_do_mach_dien.png', url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=500', type: 'image/png', size: 512000, uploadedAt: new Date().toISOString() },
+                { id: 'att-2', name: 'Mau_bao_cao.docx', url: '#', type: 'application/msword', size: 1024000, uploadedAt: new Date().toISOString() }
+            ];
+        }
+    }
+
     return {
         id: a.id,
         title: a.title,
-        description: a.description,
+        description: description,
         dueDate: a.dueDate.toISOString(),
         teacherId: a.teacherId,
         status: a.status as 'draft' | 'open' | 'closed',
         type: a.type as 'exercise' | 'test' | 'project',
         subject: a.subject || undefined,
         maxScore: a.maxScore || undefined,
-        attachments: sanitizeAttachments(a.attachments),
+        attachments: attachments,
         isPhysical: a.isPhysical,
         classIds: a.classIds ? JSON.parse(a.classIds) : [],
         aiSettings: a.aiSettings ? JSON.parse(a.aiSettings) : undefined,
@@ -832,7 +863,7 @@ export async function inviteStudentAction(classId: string, email: string): Promi
         if (!user) {
             // In a real app, we would create a "PendingInvite" record and send an email
             // For now, we'll just return an error saying user must register first
-            return { success: false, message: 'Email này chưa đăng ký tài khoản Ergonix.' };
+            return { success: false, message: 'Email này chưa đăng ký tài khoản Miqix.' };
         }
 
         // 2. Check if already enrolled
