@@ -188,6 +188,39 @@ async function main() {
     // 5. ASSIGNMENTS & SUBMISSIONS (Main Class)
     const assignmentsData = [
         {
+            title: 'Phân tích bài thơ "Tây Tiến" - Quang Dũng (Bài Kiểm Tra Dài Hạn)',
+            description: `**ĐỀ BÀI: Cảm nhận của anh/chị về vẻ đẹp của hình tượng người lính Tây Tiến qua đoạn thơ sau:**
+            
+            "Tây Tiến đoàn binh không mọc tóc
+            Quân xanh màu lá dữ oai hùm
+            Mắt trừng gửi mộng qua biên giới
+            Đêm mơ Hà Nội dáng kiều thơm
+            Rải rác biên cương mồ viễn xứ
+            Chiến trường đi chẳng tiếc đời xanh
+            Áo bào thay chiếu anh về đất
+            Sông Mã gầm lên khúc độc hành"
+            
+            *(Trích Tây Tiến - Quang Dũng, Ngữ văn 12, Tập một, NXB Giáo dục Việt Nam)*
+            
+            **Yêu cầu:**
+            1. **Phân tích chi tiết:** 
+               - Vẻ đẹp bi tráng của người lính (ngoại hình, khí phách).
+               - Vẻ đẹp lãng mạn, hào hoa (tâm hồn, giấc mơ).
+               - Lý tưởng xả thân vì Tổ quốc (sự hy sinh cao cả).
+            2. **Nghệ thuật:**
+               - Phân tích bút pháp lãng mạn kết hợp với khuynh hướng sử thi.
+               - Cách sử dụng từ Hán Việt, ngôn ngữ giàu hình ảnh và nhạc điệu.
+            3. **Liên hệ mở rộng:**
+               - So sánh với hình tượng người lính trong bài thơ "Đồng Chí" (Chính Hữu) để thấy sự khác biệt trong bút pháp nghệ thuật của hai tác giả.
+            
+            **Hình thức:** Bài viết tối thiểu 1500 chữ.
+            **Hạn nộp:** Trước 23:59 ngày 30/12/2025.`,
+            type: 'essay',
+            dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // Due in 10 days
+            maxScore: 10,
+            status: 'open'
+        },
+        {
             title: 'Phân tích bài thơ "Sóng" - Xuân Quỳnh',
             description: 'Viết bài văn nghị luận phân tích vẻ đẹp tâm hồn người phụ nữ trong tình yêu qua bài thơ Sóng.',
             type: 'essay',
