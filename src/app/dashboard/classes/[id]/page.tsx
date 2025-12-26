@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense, useCallback } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -443,11 +443,23 @@ const formatSchedule = (scheduleStr: string | null | undefined) => {
     }
 };
 
+function SearchParamsHandler({ onTabChange }: { onTabChange: (tab: any) => void }) {
+    const searchParams = useSearchParams();
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab) {
+            onTabChange(tab);
+        }
+    }, [searchParams, onTabChange]);
+    return null;
+}
+
+
 export default function ClassDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const searchParams = useSearchParams();
     const classId = params.id as string;
+
 
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [classData, setClassData] = useState<Class | null>(null);
@@ -499,12 +511,12 @@ export default function ClassDetailPage() {
     } = useStreamFilters(announcements);
 
     // Read tab from URL query params
-    useEffect(() => {
-        const tab = searchParams.get('tab');
-        if (tab && ['dashboard', 'stream', 'classwork', 'people', 'settings', 'resources', 'schedule', 'attendance'].includes(tab)) {
-            setActiveTab(tab as typeof activeTab);
+    const handleTabChange = useCallback((tab: string) => {
+        if (['dashboard', 'stream', 'classwork', 'people', 'settings', 'resources', 'schedule', 'attendance'].includes(tab)) {
+            setActiveTab(tab as any);
         }
-    }, [searchParams]);
+    }, []);
+
 
     // Reset displayCount when filter changes
     useEffect(() => {
@@ -796,6 +808,10 @@ export default function ClassDetailPage() {
     if (currentUser.role === 'teacher') {
         return (
             <div className="flex-1 w-full h-full">
+                <Suspense fallback={null}>
+                    <SearchParamsHandler onTabChange={handleTabChange} />
+                </Suspense>
+
                 <div className="space-y-6 w-full h-full overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                     {/* Skip to Content Link for Accessibility */}
                     <a
@@ -950,7 +966,7 @@ export default function ClassDetailPage() {
                                         onPostAnnouncement={() => {
                                             // Switch to stream tab and maybe focus input?
                                             // For now just switching tab
-                                            const params = new URLSearchParams(searchParams.toString());
+                                            const params = new URLSearchParams(window.location.search);
                                             params.set('tab', 'stream');
                                             router.push(`/dashboard/classes/${classId}?${params.toString()}`);
                                         }}
@@ -1096,6 +1112,10 @@ export default function ClassDetailPage() {
     // --- STUDENT VIEW ---
     return (
         <div className="flex-1 w-full h-full">
+            <Suspense fallback={null}>
+                <SearchParamsHandler onTabChange={handleTabChange} />
+            </Suspense>
+
             <div className="space-y-6 w-full h-full overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                 {/* Class Info Panel for Students */}
                 <ClassInfoPanel
