@@ -48,14 +48,28 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
                 if (parsedCredentials.success) {
                     const { email, password } = parsedCredentials.data;
-                    const user = await db.user.findUnique({ where: { email } });
-                    if (!user) return null;
 
-                    const passwordsMatch = await bcrypt.compare(password, user.password);
-                    if (passwordsMatch) return user as any;
+                    try {
+                        console.log('Authorizing user:', email);
+                        const user = await db.user.findUnique({ where: { email } });
+                        if (!user) {
+                            console.log('User not found:', email);
+                            return null;
+                        }
+
+                        const passwordsMatch = await bcrypt.compare(password, user.password);
+                        if (passwordsMatch) {
+                            console.log('Password match, returning user');
+                            return user as any;
+                        }
+                        console.log('Password mismatch');
+                    } catch (error) {
+                        console.error('Authorize error:', error);
+                        throw error; // Rethrow to be caught by AuthError
+                    }
                 }
 
-                console.log('Invalid credentials');
+                console.log('Invalid credentials schema');
                 return null;
             },
         }),

@@ -79,8 +79,10 @@ export async function authenticate(
             switch (error.type) {
                 case 'CredentialsSignin':
                     return 'Thông tin đăng nhập không chính xác.';
+                case 'CallbackRouteError':
+                    return `Lỗi kết nối hoặc xử lý: ${error.cause?.err?.message || error.message}`;
                 default:
-                    return 'Đã xảy ra lỗi.';
+                    return `Lỗi (${error.type}): ${error.message}`;
             }
         }
         throw error;
