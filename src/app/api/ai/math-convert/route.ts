@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
 
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY,
-});
+const OPENROUTER_MODEL = "meta-llama/llama-3.3-70b-instruct:free";
 
 export async function POST(request: Request) {
     try {
@@ -11,6 +8,12 @@ export async function POST(request: Request) {
 
         if (!text || typeof text !== 'string') {
             return NextResponse.json({ error: 'Missing text parameter' }, { status: 400 });
+        }
+
+        const apiKey = process.env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+            console.error("OPENROUTER_API_KEY is missing");
+            throw new Error("OPENROUTER_API_KEY is missing");
         }
 
         const systemPrompt = `Bạn là một chuyên gia chuyển đổi ngôn ngữ tự nhiên tiếng Việt sang công thức LaTeX.
@@ -31,17 +34,25 @@ Ví dụ:
 
         const userPrompt = `Chuyển đổi sang LaTeX: "${text}"`;
 
-        const completion = await groq.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
-            messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: userPrompt }
-            ],
-            temperature: 0.3,
-            max_tokens: 256,
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                model: OPENROUTER_MODEL,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt }
+                ],
+                temperature: 0.3,
+                max_tokens: 256,
+            }),
         });
 
-        const latex = completion.choices[0]?.message?.content?.trim() || text;
+        const completion = await response.json();
+        const latex = completion.choices?.[0]?.message?.content?.trim() || text;
 
         return NextResponse.json({ latex });
     } catch (error) {
