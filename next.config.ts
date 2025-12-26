@@ -13,3 +13,4 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 
 // Force restart for Prisma schema update
+// Force fresh build 1766770937
