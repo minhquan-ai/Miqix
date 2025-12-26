@@ -1,119 +1,157 @@
 import { NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
+import { getAssignmentByIdAction } from '@/lib/actions';
 
-// Initialize Groq Client
-// Note: SDK automatically searches for GROQ_API_KEY in process.env
-// Initialize Groq Client
-// Note: SDK automatically searches for GROQ_API_KEY in process.env
+const PAYLOAD_INSTRUCTIONS = `
+[QUAN TRỌNG: CẤU TRÚC PAYLOAD ĐẶC BIỆT CHO CANVAS]
+Để hiển thị giao diện tương tác đẹp mắt trên Canvas, hãy sử dụng cú pháp đặc biệt sau:
 
-// Update to active model (Llama 3.3 70B Versatile is the current standard)
-// Update to active model as requested
-const MODEL_ID = "llama-3.3-70b-versatile";
+1. CHO FLASHCARDS (Khi người dùng hỏi tạo flashcard, ôn tập):
+Bắt đầu bằng dòng ":::payload" và kết thúc bằng ":::", với JSON ở giữa:
+:::payload
+{"type":"flashcards","data":[{"front":"Câu hỏi 1","back":"Đáp án 1"},{"front":"Câu hỏi 2","back":"Đáp án 2"}]}
+:::
+
+2. CHO NỘI DUNG CẤU TRÚC (Giáo án, Kế hoạch, Bài viết):
+:::payload
+{"type":"structured_content","title":"Tên tài liệu","sections":[{"heading":"Mục 1","content":"Nội dung..."}]}
+:::
+
+3. CHO CÁC LỰA CHỌN (Drafts, Options):
+:::payload
+{"type":"options","data":[{"title":"Phương án 1","content":"..."},{"title":"Phương án 2","content":"..."}]}
+:::
+
+Nếu không thuộc các trường hợp trên, hãy trả lời bằng Markdown bình thường.
+`;
 
 export async function POST(request: Request) {
     try {
-        // 1. Validate API Key Existence
-        if (!process.env.GROQ_API_KEY) {
-            console.error("Missing GROQ_API_KEY environment variable.");
-            return NextResponse.json(
-                { error: "Server Configuration Error: Missing API Key" },
-                { status: 500 }
-            );
+        const apiKey = process.env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+            return NextResponse.json({ error: "Missing OpenRouter API Key" }, { status: 500 });
         }
 
-        // 2. Parse & Validate Request Body
-        const body = await request.json().catch(() => null);
+        const body = await request.json();
+        const { message, mode, previousMessages = [], context, includeReasoning, targetAssignmentId, userRole } = body;
+        const isTeacher = userRole === 'teacher';
 
-        if (!body || typeof body.message !== 'string' || !body.message.trim()) {
-            return NextResponse.json(
-                { error: "Invalid input: 'message' field is required and must be a non-empty string." },
-                { status: 400 }
-            );
+        // 1. Fetch Detailed Assignment Context if targeted
+        let targetedAssignmentContext = "";
+        if (targetAssignmentId) {
+            const assignment = await getAssignmentByIdAction(targetAssignmentId);
+            if (assignment) {
+                targetedAssignmentContext = [
+                    "BỐI CẢNH BÀI TẬP MỤC TIÊU:",
+                    "- Tiêu đề: " + assignment.title,
+                    "- Mô tả: " + assignment.description,
+                    "- Tiêu chí chấm điểm (Rubric): " + JSON.stringify(assignment.rubric),
+                    "- Điểm tối đa: " + assignment.maxScore,
+                    "",
+                    "Hãy tập trung trả lời dựa trên bài tập này."
+                ].join("\n");
+            }
         }
 
-        const { message } = body;
+        // 2. Build General Context
+        let generalContext = "";
+        if (context) {
+            const userTypeLabel = isTeacher ? 'GIÁO VIÊN' : 'HỌC SINH';
+            const assignmentsList = context.assignments ? context.assignments.join(", ") : "Không có";
+            const eventsList = context.eventsToday ? context.eventsToday.join(", ") : "Trống";
+            const analyticsInfo = isTeacher
+                ? "Cần chấm " + (context.analytics?.ungradedCount || 0) + ", ĐTB lớp " + (context.analytics?.averageScore || "N/A")
+                : "Điểm " + (context.analytics?.averageScore || "N/A") + ", Chuyên cần " + (context.analytics?.attendance || "N/A") + "%";
 
-        // 3. Call Groq API
-        const groq = new Groq({
-            apiKey: process.env.GROQ_API_KEY,
+            generalContext = [
+                "THÔNG TIN HỆ THỐNG (" + userTypeLabel + "):",
+                "- Các bài tập: " + assignmentsList,
+                "- Lịch trình: " + eventsList,
+                "- Analytics: " + analyticsInfo
+            ].join("\n");
+        }
+
+        // 3. Build role-specific instructions
+        const roleInstructions = isTeacher
+            ? [
+                "VAI TRÒ GIÁO VIÊN:",
+                "- Chế độ PLANNER: Hỗ trợ soạn giáo án, tạo đề thi, gợi ý hoạt động giảng dạy.",
+                "- Chế độ GRADER: Phân tích bài làm của học sinh, gợi ý nhận xét và điểm số dựa trên rubric.",
+                "- Chế độ ANALYSIS: Phân tích dữ liệu lớp học, tìm ra học sinh yếu hoặc xu hướng học tập.",
+                "- Chế độ SUMMARY: Tóm tắt nội dung tiết dạy hoặc các tài liệu chuyên môn."
+            ].join("\n")
+            : [
+                "VAI TRÒ HỌC SINH:",
+                "- Chế độ SOLVER: Áp dụng phương pháp Socratic, gợi mở hướng giải thay vì cho đáp án.",
+                "- Chế độ SUMMARY: Tập trung vào các ý chính, ngắn gọn.",
+                "- Chế độ EXAM: Giả lập câu hỏi ôn tập, chỉ ra lỗ hổng kiến thức.",
+                "- Chế độ WRITING: Chú trọng vào ngôn từ, diễn đạt, sáng tạo."
+            ].join("\n");
+
+        // 4. Combine system prompt
+        const assistantType = isTeacher ? 'giảng dạy và quản lý lớp học' : 'học thuật';
+        const currentMode = (mode?.toUpperCase() || "STANDARD");
+
+        const systemPromptParts = [
+            "Bạn là Miqix AI, trợ lý " + assistantType + " thông minh.",
+            "Sử dụng Tiếng Việt. Phong cách: chuyên nghiệp, gần gũi, Markdown hóa (Bảng, Danh sách, Đậm).",
+            "",
+            targetedAssignmentContext,
+            generalContext,
+            "",
+            roleInstructions,
+            "",
+            "CHẾ ĐỘ TRỢ LÝ HIỆN TẠI: " + currentMode,
+            "",
+            PAYLOAD_INSTRUCTIONS
+        ];
+
+        const systemPrompt = systemPromptParts.filter(Boolean).join("\n");
+
+        const messages = [
+            { role: "system", content: systemPrompt },
+            ...previousMessages,
+            { role: "user", content: message }
+        ];
+
+        // 5. Call OpenRouter
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + apiKey,
+                "HTTP-Referer": "https://miqix.edu.vn",
+                "X-Title": "Miqix Learning",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "xiaomi/mimo-v2-flash:free",
+                messages,
+                include_reasoning: includeReasoning,
+                temperature: 0.7,
+                max_tokens: 4096,
+            })
         });
 
-        const completion = await groq.chat.completions.create({
-            messages: [
-                {
-                    role: "system",
-                    content: `Bạn là Miqix AI - trợ lý học thuật chuyên sâu được tích hợp trong nền tảng giáo dục Miqix.
+        const data = await response.json();
 
-BỐI CẢNH ỨNG DỤNG:
-- Miqix là nền tảng quản lý học tập hiện đại cho giáo viên và học sinh Việt Nam.
-- Các tính năng chính: Lớp học (Classes), Bài tập (Assignments/Missions), Lịch biểu (Schedule), Phân tích học tập (Analytics), và Chấm bài tự động.
-- Phương châm: Tối ưu hóa thời gian cho giáo viên và khuyến khích tư duy chủ động cho học sinh.
-
-TRIẾT LÝ HỖ TRỢ (SOCRATIC METHOD):
-- Đối với bài tập: KHÔNG bao giờ đưa ra đáp án trực tiếp ngay lập tức.
-- Hãy dẫn dắt bằng cách đặt câu hỏi gợi mở, nhắc lại kiến thức nền tảng, hoặc đưa ra các gợi ý (hints) nhỏ để người dùng tự khám phá ra câu trả lời.
-- Khuyến khích sự tò mò và tư duy phản biện.
-
-PHONG CÁCH GIAO TIẾP & ĐỊNH DẠNG:
-- Ngôn ngữ: Tiếng Việt tự nhiên, chuyên nghiệp nhưng thân thiện.
-- Trình bày giàu thẩm mỹ (Rich Aesthetics):
-    + Sử dụng **Bold** cho các thông tin quan trọng (tên lớp, môn học, thời gian).
-    + Sử dụng dấu gạch đầu dòng (-) hoặc chấm tròn (•) cho danh sách.
-    + Sử dụng đường kẻ phân cách (---) để tách biệt các ý lớn.
-    + Sử dụng các biểu tượng biểu cảm (emojis) phù hợp (📐, 📅, ✨, 🚀) để giao diện sinh động.
-- Trả lời có cấu trúc, bố cục thoáng đãng, dễ đọc trên thiết bị di động.
-
-Nếu người dùng hỏi về các tính năng của app, hãy giải thích dựa trên các module (Lớp học, Nhiệm vụ, Lịch biểu).
-
-CHỈ DẪN PHẢN HỒI THEO VAI TRÒ (QUAN TRỌNG):
-Hãy xác định vai trò người dùng dựa trên ngữ cảnh được cung cấp (Giáo viên hoặc Học sinh).
-
-1. ĐỐI VỚI GIÁO VIÊN (Teacher):
-- Đóng vai một trợ lý giảng dạy đắc lực, chuyên nghiệp và tận tụy.
-- Hỗ trợ phân tích dữ liệu lớp học, gợi ý phương pháp giảng dạy, và soạn thảo thông báo/bài tập.
-- Ngôn ngữ: Trang trọng, súc tích, tập trung vào giải pháp quản lý hiệu quả.
-
-2. ĐỐI VỚI HỌC SINH (Student):
-- Đóng vai một người bạn đồng hành (mentor) thân thiện, kiên nhẫn và khích lệ.
-- Áp dụng triệt để phương pháp Socratic: Gợi mở tư duy thay vì làm hộ.
-- Hỗ trợ lập kế hoạch học tập, giải thích khái niệm khó, và quản lý deadline.
-- Ngôn ngữ: Gần gũi, năng động (vibe Gen Z một chút nhưng vẫn lịch sự), sử dụng teencode nhẹ nhàng nếu phù hợp.`
-                },
-                {
-                    role: "user",
-                    content: message
-                }
-            ],
-            model: MODEL_ID,
-            temperature: 0.7,
-            max_tokens: 2048, // Adjusted for typical chat feature needs
-        });
-
-        // 4. Extract Reply
-        const reply = completion.choices[0]?.message?.content || "";
-
-        if (!reply) {
-            throw new Error("Empty response from AI Provider");
+        if (data.error) {
+            throw new Error(data.error.message || "OpenRouter API Error");
         }
 
-        // 5. Return Success Response
-        return NextResponse.json({ reply });
+        const choice = data.choices[0];
+        let responseText = choice.message.content;
+
+        // Handle reasoning (thinking) if present
+        if (choice.message.reasoning) {
+            responseText = "> [!NOTE]\n> **Quá trình tư duy:**\n> " + choice.message.reasoning.replace(/\n/g, '\n> ') + "\n\n" + responseText;
+        }
+
+        return NextResponse.json({ reply: responseText });
 
     } catch (error: any) {
-        console.error("[Groq API Error]:", error);
-
-        // Handle specific Groq errors if possible, otherwise generic 500
-        if (error?.status === 429) {
-            return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
-        }
-
-        if (error?.status === 401) {
-            return NextResponse.json({ error: "Unauthorized. Invalid API Key." }, { status: 401 });
-        }
-
-        return NextResponse.json(
-            { error: "Internal Server Error", details: error instanceof Error ? error.message : "Unknown error" },
-            { status: 500 }
-        );
+        console.error("[OpenRouter API Error]:", error);
+        return NextResponse.json({
+            error: "Lỗi kết nối Miqix AI (OpenRouter)",
+            details: error.message
+        }, { status: 500 });
     }
 }

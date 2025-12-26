@@ -14,7 +14,9 @@ export default auth((req) => {
         return NextResponse.redirect(new URL('/dashboard', req.url));
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set('ngrok-skip-browser-warning', 'true');
+    return response;
 });
 
 export const config = {

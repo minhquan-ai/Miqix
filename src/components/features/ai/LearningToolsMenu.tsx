@@ -1,6 +1,6 @@
 "use client";
 
-import { BrainCircuit, Calculator, Search, FileText, HelpCircle, CheckCircle2 } from "lucide-react";
+import { BrainCircuit, FileText, Target, PenTool } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface LearningToolsMenuProps {
@@ -10,37 +10,37 @@ interface LearningToolsMenuProps {
 export function LearningToolsMenu({ onSelectTool }: LearningToolsMenuProps) {
     const tools = [
         {
-            id: "socratic",
-            label: "Hướng dẫn tôi",
-            desc: "Gợi ý cách làm thay vì cho đáp án",
-            icon: HelpCircle,
+            id: "solver",
+            label: "Giải bài tập",
+            desc: "Hướng dẫn giải bài từng bước",
+            icon: BrainCircuit,
             color: "text-blue-500",
             bg: "bg-blue-50",
             border: "border-blue-100"
         },
         {
-            id: "rubric",
-            label: "Kiểm tra Barem",
-            desc: "So sánh bài làm với tiêu chí điểm",
-            icon: CheckCircle2,
+            id: "summary",
+            label: "Tóm tắt",
+            desc: "Tóm tắt nội dung chính bài này",
+            icon: FileText,
             color: "text-emerald-500",
             bg: "bg-emerald-50",
             border: "border-emerald-100"
         },
         {
-            id: "explain",
-            label: "Giải thích (ELI5)",
-            desc: "Giải thích khái niệm đơn giản",
-            icon: BrainCircuit,
+            id: "exam",
+            label: "Ôn thi",
+            desc: "Luyện tập và kiểm tra kiến thức",
+            icon: Target,
             color: "text-purple-500",
             bg: "bg-purple-50",
             border: "border-purple-100"
         },
         {
-            id: "quiz",
-            label: "Quiz nhanh",
-            desc: "5 câu hỏi trắc nghiệm ôn tập",
-            icon: FileText,
+            id: "writing",
+            label: "Sáng tạo",
+            desc: "Hỗ trợ diễn đạt và trau chuốt",
+            icon: PenTool,
             color: "text-orange-500",
             bg: "bg-orange-50",
             border: "border-orange-100"

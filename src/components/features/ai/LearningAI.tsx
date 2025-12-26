@@ -19,7 +19,7 @@ export function LearningAI({ onClose, user, assignmentTitle, assignmentContext, 
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
-    const [mode, setMode] = useState<'socratic' | 'general' | 'rubric'>('socratic');
+    const [mode, setMode] = useState<'solver' | 'standard' | 'summary' | 'exam' | 'writing'>('solver');
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -45,31 +45,39 @@ export function LearningAI({ onClose, user, assignmentTitle, assignmentContext, 
         setLoading(true);
 
         const systemContext = `
-            [VAI TRÒ: TRỢ LÝ HỌC TẬP (LEARNING ASSISTANT)]
+            [VAI TRÒ: TRỢ LÝ HỌC TẬP (MIQIX LEARNING ASSISTANT)]
             - Bạn KHÔNG PHẢI là máy giải bài tập. KHÔNG bao giờ đưa ra đáp án trực tiếp cho bài tập về nhà.
             - Chế độ hiện tại: ${modeToUse.toUpperCase()}
             - Tên bài tập: ${assignmentTitle}
-            - Nội dung đề bài: ${assignmentContext?.substring(0, 1000)}...
-            - Bài làm hiện tại của học sinh: ${submissionContext?.substring(0, 500)}...
+            - Nội dung đề bài: ${assignmentContext}
+            - Bài làm hiện tại của học sinh: ${submissionContext}
             
-            [QUY TẮC CỐT LÕI - SOCRATIC MODE]
-            1. Nếu học sinh hỏi đáp án -> Hãy hỏi ngược lại 1 câu hỏi gợi mở để họ tự tìm ra.
+            [QUY TẮC CỐT LÕI - SOLVER MODE]
+            1. Nếu học sinh hỏi đáp án -> Hãy hỏi ngược lại 1 câu hỏi gợi mở để họ tự tìm ra (Socratic).
             2. Chia nhỏ vấn đề thành các bước.
             3. Chỉ cung cấp công thức hoặc lý thuyết liên quan, không tính toán hộ.
             
-            [QUY TẮC - RUBRIC CHECK]
-            1. Đánh giá bài làm dựa trên tiêu chí học thuật.
-            2. Chỉ ra điểm mạnh và điểm cần cải thiện.
+            [QUY TẮC - SUMMARY MODE]
+            1. Tóm tắt ngắn gọn đề bài hoặc bản nháp của học sinh.
+            2. Lọc ra các ý chính cần nắm vững.
             
-            [QUY TẮC - ELI5]
-            1. Giải thích cực kỳ đơn giản, dùng ví dụ đời thường.
+            [QUY TẮC - EXAM MODE]
+            1. Tạo câu hỏi luyện tập dựa trên đề bài.
+            2. Giúp học sinh kiểm tra mức độ hiểu bài.
+
+            [QUY TẮC - WRITING MODE]
+            1. Hỗ trợ trau chuốt câu từ trong bài làm.
+            2. Gợi ý các cách diễn đạt sáng tạo và chuyên nghiệp hơn.
         `;
 
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: `${systemContext}\n\nCâu hỏi học sinh: ${textToSend}` }),
+                body: JSON.stringify({
+                    message: `${systemContext}\n\nCâu hỏi học sinh: ${textToSend}`,
+                    previousMessages: messages.slice(-10) // Gửi 10 tin nhắn gần nhất để giữ context
+                }),
             });
 
             const data = await response.json();
@@ -95,23 +103,25 @@ export function LearningAI({ onClose, user, assignmentTitle, assignmentContext, 
         let newMode = "general";
 
         switch (toolId) {
-            case "socratic":
+            case "solver":
                 prompt = "Tôi đang gặp khó khăn ở bài này, bạn có thể gợi ý cho tôi hướng giải quyết không?";
-                newMode = "socratic";
-                setMode("socratic");
+                newMode = "solver";
+                setMode("solver");
                 break;
-            case "rubric":
-                prompt = "Hãy chấm điểm thử bài làm nháp của tôi dựa trên yêu cầu đề bài. Chỉ ra lỗi sai và cách cải thiện.";
-                newMode = "rubric";
-                setMode("rubric");
+            case "summary":
+                prompt = "Hãy tóm tắt lại các yêu cầu chính của đề bài và những gì tôi đã làm được.";
+                newMode = "summary";
+                setMode("summary");
                 break;
-            case "explain":
-                prompt = "Hãy giải thích khái niệm chính của bài này cho tôi dễ hiểu (như 5 tuổi).";
-                newMode = "general";
+            case "exam":
+                prompt = "Hãy tạo cho tôi một vài câu hỏi luyện tập để kiểm tra xem tôi có hiểu bài này không.";
+                newMode = "exam";
+                setMode("exam");
                 break;
-            case "quiz":
-                prompt = "Hãy tạo cho tôi 5 câu hỏi trắc nghiệm ngắn để kiểm tra kiến thức về bài này.";
-                newMode = "general";
+            case "writing":
+                prompt = "Hãy giúp tôi trau chuốt lại cách diễn đạt trong bài làm của mình.";
+                newMode = "writing";
+                setMode("writing");
                 break;
         }
 
@@ -189,7 +199,7 @@ export function LearningAI({ onClose, user, assignmentTitle, assignmentContext, 
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
                         disabled={loading}
-                        placeholder={mode === 'socratic' ? "Hỏi để được gợi ý..." : "Nhập câu hỏi..."}
+                        placeholder={mode === 'solver' ? "Hỏi để được gợi ý..." : "Nhập câu hỏi..."}
                         className="flex-1 bg-transparent border-none text-[15px] py-3 pl-4 focus:ring-0 focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium resize-none overflow-y-auto scrollbar-none leading-relaxed max-h-[120px]"
                         rows={1}
                         style={{ minHeight: '44px' }}
@@ -206,8 +216,8 @@ export function LearningAI({ onClose, user, assignmentTitle, assignmentContext, 
 
                 <div className="flex justify-between items-center px-2 mt-2">
                     <div className="flex items-center gap-2">
-                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border ${mode === 'socratic' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-gray-50 text-gray-500 border-gray-200'}`}>
-                            {mode === 'socratic' ? 'Socratic Mode' : 'General Mode'}
+                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border ${mode === 'solver' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+                            {mode === 'solver' ? 'Solver Mode' : mode.toUpperCase() + ' Mode'}
                         </span>
                     </div>
                     <button

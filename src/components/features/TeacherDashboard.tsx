@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LogOut, Calendar as CalendarIcon, FileText, CheckCircle, Users, BookOpen, BrainCircuit, GraduationCap } from "lucide-react";
+import { LogOut, Calendar as CalendarIcon, FileText, CheckCircle, Users, BookOpen, BrainCircuit, GraduationCap, Zap } from "lucide-react";
 import { logout } from "@/lib/auth-actions";
 import { useRouter } from "next/navigation";
 import { Class, User } from "@/types";
@@ -94,7 +94,7 @@ export function TeacherDashboard({ user, analytics }: TeacherDashboardProps) {
             id: 'grading',
             label: 'Cần chấm điểm',
             icon: CheckCircle,
-            href: '/dashboard/teacher-missions?status=needs_grading',
+            href: '/dashboard/assignments?status=needs_grading',
             badge: dashboardAnalytics.ungradedCount > 0 ? dashboardAnalytics.ungradedCount : undefined,
             color: 'orange',
             description: 'Bài tập đang chờ xử lý'
@@ -127,180 +127,154 @@ export function TeacherDashboard({ user, analytics }: TeacherDashboardProps) {
     ];
 
     return (
-        <div className="space-y-8 pb-10">
-            {/* 1. Hero Section - The "Control Tower" Header */}
-            <motion.div variants={item} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-5 w-full md:w-auto">
-                    {/* Avatar */}
-                    <div className="w-16 h-16 rounded-full border-4 border-indigo-50 overflow-hidden shadow-sm flex-shrink-0">
-                        <img
-                            src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
-                            alt={user.name}
-                            className="w-full h-full object-cover bg-gray-100"
-                        />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            {getGreeting()}, Thầy/Cô {user.name.split(' ').pop()}
-                        </h1>
-                        <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
-                            <span className="flex items-center gap-1.5 bg-gray-100 px-2.5 py-1 rounded-md font-medium">
-                                <CalendarIcon className="w-3.5 h-3.5" />
-                                {todayDate}
-                            </span>
-                            <span className="hidden md:inline">•</span>
-                            <span className="text-indigo-600 font-medium">Hôm nay có 3 tiết dạy (Sáng)</span>
+        <div className="flex-1 h-full overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-gray-200">
+            <div className="max-w-7xl mx-auto space-y-8 pb-10">
+                {/* 1. Hero Section - The "Control Tower" Header */}
+                <motion.div variants={item} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-5 w-full md:w-auto">
+                        {/* Avatar */}
+                        <div className="w-16 h-16 rounded-full border-4 border-indigo-50 overflow-hidden shadow-sm flex-shrink-0">
+                            <img
+                                src={user.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
+                                alt={user.name}
+                                className="w-full h-full object-cover bg-gray-100"
+                            />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900">
+                                {getGreeting()}, Thầy/Cô {user.name.split(' ').pop()}
+                            </h1>
+                            <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
+                                <span className="flex items-center gap-1.5 bg-gray-100 px-2.5 py-1 rounded-md font-medium">
+                                    <CalendarIcon className="w-3.5 h-3.5" />
+                                    {todayDate}
+                                </span>
+                                <span className="hidden md:inline">•</span>
+                                <span className="text-indigo-600 font-medium">Hôm nay có 3 tiết dạy (Sáng)</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Top Actions */}
-                <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-                    <button
-                        onClick={() => setShowAssignmentModal(true)}
-                        className="px-4 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all font-semibold text-sm shadow-sm flex items-center gap-2"
+                    {/* Top Actions */}
+                    <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                        <button
+                            onClick={() => setShowAssignmentModal(true)}
+                            className="px-4 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all font-semibold text-sm shadow-sm flex items-center gap-2"
+                        >
+                            <FileText className="w-4 h-4" />
+                            <span>Tạo bài tập</span>
+                        </button>
+                        <NotificationBell userId={user.id} />
+                        <button
+                            onClick={handleLogout}
+                            className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-100"
+                            title="Đăng xuất"
+                        >
+                            <LogOut className="w-5 h-5" />
+                        </button>
+                    </div>
+                </motion.div>
+
+                {loading ? (
+                    <div className="text-center py-20 text-muted-foreground">Đang tải dữ liệu trung tâm...</div>
+                ) : (
+                    <motion.div
+                        variants={container}
+                        initial="hidden"
+                        animate="show"
+                        className="space-y-8"
                     >
-                        <FileText className="w-4 h-4" />
-                        <span>Tạo bài tập</span>
-                    </button>
-                    <NotificationBell userId={user.id} />
-                    <button
-                        onClick={handleLogout}
-                        className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-100"
-                        title="Đăng xuất"
-                    >
-                        <LogOut className="w-5 h-5" />
-                    </button>
-                </div>
-            </motion.div>
+                        {/* 2. The Hub - Quick Access Grid */}
+                        <section>
+                            <div className="flex items-center justify-between mb-4 px-1">
+                                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                    <Zap className="w-5 h-5 text-amber-500" />
+                                    Truy cập nhanh
+                                </h3>
+                                <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded-lg">
+                                    Dashboard v2.0
+                                </span>
+                            </div>
+                            <QuickAccessGrid items={hubItems} />
+                        </section>
 
-            {loading ? (
-                <div className="text-center py-20 text-muted-foreground">Đang tải dữ liệu trung tâm...</div>
-            ) : (
-                <motion.div
-                    variants={container}
-                    initial="hidden"
-                    animate="show"
-                    className="space-y-8"
-                >
-                    {/* 2. The Hub - Quick Access Grid */}
-                    <section>
-                        <div className="flex items-center justify-between mb-4 px-1">
-                            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <Zap className="w-5 h-5 text-amber-500" />
-                                Truy cập nhanh
-                            </h3>
-                            <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded-lg">
-                                Dashboard v2.0
-                            </span>
-                        </div>
-                        <QuickAccessGrid items={hubItems} />
-                    </section>
+                        {/* 3. The Pulse - Performance & Timeline Split */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Left Main: Performance Overview + "Invisible AI" */}
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                                            <GraduationCap className="w-5 h-5 text-indigo-600" />
+                                            Hiệu suất lớp học
+                                        </h3>
+                                        <span className={`text-sm font-bold px-3 py-1 rounded-full ${dashboardAnalytics.scoreTrend === 'up' ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-600'
+                                            }`}>
+                                            {dashboardAnalytics.scoreTrend === 'up' ? '↗ Tăng trưởng' : '→ Ổn định'}
+                                        </span>
+                                    </div>
 
-                    {/* 3. The Pulse - Performance & Timeline Split */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Left Main: Performance Overview + "Invisible AI" */}
-                        <div className="lg:col-span-2 space-y-6">
-                            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                        <GraduationCap className="w-5 h-5 text-indigo-600" />
-                                        Hiệu suất lớp học
-                                    </h3>
-                                    <span className={`text-sm font-bold px-3 py-1 rounded-full ${dashboardAnalytics.scoreTrend === 'up' ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-600'
-                                        }`}>
-                                        {dashboardAnalytics.scoreTrend === 'up' ? '↗ Tăng trưởng' : '→ Ổn định'}
-                                    </span>
+
+                                    {/* "Invisible AI" Insight Box */}
+                                    <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-white rounded-xl p-4 border border-indigo-100/50 flex gap-4">
+                                        <div className="p-2 bg-white rounded-lg shadow-sm text-indigo-600 h-fit">
+                                            <BrainCircuit className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-indigo-900 mb-1">AI Phân tích</h4>
+                                            <p className="text-sm text-indigo-800/80 leading-relaxed">
+                                                Điểm trung bình có xu hướng tăng nhẹ so với tuần trước.
+                                                Tuy nhiên, lớp <strong>10A2</strong> có tỉ lệ nộp bài thấp (65%).
+                                                Thầy nên nhắc nhở trước bài kiểm tra sắp tới.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {/* Simple Bar Chart Visualization */}
-                                <div className="space-y-4 mb-6">
-                                    <div className="flex items-end gap-2 h-32 items-end justify-between px-4 pb-2 border-b border-gray-100">
-                                        {[6.5, 7.2, 7.0, 7.5, 7.8, dashboardAnalytics.averageScore].map((score, i) => (
-                                            <div key={i} className="w-full relative group">
-                                                <div
-                                                    className="w-full min-w-[20px] bg-indigo-100 rounded-t-lg hover:bg-indigo-200 transition-all relative"
-                                                    style={{ height: `${(score / 10) * 100}%` }}
-                                                >
-                                                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        {score.toFixed(1)}
-                                                    </div>
+                                {/* Classes Quick List */}
+                                {classes.length > 0 && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {classes.slice(0, 4).map(cls => (
+                                            <div key={cls.id} className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-between hover:border-indigo-200 transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/classes/${cls.id}`)}>
+                                                <div>
+                                                    <div className="font-bold text-gray-900">{cls.name}</div>
+                                                    <div className="text-xs text-gray-500">{cls.studentCount || 0} học sinh • {cls.code}</div>
+                                                </div>
+                                                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
+                                                    <Users className="w-4 h-4" />
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="flex justify-between text-xs text-gray-400 px-4">
-                                        <span>Tuần 1</span>
-                                        <span>Tuần 2</span>
-                                        <span>Tuần 3</span>
-                                        <span>Tuần 4</span>
-                                        <span>Tuần 5</span>
-                                        <span className="font-bold text-indigo-600">Hiện tại</span>
-                                    </div>
-                                </div>
-
-                                {/* "Invisible AI" Insight Box */}
-                                <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-white rounded-xl p-4 border border-indigo-100/50 flex gap-4">
-                                    <div className="p-2 bg-white rounded-lg shadow-sm text-indigo-600 h-fit">
-                                        <BrainCircuit className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-bold text-indigo-900 mb-1">AI Phân tích</h4>
-                                        <p className="text-sm text-indigo-800/80 leading-relaxed">
-                                            Điểm trung bình có xu hướng tăng nhẹ so với tuần trước.
-                                            Tuy nhiên, lớp <strong>10A2</strong> có tỉ lệ nộp bài thấp (65%).
-                                            Thầy nên nhắc nhở trước bài kiểm tra sắp tới.
-                                        </p>
-                                    </div>
-                                </div>
+                                )}
                             </div>
 
-                            {/* Classes Quick List */}
-                            {classes.length > 0 && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {classes.slice(0, 4).map(cls => (
-                                        <div key={cls.id} className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm flex items-center justify-between hover:border-indigo-200 transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/classes/${cls.id}`)}>
-                                            <div>
-                                                <div className="font-bold text-gray-900">{cls.name}</div>
-                                                <div className="text-xs text-gray-500">{cls.studentCount || 0} học sinh • {cls.code}</div>
-                                            </div>
-                                            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
-                                                <Users className="w-4 h-4" />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            {/* Right Sidebar: Timeline & Alerts */}
+                            <div className="space-y-6">
+                                {/* Students At Risk */}
+                                {dashboardAnalytics.atRiskStudents.length > 0 && (
+                                    <AtRiskWidget students={dashboardAnalytics.atRiskStudents} classId="all" />
+                                )}
+
+                                {/* Upcoming Timeline */}
+                                <UpcomingWidget deadlines={dashboardAnalytics.upcomingDeadlines} classId="all" />
+                            </div>
                         </div>
+                    </motion.div>
+                )}
 
-                        {/* Right Sidebar: Timeline & Alerts */}
-                        <div className="space-y-6">
-                            {/* Students At Risk */}
-                            {dashboardAnalytics.atRiskStudents.length > 0 && (
-                                <AtRiskWidget students={dashboardAnalytics.atRiskStudents} classId="all" />
-                            )}
-
-                            {/* Upcoming Timeline */}
-                            <UpcomingWidget deadlines={dashboardAnalytics.upcomingDeadlines} classId="all" />
-                        </div>
-                    </div>
-                </motion.div>
-            )}
-
-            {/* Modals */}
-            <ClassCreatorModal
-                isOpen={showClassModal}
-                onClose={() => setShowClassModal(false)}
-                onSuccess={refreshData}
-            />
-            <AssignmentCreatorModal
-                isOpen={showAssignmentModal}
-                onClose={() => setShowAssignmentModal(false)}
-                onSuccess={refreshData}
-            />
+                {/* Modals */}
+                <ClassCreatorModal
+                    isOpen={showClassModal}
+                    onClose={() => setShowClassModal(false)}
+                    onSuccess={refreshData}
+                />
+                <AssignmentCreatorModal
+                    isOpen={showAssignmentModal}
+                    onClose={() => setShowAssignmentModal(false)}
+                    onSuccess={refreshData}
+                />
+            </div>
         </div>
     );
 }
-
-// Helper icon
-import { Zap } from "lucide-react";

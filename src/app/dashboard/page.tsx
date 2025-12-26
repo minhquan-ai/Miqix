@@ -10,6 +10,7 @@ import { TeacherDashboard } from "@/components/features/TeacherDashboard";
 import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
 import { StudentAnalytics } from "@/lib/student-analytics";
 import { ClassAnalytics } from "@/lib/class-analytics";
+import { AIPlayground } from "@/components/features/ai-playground/AIPlayground";
 
 
 export default function DashboardPage() {
@@ -51,10 +52,8 @@ export default function DashboardPage() {
 
   return (
     <>
-      {user.role === 'teacher' && teacherAnalytics ? (
-        <TeacherDashboard user={user} analytics={teacherAnalytics} />
-      ) : user.role === 'student' && studentAnalytics ? (
-        <StudentDashboard user={user} analytics={studentAnalytics} />
+      {user.role === 'teacher' || user.role === 'student' ? (
+        <AIPlayground user={user} />
       ) : (
         <div className="text-center py-20">Không thể tải dữ liệu bảng điều khiển.</div>
       )}

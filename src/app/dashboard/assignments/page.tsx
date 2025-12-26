@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, CheckCircle, Clock, Plus, Search, FileEdit } from "lucide-react";
-import { getCurrentUserAction, getAssignmentsAction, getSubmissionsAction, getClassesAction } from "@/lib/actions";
+import { getCurrentUserAction, getAssignmentsAction, getSubmissionsAction } from "@/lib/actions";
 import { Assignment, Submission, User } from "@/types";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -103,20 +103,22 @@ function AssignmentsContent() {
 
     if (loading) {
         return (
-            <div className="space-y-6 -m-8 p-8">
-                <Skeleton className="h-40 w-full rounded-3xl" />
-                <Skeleton className="h-14 w-full rounded-2xl" />
-                <div className="space-y-12">
-                    {[1, 2].map(s => (
-                        <div key={s} className="space-y-6">
-                            <Skeleton className="h-8 w-48" />
-                            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-                                {[1, 2, 3, 4, 5].map(i => (
-                                    <Skeleton key={i} className="h-48 rounded-2xl" />
-                                ))}
+            <div className="flex-1 h-full overflow-y-auto p-4 md:p-8">
+                <div className="max-w-[1600px] mx-auto space-y-6">
+                    <Skeleton className="h-40 w-full rounded-3xl" />
+                    <Skeleton className="h-14 w-full rounded-2xl" />
+                    <div className="space-y-12">
+                        {[1, 2].map(s => (
+                            <div key={s} className="space-y-6">
+                                <Skeleton className="h-8 w-48" />
+                                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+                                    {[1, 2, 3, 4, 5].map(i => (
+                                        <Skeleton key={i} className="h-48 rounded-2xl" />
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
         );
@@ -125,8 +127,8 @@ function AssignmentsContent() {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white -m-8 p-8 px-4 md:px-8">
-            <div className="w-full space-y-8">
+        <div className="flex-1 h-full overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-gray-200">
+            <div className="w-full max-w-[1600px] mx-auto space-y-8 pb-20">
                 <AssignmentCreatorModal
                     isOpen={showCreateModal}
                     onClose={() => setShowCreateModal(false)}
@@ -149,11 +151,17 @@ function AssignmentsContent() {
                                 <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
                                     <BookOpen className="w-6 h-6" />
                                 </div>
-                                <span className="text-sm font-medium text-white/80">Danh sách bài tập</span>
+                                <span className="text-sm font-medium text-white/80">
+                                    {user.role === 'teacher' ? "Quản lý Giảng dạy" : "Trung tâm Học tập"}
+                                </span>
                             </div>
-                            <h1 className="text-3xl font-bold mb-2">Bài tập của tôi</h1>
+                            <h1 className="text-3xl font-bold mb-2">
+                                {user.role === 'teacher' ? "Quản lý Bài tập" : "Nhiệm vụ của tôi"}
+                            </h1>
                             <p className="text-white/80 text-sm max-w-md">
-                                Quản lý, theo dõi và hoàn thành các nhiệm vụ học tập của bạn.
+                                {user.role === 'teacher'
+                                    ? "Thiết kế, giao bài và theo dõi tiến độ học tập của các lớp học bạn quản lý."
+                                    : "Quản lý, theo dõi và hoàn thành các nhiệm vụ học tập để đạt kết quả tốt nhất."}
                             </p>
                         </div>
                         {user.role === 'teacher' && (
@@ -330,7 +338,7 @@ function AssignmentCard({ assignment, user, submissions }: { assignment: Assignm
             : "border-gray-100 bg-white";
 
     return (
-        <Link href={user.role === 'teacher' ? `/dashboard/assignments/${assignment.id}/submissions` : `/assignments/${assignment.id}`}>
+        <Link href={user.role === 'teacher' ? `/dashboard/assignments/${assignment.id}/submissions` : `/dashboard/assignments/${assignment.id}`}>
             <div className={`${urgencyStyles} rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-blue-200 transition-all h-full flex flex-col cursor-pointer group relative overflow-hidden border`}>
                 <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
                 <div className="flex justify-between items-start mb-4">

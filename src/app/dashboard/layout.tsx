@@ -48,10 +48,25 @@ export default function DashboardLayout({
         loadData();
     }, []);
 
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+    // Sync sidebar state with localStorage
+    useEffect(() => {
+        const savedState = localStorage.getItem('sidebar-collapsed');
+        if (savedState !== null) {
+            setIsSidebarCollapsed(savedState === 'true');
+        }
+    }, []);
+
+    const toggleSidebar = () => {
+        const newState = !isSidebarCollapsed;
+        setIsSidebarCollapsed(newState);
+        localStorage.setItem('sidebar-collapsed', String(newState));
+    };
+
     // Mock counts for now - in real app these would come from server actions
     const counts = {
         pendingAssignments: 5,
-        activeMissions: 2,
         unreadNotifications: 3,
         unreadMessages: 1,
         draftAssignments: 2
@@ -59,14 +74,24 @@ export default function DashboardLayout({
 
     return (
         <NavigationProvider>
-            <div className="flex min-h-screen bg-background text-foreground font-sans antialiased">
-                <Sidebar
-                    user={currentUser}
-                    classes={userClasses}
-                    isLoading={isLoading}
-                    counts={counts}
-                />
-                <main className="flex-1 overflow-y-auto h-screen bg-muted/10 p-8">
+            <div
+                className="flex min-h-screen bg-background text-foreground font-sans antialiased"
+                style={{ '--sidebar-width': isSidebarCollapsed ? '80px' : '256px' } as React.CSSProperties}
+            >
+                <aside className="fixed inset-y-0 left-0 z-50">
+                    <Sidebar
+                        user={currentUser}
+                        classes={userClasses}
+                        isLoading={isLoading}
+                        counts={counts}
+                        isCollapsed={isSidebarCollapsed}
+                        onToggle={toggleSidebar}
+                    />
+                </aside>
+                <main
+                    className={`flex-1 h-screen bg-white overflow-hidden transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'md:pl-20' : 'md:pl-64'
+                        }`}
+                >
                     {children}
                 </main>
             </div>

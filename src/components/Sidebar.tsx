@@ -50,11 +50,12 @@ interface SidebarProps {
     isLoading: boolean;
     counts?: {
         pendingAssignments: number;
-        activeMissions: number;
         unreadNotifications: number;
         unreadMessages: number;
         draftAssignments: number;
     };
+    isCollapsed?: boolean;
+    onToggle?: () => void;
 }
 
 type SidebarItemType = {
@@ -68,7 +69,7 @@ type SidebarItemType = {
     role?: 'teacher' | 'student' | 'all';
 };
 
-export default function Sidebar({ user, classes, isLoading, counts }: SidebarProps) {
+export default function Sidebar({ user, classes, isLoading, counts, isCollapsed: isCollapsedProp, onToggle }: SidebarProps) {
     const pathname = usePathname();
     const { navigateTo } = useNavigation();
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -76,7 +77,10 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
     });
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isCollapsedInternal, setIsCollapsedInternal] = useState(false);
+
+    // Determine effective state
+    const isCollapsed = isCollapsedProp !== undefined ? isCollapsedProp : isCollapsedInternal;
     const showExpanded = !isCollapsed;
 
     // Smooth navigation handler
@@ -87,45 +91,50 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
         navigateTo(href);
     }, [navigateTo]);
 
-    // Load collapsed state from localStorage
+    // Internal state management only if prop not provided
     useEffect(() => {
-        const savedState = localStorage.getItem('sidebar-collapsed');
-        if (savedState !== null) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setIsCollapsed(savedState === 'true');
+        if (isCollapsedProp === undefined) {
+            const savedState = localStorage.getItem('sidebar-collapsed');
+            if (savedState !== null) {
+                setIsCollapsedInternal(savedState === 'true');
+            }
         }
-    }, []);
+    }, [isCollapsedProp]);
 
     // Auto-reset state when collapsed
     useEffect(() => {
         if (isCollapsed) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setShowProfileMenu(false);
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setExpandedSections({});
+            setShowProfileMenu(false);
         }
     }, [isCollapsed]);
 
     // Toggle collapse and save to localStorage
     const toggleCollapse = (e?: React.MouseEvent) => {
         if (e) e.stopPropagation();
-        const newState = !isCollapsed;
-        setIsCollapsed(newState);
-        localStorage.setItem('sidebar-collapsed', String(newState));
+        if (onToggle) {
+            onToggle();
+        } else {
+            const newState = !isCollapsedInternal;
+            setIsCollapsedInternal(newState);
+            localStorage.setItem('sidebar-collapsed', String(newState));
+        }
     };
 
     const handleSidebarClick = () => {
-        // Toggle state based on current state
-        const newState = !isCollapsed;
-        setIsCollapsed(newState);
-        localStorage.setItem('sidebar-collapsed', String(newState));
+        if (onToggle) {
+            onToggle();
+        } else {
+            const newState = !isCollapsedInternal;
+            setIsCollapsedInternal(newState);
+            localStorage.setItem('sidebar-collapsed', String(newState));
+        }
     };
 
     // Use zeros as fallback if counts not provided
     // The parent component should pass real counts from the database
     const safeCounts = counts || {
         pendingAssignments: 0,
-        activeMissions: 0,
         unreadNotifications: 0,
         unreadMessages: 0,
         draftAssignments: 0
@@ -148,7 +157,7 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
     const menuItems: SidebarItemType[] = [
         {
             id: 'dashboard',
-            label: 'Dashboard',
+            label: 'Miqix AI',
             icon: LayoutDashboard,
             href: '/dashboard',
             role: 'all'
@@ -179,15 +188,6 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
             href: '/dashboard/assignments',
             // subItems removed as requested
         },
-        {
-            id: 'missions',
-            label: 'Nhiệm vụ',
-            icon: Target,
-            href: user?.role === 'teacher' ? '/dashboard/teacher-missions' : '/dashboard/missions',
-            badge: safeCounts.activeMissions,
-            badgeColor: 'purple',
-            role: 'all'
-        }
     ];
 
     const quickActions: SidebarItemType[] = [
@@ -447,18 +447,6 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
                 >
                     {/* Main Menu */}
                     <div>
-                        {showExpanded ? (
-                            <motion.div
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.2, delay: 0.05 }}
-                                className="px-3 mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap overflow-hidden"
-                            >
-                                Menu
-                            </motion.div>
-                        ) : (
-                            <div className="h-px bg-border mx-3 my-4" />
-                        )}
                         <motion.div
                             className="space-y-1"
                             variants={menuListVariants}
@@ -468,32 +456,24 @@ export default function Sidebar({ user, classes, isLoading, counts }: SidebarPro
                         >
                             {menuItems.map(renderMenuItem)}
                         </motion.div>
+
                     </div>
 
                     {/* Quick Actions */}
-                    <div>
-                        {showExpanded ? (
+                    {quickActions.length > 0 && (
+                        <div>
                             <motion.div
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.2, delay: 0.05 }}
-                                className="px-3 mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap overflow-hidden"
+                                className="space-y-1"
+                                variants={menuListVariants}
+                                initial="hidden"
+                                animate="show"
+                                key={showExpanded ? 'expanded' : 'collapsed'}
                             >
-                                Thông báo & Tin nhắn
+                                {quickActions.map(renderMenuItem)}
                             </motion.div>
-                        ) : (
-                            <div className="h-px bg-border mx-3 my-4" />
-                        )}
-                        <motion.div
-                            className="space-y-1"
-                            variants={menuListVariants}
-                            initial="hidden"
-                            animate="show"
-                            key={showExpanded ? 'expanded' : 'collapsed'}
-                        >
-                            {quickActions.map(renderMenuItem)}
-                        </motion.div>
-                    </div>
+                        </div>
+                    )}
+
                 </div>
 
                 {/* Footer Section - Fixed Bottom Layer */}

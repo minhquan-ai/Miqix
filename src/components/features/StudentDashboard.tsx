@@ -155,7 +155,7 @@ export function StudentDashboard({ user, analytics }: StudentDashboardProps) {
                                 <Target className="w-4 h-4 text-indigo-600" />
                                 Nhiệm vụ đang chờ
                             </h3>
-                            <Link href="/dashboard/missions" className="text-sm text-indigo-600 hover:underline">
+                            <Link href="/dashboard/assignments" className="text-sm text-indigo-600 hover:underline">
                                 Xem tất cả
                             </Link>
                         </div>
@@ -243,13 +243,13 @@ export function StudentDashboard({ user, analytics }: StudentDashboardProps) {
                             </Link>
 
                             <Link
-                                href="/dashboard/missions"
+                                href="/dashboard/assignments"
                                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-purple-50 transition-colors group"
                             >
                                 <div className="w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center">
-                                    <Target className="w-4 h-4 text-purple-600" />
+                                    <BookOpen className="w-4 h-4 text-purple-600" />
                                 </div>
-                                <span className="font-medium text-gray-700 group-hover:text-purple-600">Nhiệm vụ</span>
+                                <span className="font-medium text-gray-700 group-hover:text-purple-600">Bài tập của tôi</span>
                             </Link>
 
                             <button

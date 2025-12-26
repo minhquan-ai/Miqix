@@ -20,6 +20,8 @@ export const metadata: Metadata = {
 import { ToastProvider } from "@/components/ui/Toast";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { SubjectProvider } from "@/contexts/SubjectContext";
+import { AIProvider } from "@/contexts/AIContext";
+import { AIButler } from "@/components/features/ai/AIButler";
 
 export default function RootLayout({
   children,
@@ -33,11 +35,14 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <SubjectProvider>
-          <ToastProvider>
-            <ErrorBoundary>
-              {children}
-            </ErrorBoundary>
-          </ToastProvider>
+          <AIProvider>
+            <ToastProvider>
+              <ErrorBoundary>
+                {children}
+                <AIButler />
+              </ErrorBoundary>
+            </ToastProvider>
+          </AIProvider>
         </SubjectProvider>
       </body>
     </html>

@@ -7,8 +7,6 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, Loa
 import { getAggregatedScheduleAction, ScheduleEvent } from "@/lib/schedule-actions";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { AIPageWrapper } from "@/components/layout/AIPageWrapper";
-import { ScheduleAI } from "@/components/features/ai/ScheduleAI";
 import { ScheduleCreationWizard } from "@/components/features/ScheduleCreationWizard";
 import { EventDetailModal } from "@/components/features/EventDetailModal";
 
@@ -130,17 +128,8 @@ export default function ScheduleContent() {
     const timeIndicatorTop = getCurrentTimePosition();
 
     return (
-
-        <AIPageWrapper
-            renderAI={({ onClose }) => (
-                <ScheduleAI
-                    onClose={onClose}
-                    weekStartStr={weekStart.toISOString()}
-                    onEventAdded={handleRefresh}
-                />
-            )}
-        >
-            <div className="flex-1 flex flex-col gap-6 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+        <div className="flex-1 h-full overflow-hidden flex flex-col p-4 md:p-8">
+            <div className="flex flex-col gap-6 w-full max-w-[1600px] mx-auto h-full min-h-0">
                 {/* HERO SECTION - Compact Mode */}
                 <div
                     className="relative overflow-hidden bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 rounded-[2rem] p-4 text-white shadow-xl shadow-purple-500/10 shrink-0 flex items-center justify-between"
@@ -152,14 +141,15 @@ export default function ScheduleContent() {
                         <h1 className="text-xl font-bold">Thời khóa biểu</h1>
                     </div>
 
-                    <button
-                        onClick={() => setShowCreateModal(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl font-semibold transition-all shadow-sm border border-white/20"
-                    >
-                        <Plus className="w-4 h-4" />
-                        <span>Tạo lịch biểu</span>
-                    </button>
-
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setShowCreateModal(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl font-semibold transition-all shadow-sm border border-white/20"
+                        >
+                            <Plus className="w-4 h-4" />
+                            <span>Tạo lịch biểu</span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* CONTROL BAR */}
@@ -205,7 +195,7 @@ export default function ScheduleContent() {
 
                 {/* SCHEDULE GRID CARD */}
                 <div
-                    className="flex-1 bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col min-h-[500px]"
+                    className="flex-1 bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col min-h-0"
                 >
                     {/* Scrollable Container */}
                     <div className="flex-1 overflow-y-auto overflow-x-auto relative scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
@@ -389,20 +379,20 @@ export default function ScheduleContent() {
                         )}
                     </div>
                 </div>
+
+                <ScheduleCreationWizard
+                    isOpen={showCreateModal}
+                    onClose={() => setShowCreateModal(false)}
+                    onSuccess={handleRefresh}
+                    initialDate={currentDate}
+                />
+
+                <EventDetailModal
+                    event={selectedEvent}
+                    onClose={() => setSelectedEvent(null)}
+                    onEventDeleted={handleRefresh}
+                />
             </div>
-
-            <ScheduleCreationWizard
-                isOpen={showCreateModal}
-                onClose={() => setShowCreateModal(false)}
-                onSuccess={handleRefresh}
-                initialDate={currentDate}
-            />
-
-            <EventDetailModal
-                event={selectedEvent}
-                onClose={() => setSelectedEvent(null)}
-                onEventDeleted={handleRefresh}
-            />
-        </AIPageWrapper>
+        </div>
     );
 }
