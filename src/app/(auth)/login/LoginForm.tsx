@@ -1,26 +1,42 @@
 "use client";
 
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Mail, Lock, ArrowRight, Loader2, GraduationCap, AlertCircle, CheckCircle2 } from "lucide-react";
 import { authenticate } from "@/lib/auth-actions";
 
-export function LoginForm() {
-    const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+function RegistrationSuccessMessage() {
     const searchParams = useSearchParams();
-    const justRegistered = searchParams.get('registered') === 'true';
-    const [showSuccess, setShowSuccess] = useState(justRegistered);
+    const [showSuccess, setShowSuccess] = useState(false);
 
-    // Hide success message after 5 seconds
+    useEffect(() => {
+        if (searchParams.get('registered') === 'true') {
+            setShowSuccess(true);
+        }
+    }, [searchParams]);
+
     useEffect(() => {
         if (showSuccess) {
             const timer = setTimeout(() => setShowSuccess(false), 5000);
             return () => clearTimeout(timer);
         }
     }, [showSuccess]);
+
+    if (!showSuccess) return null;
+
+    return (
+        <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 p-3 rounded-lg mb-4 border border-green-200">
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+            <p>Đăng ký thành công! Hãy đăng nhập để tiếp tục.</p>
+        </div>
+    );
+}
+
+export function LoginForm() {
+    const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     return (
         <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-sm p-8">
@@ -33,12 +49,9 @@ export function LoginForm() {
             </div>
 
             {/* Success message after registration */}
-            {showSuccess && (
-                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 p-3 rounded-lg mb-4 border border-green-200">
-                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                    <p>Đăng ký thành công! Hãy đăng nhập để tiếp tục.</p>
-                </div>
-            )}
+            <Suspense fallback={null}>
+                <RegistrationSuccessMessage />
+            </Suspense>
 
             <form action={formAction} className="space-y-4">
                 <div className="space-y-2">

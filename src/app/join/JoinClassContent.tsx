@@ -1,35 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Key } from "lucide-react";
 import { joinClassAction, getCurrentUserAction } from "@/lib/actions";
 import { useToast } from "@/components/ui/Toast";
 
-export function JoinClassPageContent() {
+function UrlCodeHandler({ onCodeFound, joining }: { onCodeFound: (code: string) => void, joining: boolean }) {
     const searchParams = useSearchParams();
+
+    useEffect(() => {
+        const code = searchParams.get('code');
+        if (code) {
+            onCodeFound(code.toUpperCase());
+        }
+    }, [searchParams, onCodeFound]);
+
+    return null;
+}
+
+export function JoinClassPageContent() {
     const router = useRouter();
     const { showToast } = useToast();
 
     const [classCode, setClassCode] = useState("");
     const [joining, setJoining] = useState(false);
-
-    // Auto-fill and join if code is in URL
-    useEffect(() => {
-        const code = searchParams.get('code');
-        if (code) {
-            const cleanCode = code.toUpperCase();
-            setClassCode(cleanCode);
-        }
-    }, [searchParams]);
-
-    // Separate effect to trigger join once classCode is set from URL
-    useEffect(() => {
-        const codeFromUrl = searchParams.get('code');
-        if (codeFromUrl && classCode === codeFromUrl.toUpperCase() && !joining) {
-            handleJoin();
-        }
-    }, [classCode, searchParams]);
 
     const handleJoin = async () => {
         if (!classCode.trim()) {
@@ -106,6 +101,9 @@ export function JoinClassPageContent() {
 
                     {/* Form */}
                     <div className="p-8 space-y-6">
+                        <Suspense fallback={null}>
+                            <UrlCodeHandler onCodeFound={setClassCode} joining={joining} />
+                        </Suspense>
                         {/* Class Code Input */}
                         <div>
                             <label className="block text-sm font-medium mb-2">
