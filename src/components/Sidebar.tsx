@@ -247,7 +247,7 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
                             onClick={(e) => {
                                 e.stopPropagation();
                                 if (isCollapsed) {
-                                    setIsCollapsed(false);
+                                    setIsCollapsedInternal(false);
                                     localStorage.setItem('sidebar-collapsed', 'false');
                                 }
                                 toggleSection(item.id);

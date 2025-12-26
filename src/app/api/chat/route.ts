@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { message, mode, previousMessages = [], context, includeReasoning, targetAssignmentId, userRole } = body;
+        const { message, mode, previousMessages = [], context, includeReasoning, targetAssignmentId, targetClassId, userRole, forceCanvas } = body;
         const isTeacher = userRole === 'teacher';
 
         // 1. Fetch Detailed Assignment Context if targeted
@@ -48,6 +48,32 @@ export async function POST(request: Request) {
                     "- Điểm tối đa: " + assignment.maxScore,
                     "",
                     "Hãy tập trung trả lời dựa trên bài tập này."
+                ].join("\n");
+            }
+        }
+
+        // 1b. Fetch Detailed Class Context if targeted
+        let targetedClassContext = "";
+        if (targetClassId) {
+            const { getClassByIdAction, getClassAnalyticsDataAction } = await import("@/lib/actions");
+            const classData = await getClassByIdAction(targetClassId);
+            const analyticsData = await getClassAnalyticsDataAction(targetClassId);
+            if (classData) {
+                const studentCount = analyticsData?.students?.length || 0;
+                const totalSubmissions = analyticsData?.assignments?.reduce((acc: number, a: any) => acc + (a.submissions?.length || 0), 0) || 0;
+                const totalPossible = studentCount * (analyticsData?.assignments?.length || 1);
+                const submissionRate = totalPossible > 0 ? (totalSubmissions / totalPossible * 100) : 0;
+
+                targetedClassContext = [
+                    "BỐI CẢNH LỚP HỌC MỤC TIÊU:",
+                    "- Tên lớp: " + classData.name,
+                    "- Môn học: " + (classData.subject || "N/A"),
+                    "- Mô tả: " + (classData.description || "Không có mô tả"),
+                    "- Số học sinh: " + studentCount,
+                    "- Số bài tập: " + (analyticsData?.assignments?.length || 0),
+                    "- Tỷ lệ nộp bài: " + submissionRate.toFixed(0) + "%",
+                    "",
+                    "Hãy tập trung phân tích và trả lời dựa trên lớp học này."
                 ].join("\n");
             }
         }
@@ -70,39 +96,55 @@ export async function POST(request: Request) {
             ].join("\n");
         }
 
-        // 3. Build role-specific instructions
+        // 3. Build role-specific instructions (Strict)
         const roleInstructions = isTeacher
             ? [
-                "VAI TRÒ GIÁO VIÊN:",
-                "- Chế độ PLANNER: Hỗ trợ soạn giáo án, tạo đề thi, gợi ý hoạt động giảng dạy.",
-                "- Chế độ GRADER: Phân tích bài làm của học sinh, gợi ý nhận xét và điểm số dựa trên rubric.",
-                "- Chế độ ANALYSIS: Phân tích dữ liệu lớp học, tìm ra học sinh yếu hoặc xu hướng học tập.",
-                "- Chế độ SUMMARY: Tóm tắt nội dung tiết dạy hoặc các tài liệu chuyên môn."
+                "VAI TRÒ: GIÁO VIÊN (TEACHER)",
+                "NHIỆM VỤ:",
+                "- Hỗ trợ soạn giáo án, tạo đề thi, thiết kế hoạt động giảng dạy.",
+                "- Phân tích dữ liệu học sinh, nhận xét bài làm.",
+                "- Phong cách: Chuyên nghiệp, sư phạm, chi tiết, hướng dẫn đồng nghiệp.",
+                "- CHÚ Ý: Bạn đang nói chuyện với giáo viên, KHÔNG PHẢI học sinh. Đừng giảng bài cho họ, hãy hỗ trợ công việc của họ."
             ].join("\n")
             : [
-                "VAI TRÒ HỌC SINH:",
-                "- Chế độ SOLVER: Áp dụng phương pháp Socratic, gợi mở hướng giải thay vì cho đáp án.",
-                "- Chế độ SUMMARY: Tập trung vào các ý chính, ngắn gọn.",
-                "- Chế độ EXAM: Giả lập câu hỏi ôn tập, chỉ ra lỗ hổng kiến thức.",
-                "- Chế độ WRITING: Chú trọng vào ngôn từ, diễn đạt, sáng tạo."
+                "VAI TRÒ: HỌC SINH (STUDENT)",
+                "NHIỆM VỤ:",
+                "- Hỗ trợ giải bài tập (gợi mở, Socratic), tóm tắt kiến thức, ôn thi.",
+                "- Phong cách: Thân thiện, khuyến khích, dễ hiểu, kiên nhẫn.",
+                "- CHÚ Ý: Bạn là gia sư/người bạn đồng hành."
             ].join("\n");
 
         // 4. Combine system prompt
-        const assistantType = isTeacher ? 'giảng dạy và quản lý lớp học' : 'học thuật';
+        const assistantType = isTeacher ? 'giảng dạy chuyên nghiệp' : 'học tập cá nhân';
         const currentMode = (mode?.toUpperCase() || "STANDARD");
+
+        let canvasInstruction = "";
+        if (forceCanvas) {
+            canvasInstruction = `
+            [CHẾ ĐỘ CANVAS MODE: BẬT (BẮT BUỘC)]
+            1. Output của bạn PHẢI chứa block ':::payload' hợp lệ (structured_content hoặc flashcards).
+            2. Nếu người dùng yêu cầu soạn bài/tài liệu: Dùng 'structured_content'.
+            3. Nếu người dùng yêu cầu ôn tập: Dùng 'flashcards'.
+            4. KHÔNG trả lời bằng text đơn thuần.
+            `;
+        }
 
         const systemPromptParts = [
             "Bạn là Miqix AI, trợ lý " + assistantType + " thông minh.",
-            "Sử dụng Tiếng Việt. Phong cách: chuyên nghiệp, gần gũi, Markdown hóa (Bảng, Danh sách, Đậm).",
+            "Sử dụng Tiếng Việt. Hỗ trợ hiển thị công thức Toán học bằng LaTeX (dùng $ cho inline, $$ cho block).",
+            "Phong cách: chuyên nghiệp, gần gũi, Markdown hóa (Bảng, Danh sách, Đậm).",
             "",
             targetedAssignmentContext,
+            targetedClassContext,
             generalContext,
             "",
             roleInstructions,
             "",
             "CHẾ ĐỘ TRỢ LÝ HIỆN TẠI: " + currentMode,
             "",
-            PAYLOAD_INSTRUCTIONS
+            PAYLOAD_INSTRUCTIONS,
+            "",
+            canvasInstruction
         ];
 
         const systemPrompt = systemPromptParts.filter(Boolean).join("\n");
@@ -138,14 +180,13 @@ export async function POST(request: Request) {
         }
 
         const choice = data.choices[0];
-        let responseText = choice.message.content;
+        const responseText = choice.message.content;
+        const reasoning = choice.message.reasoning || null;
 
-        // Handle reasoning (thinking) if present
-        if (choice.message.reasoning) {
-            responseText = "> [!NOTE]\n> **Quá trình tư duy:**\n> " + choice.message.reasoning.replace(/\n/g, '\n> ') + "\n\n" + responseText;
-        }
-
-        return NextResponse.json({ reply: responseText });
+        return NextResponse.json({
+            reply: responseText,
+            reasoning: reasoning
+        });
 
     } catch (error: any) {
         console.error("[OpenRouter API Error]:", error);

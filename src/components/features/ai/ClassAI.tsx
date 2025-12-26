@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Sparkles, Bot, ArrowRight, Loader2, ChevronDown } from "lucide-react";
-import { AIPanelShell } from "./AIPanelShell";
+import { AIPanelShell, saveToAIHistory } from "./AIPanelShell";
 import { motion } from "framer-motion";
 import { MarkdownText } from "@/components/ui/MarkdownText";
 
@@ -73,8 +73,16 @@ export function ClassAI({ onClose, user, classes }: ClassAIProps) {
         }
     };
 
+    const handleClose = () => {
+        // Save conversation to shared AI history before closing
+        if (messages.length > 0) {
+            saveToAIHistory("Lớp học", messages);
+        }
+        onClose();
+    };
+
     return (
-        <AIPanelShell onClose={onClose} title="Trợ lý Lớp học" loading={loading}>
+        <AIPanelShell onClose={handleClose} title="Trợ lý Lớp học" loading={loading} sourceContext="class">
             {/* Container: flex flex-col h-full để empty state có thể căn giữa */}
             <div
                 ref={messagesContainerRef}

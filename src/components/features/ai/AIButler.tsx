@@ -88,9 +88,9 @@ export function AIButler() {
 
     return (
         <>
-            {/* Floating Toggle Button - Only show when panel is closed */}
+            {/* Floating Toggle Button - Only show when panel is closed AND canvas is closed */}
             <AnimatePresence>
-                {!isOpen && (
+                {!isOpen && !isCanvasOpen && (
                     <motion.div
                         initial={{ scale: 0, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}

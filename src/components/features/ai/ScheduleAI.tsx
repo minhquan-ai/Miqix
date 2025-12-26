@@ -5,7 +5,7 @@ import { Sparkles, ArrowRight, Loader2, Bot, MessageCircle, PenLine, ChevronDown
 import { analyzeScheduleAIAction, createPersonalEventAction, deletePersonalEventAction } from "@/lib/schedule-actions";
 import { format, parseISO } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import { AIPanelShell } from "./AIPanelShell";
+import { AIPanelShell, saveToAIHistory } from "./AIPanelShell";
 import { MarkdownText } from "@/components/ui/MarkdownText";
 
 interface ScheduleAIProps {
@@ -126,8 +126,16 @@ export function ScheduleAI({ onClose, weekStartStr, onEventAdded }: ScheduleAIPr
         }
     };
 
+    const handleClose = () => {
+        // Save conversation to shared AI history before closing
+        if (messages.length > 0) {
+            saveToAIHistory("Lịch biểu", messages);
+        }
+        onClose();
+    };
+
     return (
-        <AIPanelShell onClose={onClose} title="Trợ lý Lịch biểu" loading={loading}>
+        <AIPanelShell onClose={handleClose} title="Trợ lý Lịch biểu" loading={loading} sourceContext="schedule">
             {/* Container: flex flex-col h-full để empty state có thể căn giữa */}
             <div
                 ref={messagesContainerRef}

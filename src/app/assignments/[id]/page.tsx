@@ -167,7 +167,6 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
                         isLoading={false}
                         counts={{
                             pendingAssignments: 5,
-                            activeMissions: 2,
                             unreadNotifications: 3,
                             unreadMessages: 1,
                             draftAssignments: 0

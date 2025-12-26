@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Sparkles, Bot, Send, Loader2 } from "lucide-react";
-import { AIPanelShell } from "./AIPanelShell";
+import { AIPanelShell, saveToAIHistory } from "./AIPanelShell";
 import { motion } from "framer-motion";
 import { MarkdownText } from "@/components/ui/MarkdownText";
 
@@ -63,8 +63,16 @@ export function MissionAI({ onClose, userId, missions }: MissionAIProps) {
         }
     };
 
+    const handleClose = () => {
+        // Save conversation to shared AI history before closing
+        if (messages.length > 0) {
+            saveToAIHistory("Nhiệm vụ", messages);
+        }
+        onClose();
+    };
+
     return (
-        <AIPanelShell onClose={onClose} title="Trợ lý Học tập" loading={loading}>
+        <AIPanelShell onClose={handleClose} title="Trợ lý Học tập" loading={loading} sourceContext="mission">
             <div className="flex-1 overflow-y-auto p-4 space-y-5 bg-white scrollbar-thin scrollbar-thumb-gray-100">
                 {messages.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-full text-center space-y-8 opacity-90 pb-10">

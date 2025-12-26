@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Sparkles, Bot, ArrowRight, BookOpen, GraduationCap, ChevronDown } from "lucide-react";
-import { AIPanelShell } from "./AIPanelShell";
+import { AIPanelShell, saveToAIHistory } from "./AIPanelShell";
 import { motion } from "framer-motion";
 import { MarkdownText } from "@/components/ui/MarkdownText";
 import { LearningToolsMenu } from "./LearningToolsMenu";
@@ -128,8 +128,16 @@ export function LearningAI({ onClose, user, assignmentTitle, assignmentContext, 
         handleSend(prompt, newMode);
     };
 
+    const handleClose = () => {
+        // Save conversation to shared AI history before closing
+        if (messages.length > 0) {
+            saveToAIHistory("Học tập", messages);
+        }
+        onClose();
+    };
+
     return (
-        <AIPanelShell onClose={onClose} title="Trợ lý Học tập" loading={loading}>
+        <AIPanelShell onClose={handleClose} title="Trợ lý Học tập" loading={loading} sourceContext="learning">
             <div
                 ref={messagesContainerRef}
                 className={`flex-1 flex flex-col px-4 py-4 space-y-6 bg-slate-50/50 scrollbar-thin scrollbar-thumb-gray-200 ${messages.length > 0 ? 'overflow-y-auto' : 'overflow-hidden'}`}
