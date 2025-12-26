@@ -44,8 +44,8 @@ model User {
   studentGuardians    StudentGuardian[]   @relation("StudentGuardians")
   submissions         Submission[]
   worksheetProgresses WorksheetProgress[]
-  teachingSubjects    String? // Comma-separated list of subjects e.g. "MATH,PHYSICS"
-  preferences         String? // JSON string for user preferences including subject-specific settings
+  teachingSubjects    String?
+  preferences         String?
 }
 
 model Class {
