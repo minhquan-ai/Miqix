@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Sparkles,
+    Share2,
     Send,
     Mic,
     Bot,
@@ -30,10 +31,13 @@ import {
     ChevronLeft,
     ChevronRight,
     BookOpen,
-    ArrowRight
+    ArrowRight,
+    GraduationCap,
+    Search,
+    User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { User } from "@/types";
+import { User as UserType } from "@/types";
 import { useAIContext } from "@/contexts/AIContext";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -44,9 +48,18 @@ import { format, startOfWeek, isAfter, isToday } from "date-fns";
 import { getAggregatedScheduleAction, ScheduleEvent } from "@/lib/schedule-actions";
 import { getAssignmentsAction, getClassesAction } from "@/lib/actions";
 import { getStudentDashboardAnalyticsAction, getTeacherDashboardAnalyticsAction } from "@/lib/analytics-actions";
+import { WIDGET_REGISTRY, getDefaultLayout, WidgetDefinition } from "@/config/widget-registry";
+import { WidgetStore } from "@/components/features/dashboard/WidgetStore";
+import { WidgetPlaceholder } from "@/components/features/dashboard/WidgetPlaceholder";
+import { CanvasDashboard } from "./CanvasDashboard";
 
 interface AIPlaygroundProps {
-    user: User;
+    user: UserType;
+}
+
+interface WidgetConfig {
+    left: string[];
+    right: string[];
 }
 
 interface Message {
@@ -72,7 +85,7 @@ interface ChatSession {
     updatedAt: number;
 }
 
-type ChatMode = "standard" | "solver" | "summary" | "exam" | "writing" | "planner" | "grader" | "analysis";
+type ChatMode = "standard" | "tutor" | "solver" | "summary" | "exam" | "writing" | "planner" | "grader" | "analysis";
 
 interface ModeInfo {
     id: ChatMode;
@@ -81,6 +94,7 @@ interface ModeInfo {
     description: string;
     recommendations: string[];
     contextType?: 'assignment' | 'class' | 'schedule' | 'none';
+    prompt?: string;
 }
 
 const STUDENT_MODES: ModeInfo[] = [
@@ -89,40 +103,16 @@ const STUDENT_MODES: ModeInfo[] = [
         label: "Bình thường",
         icon: MessageCircle,
         description: "Trợ lý học tập tổng quát",
-        recommendations: ["Lập kế hoạch học tập tuần này", "Giải thích khái niệm Quantum Physics", "Cách học tốt môn Văn"],
+        recommendations: ["Lập kế hoạch học tập tuần này", "Giải thích khái niệm lực hấp dẫn", "Cách học tốt môn Văn", "Tìm tài liệu ôn thi Toán"],
         contextType: "assignment"
     },
     {
-        id: "solver",
-        label: "Giải bài tập",
-        icon: BrainCircuit,
-        description: "Hướng dẫn giải bài từng bước",
-        recommendations: ["Giải bài toán tích phân này", "Giải thích hiện tượng quang điện", "Phân tích nhân vật Huấn Cao"],
+        id: "tutor", // Changed from multiple modes to one "Learning" mode
+        label: "Góc học tập",
+        icon: GraduationCap,
+        description: "Chế độ chuyên sâu cho việc học",
+        recommendations: ["Giải bài tập này giúp mình", "Tóm tắt bài học lịch sử", "Kiểm tra kiến thức toán", "Viết bài văn nghị luận"],
         contextType: "assignment"
-    },
-    {
-        id: "summary",
-        label: "Tóm tắt",
-        icon: FileText,
-        description: "Tóm tắt nội dung bài học",
-        recommendations: ["Tóm tắt chương 1 SGK Sử 12", "Rút gọn các ý chính bài thơ Tây Tiến", "Ý chính của thuyết tiến hóa"],
-        contextType: "none"
-    },
-    {
-        id: "exam",
-        label: "Ôn thi",
-        icon: Target,
-        description: "Luyện tập và kiểm tra kiến thức",
-        recommendations: ["Tạo 5 câu hỏi trắc nghiệm Toán", "Kiểm tra kiến thức về các triều đại", "Mẹo làm bài thi THPT Quốc gia"],
-        contextType: "assignment"
-    },
-    {
-        id: "writing",
-        label: "Sáng tạo",
-        icon: PenTool,
-        description: "Hỗ trợ viết lách và diễn đạt",
-        recommendations: ["Viết mở bài nghị luận xã hội", "Sửa lỗi diễn đạt đoạn văn này", "Gợi ý ý tưởng bài viết sáng tạo"],
-        contextType: "none"
     }
 ];
 
@@ -132,7 +122,7 @@ const TEACHER_MODES: ModeInfo[] = [
         label: "Chung",
         icon: MessageCircle,
         description: "Trợ lý giảng dạy tổng quát",
-        recommendations: ["Soạn tin nhắn nhắc nhở lớp 12A1", "Gợi ý cách quản lý lớp học", "Tổng hợp thông báo tuần"],
+        recommendations: ["Soạn tin nhắn nhắc nhở lớp 12A1", "Gợi ý cách quản lý lớp học", "Tổng hợp thông báo tuần", "Tạo đề kiểm tra 15 phút"],
         contextType: "assignment"
     },
     {
@@ -244,32 +234,34 @@ const extractMainContent = (content: string): string => {
     return lines.slice(startIndex).join('\n').trim();
 };
 
-// --- Typewriter Effect Component (word by word for better readability) ---
-const TypewriterText = ({ text, speed = 30, onComplete }: { text: string; speed?: number; onComplete?: () => void }) => {
-    const [displayedWords, setDisplayedWords] = useState(0);
-    const words = text.split(/(\s+)/); // Split keeping whitespace
+// --- Typewriter Effect Component (renders markdown in realtime) ---
+const TypewriterText = ({ text, speed = 8, onComplete }: { text: string; speed?: number; onComplete?: () => void }) => {
+    const [displayedChars, setDisplayedChars] = useState(0);
 
     useEffect(() => {
-        if (displayedWords >= words.length) {
+        if (displayedChars >= text.length) {
             onComplete?.();
             return;
         }
 
         const timer = setTimeout(() => {
-            setDisplayedWords(prev => prev + 1);
+            // Show 4 characters at a time for faster speed
+            setDisplayedChars(prev => Math.min(prev + 4, text.length));
         }, speed);
 
         return () => clearTimeout(timer);
-    }, [displayedWords, words.length, speed, onComplete]);
+    }, [displayedChars, text.length, speed, onComplete]);
 
-    const displayed = words.slice(0, displayedWords).join('');
-    const isComplete = displayedWords >= words.length;
+    const displayed = text.slice(0, displayedChars);
+    const isComplete = displayedChars >= text.length;
 
     return (
-        <span>
-            {displayed}
-            {!isComplete && <span className="inline-block w-1 h-4 bg-blue-500 ml-0.5 animate-pulse align-middle" />}
-        </span>
+        <div className="prose prose-sm max-w-none dark:prose-invert">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                {displayed}
+            </ReactMarkdown>
+            {!isComplete && <span className="inline-block w-1.5 h-4 bg-blue-500 animate-pulse align-middle rounded-sm" />}
+        </div>
     );
 };
 
@@ -435,13 +427,76 @@ const LessonPlanCanvas = ({ title, sections }: { title: string; sections: any[] 
 };
 
 export function AIPlayground({ user }: AIPlaygroundProps) {
-    const MODES = user.role === 'teacher' ? TEACHER_MODES : STUDENT_MODES;
-    const [input, setInput] = useState("");
+    // --- State ---
     const [messages, setMessages] = useState<Message[]>([]);
+    const [inputValue, setInputValue] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [chatMode, setChatMode] = useState<ChatMode>("standard");
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // --- Widget State ---
+    const [isWidgetStoreOpen, setIsWidgetStoreOpen] = useState(false);
+    const [activeWidgetColumn, setActiveWidgetColumn] = useState<'left' | 'right' | null>(null);
+    const [widgetsConfig, setWidgetsConfig] = useState<WidgetConfig>({
+        left: [],
+        right: []
+    });
+
+    // --- Load Widget Config ---
+    useEffect(() => {
+        if (!user) return;
+
+        const storedConfig = localStorage.getItem(`miqix_widgets_${user.id}`);
+        if (storedConfig) {
+            try {
+                setWidgetsConfig(JSON.parse(storedConfig));
+            } catch (e) {
+                console.error("Failed to parse widget config", e);
+                setWidgetsConfig(getDefaultLayout(user.role as any));
+            }
+        } else {
+            setWidgetsConfig(getDefaultLayout(user.role as any));
+        }
+    }, [user]);
+
+    // --- Widget Handlers ---
+    const handleOpenWidgetStore = (column: 'left' | 'right') => {
+        setActiveWidgetColumn(column);
+        setIsWidgetStoreOpen(true);
+    };
+
+    const handleAddWidget = (widgetId: string) => {
+        if (!activeWidgetColumn) return;
+
+        const newConfig = {
+            ...widgetsConfig,
+            [activeWidgetColumn]: [...widgetsConfig[activeWidgetColumn], widgetId]
+        };
+
+        setWidgetsConfig(newConfig);
+        localStorage.setItem(`miqix_widgets_${user.id}`, JSON.stringify(newConfig));
+        setIsWidgetStoreOpen(false);
+    };
+
+    const handleRemoveWidget = (widgetId: string, column: 'left' | 'right') => {
+        const newConfig = {
+            ...widgetsConfig,
+            [column]: widgetsConfig[column].filter(id => id !== widgetId)
+        };
+        setWidgetsConfig(newConfig);
+        localStorage.setItem(`miqix_widgets_${user.id}`, JSON.stringify(newConfig));
+    };
+
+    // Helper to get active widgets for a column
+    const getActiveWidgets = (column: 'left' | 'right') => {
+        return widgetsConfig[column].map(id => WIDGET_REGISTRY[id]).filter(Boolean);
+    };
+
+    // --- Context & Refs ---
+    const MODES = user.role === 'teacher' ? TEACHER_MODES : STUDENT_MODES;
     const [isTyping, setIsTyping] = useState(false);
     const [upcomingEvents, setUpcomingEvents] = useState<ScheduleEvent[]>([]);
     const [pendingAssignments, setPendingAssignments] = useState<PendingAssignment[]>([]);
-    const [chatMode, setChatMode] = useState<ChatMode>("standard");
     const [showModeMenu, setShowModeMenu] = useState(false);
     const [analytics, setAnalytics] = useState<any>(null);
 
@@ -468,7 +523,16 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
     const [showAssignmentSelector, setShowAssignmentSelector] = useState(false);
     const [showClassSelector, setShowClassSelector] = useState(false);
 
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    // Search State
+    const [searchQuery, setSearchQuery] = useState("");
+
+    // Rate Limiting States
+    const [sendCooldown, setSendCooldown] = useState(false);
+    const [messageTimestamps, setMessageTimestamps] = useState<number[]>([]);
+    const RATE_LIMIT_MAX = 10; // Max messages per minute
+    const RATE_LIMIT_WINDOW = 60000; // 1 minute in ms
+    const COOLDOWN_MS = 2000; // 2 seconds cooldown
+
     const menuRef = useRef<HTMLDivElement>(null);
 
     // Close menu when clicking outside
@@ -565,7 +629,6 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
         if (session) {
             setMessages(session.messages);
             setCurrentSessionId(session.id);
-            // Optionally close history on mobile
             if (window.innerWidth < 768) setIsHistoryVisible(false);
         }
     };
@@ -588,9 +651,9 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
         scrollToBottom();
     }, [messages]);
 
-    const handleQuickAction = (action: "assignments" | "grades") => {
+    const handleQuickAction = (action: "assignments" | "grades" | "flashcards" | "history" | "classes") => {
         let content = "";
-        let canvasData = null;
+        const canvasData = null;
 
         if (action === "assignments") {
             if (pendingAssignments.length === 0) {
@@ -605,6 +668,13 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
             }
         } else if (action === "grades") {
             content = "Hiện tại mình đang cập nhật dữ liệu điểm số mới nhất từ giáo viên. Bạn muốn xem điểm của môn học cụ thể nào không?";
+        } else if (action === "flashcards") {
+            handleSend("Tạo flashcard về chủ đề này.");
+            return;
+            // setCanvasContent({ type: 'flashcards', data: MOCK_FLASHCARDS });
+        } else if (action === "history") {
+            setIsHistoryVisible(true);
+            return;
         }
 
         const aiMsg: Message = {
@@ -615,7 +685,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
         };
         setMessages(prev => [...prev, aiMsg]);
 
-        // Demo Canvas triggering
+        // Demo Canvas triggering if needed
         if (canvasData) {
             setCanvasContent(canvasData);
             setCanvasViewMode("content");
@@ -624,8 +694,21 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
     };
 
     const handleSend = async (textOverride?: string) => {
-        const textToSend = textOverride || input;
-        if (!textToSend.trim() || isTyping) return;
+        const textToSend = textOverride || inputValue;
+        if (!textToSend.trim() || isTyping || sendCooldown) return;
+
+        // Rate limit check: count messages in last minute
+        const now = Date.now();
+        const recentMessages = messageTimestamps.filter(ts => now - ts < RATE_LIMIT_WINDOW);
+        if (recentMessages.length >= RATE_LIMIT_MAX) {
+            alert(`Bạn đã gửi quá ${RATE_LIMIT_MAX} tin nhắn trong 1 phút. Vui lòng đợi một chút!`);
+            return;
+        }
+
+        // Add timestamp and start cooldown
+        setMessageTimestamps([...recentMessages, now]);
+        setSendCooldown(true);
+        setTimeout(() => setSendCooldown(false), COOLDOWN_MS);
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -635,7 +718,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
         };
 
         setMessages(prev => [...prev, userMessage]);
-        setInput("");
+        setInputValue("");
         setIsTyping(true);
 
         try {
@@ -682,11 +765,15 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                 return;
             }
 
+            // Extract payload early for both chat display and canvas handling
+            const rawReply = data.reply || "Xin lỗi, mình gặp chút trục trặc.";
+            const { text: cleanText, payload: extractedPayload } = extractPayload(rawReply);
+
             const messageId = (Date.now() + 1).toString();
             const aiMessage: Message = {
                 id: messageId,
                 role: "ai",
-                content: data.reply || "Xin lỗi, mình gặp chút trục trặc.",
+                content: cleanText || rawReply, // Use clean text (without payload JSON) for chat
                 reasoning: data.reasoning, // Include reasoning for thinking mode
                 timestamp: Date.now()
             };
@@ -722,11 +809,26 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                 return newMessages;
             });
 
-            // Simulate opening Canvas for long types of content if not empty
-            if (chatMode === "writing" || chatMode === "summary" || chatMode === "solver") {
-                // Simple heuristic for demo: if reply is long, put it in canvas
+            // If Canvas Mode is ON or payload has structured content, send to Canvas
+            if (isCanvasMode || extractedPayload) {
+                if (extractedPayload?.type === 'structured_content') {
+                    // Pass the payload object directly for Canvas to render
+                    setCanvasContent(extractedPayload);
+                } else if (extractedPayload?.type === 'flashcards') {
+                    setCanvasContent(extractedPayload);
+                    setCanvasViewMode("flashcards");
+                } else {
+                    // Wrap plain text in an object with type 'text'
+                    setCanvasContent({
+                        type: 'text',
+                        content: extractMainContent(cleanText || rawReply)
+                    });
+                }
+                setCanvasViewMode("content");
+                setIsCanvasOpen(true);
+            } else if (chatMode === "writing" || chatMode === "summary" || chatMode === "solver" || chatMode === "planner") {
+                // Original logic for specific modes
                 if (data.reply && data.reply.length > 200) {
-                    // Extract main content (remove greetings) for canvas
                     setCanvasContent(extractMainContent(data.reply));
                     setCanvasViewMode("content");
                     setIsCanvasOpen(true);
@@ -863,6 +965,16 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
+                            <div className="relative group">
+                                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-blue-500 transition-colors" />
+                                <input
+                                    type="text"
+                                    placeholder="Tìm kiếm..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-10 pr-4 py-2 w-48 md:w-64 bg-gray-100/50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all outline-none"
+                                />
+                            </div>
                             <div className="hidden sm:flex items-center bg-gray-100 rounded-full px-3 py-1 gap-2">
                                 <Zap className="w-3.5 h-3.5 text-blue-500" />
                                 <span className="text-[11px] font-black text-gray-600 uppercase tracking-wider">MiMo V2 Flash</span>
@@ -870,491 +982,219 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                         </div>
                     </header>
 
-                    {/* Scrollable Container for Messages */}
-                    <div className="flex-1 overflow-y-auto pt-16 pb-32 px-4 scrollbar-hide">
-                        {/* Consistent Centered Content Wrapper - Never changes max-width during transition */}
-                        <div className="w-full max-w-2xl mx-auto transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]">
-                            {/* Hero Section or Messages */}
+                    {/* Chat Messages */}
+                    <div className="flex-1 flex overflow-hidden pt-16 pb-32 px-4">
+                        <div className={cn(
+                            "mx-auto transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] flex gap-6",
+                            messages.length === 0 ? "w-full px-6 max-w-[98%]" : "w-full max-w-2xl px-4"
+                        )}>
+                            {/* Messages Content */}
                             {messages.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-full min-h-[70vh]">
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.5 }}
-                                        className="text-center w-full"
-                                    >
-                                        {/* AI Avatar */}
-                                        <div className="relative mb-8 inline-block">
-                                            <div className="w-32 h-32 bg-[#F7F9FB] rounded-full flex items-center justify-center relative shadow-sm mx-auto">
-                                                <Bot className="w-14 h-14 text-[#00C2A0]" />
-                                                <div className="absolute bottom-3 right-3 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center border border-gray-50">
-                                                    <Sparkles className="w-4 h-4 text-[#00C2A0]" />
-                                                </div>
+                                <div className="flex flex-col md:flex-row gap-6 w-full min-h-[75vh] items-stretch justify-between animate-in fade-in zoom-in duration-500">
+                                    {/* Left Widgets */}
+                                    {!isCanvasOpen && (
+                                        <div className="hidden xl:flex xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
+                                            <div className="flex-1 overflow-y-auto space-y-4 pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                                {getActiveWidgets('left').map((widget) => {
+                                                    const WidgetComponent = widget.component;
+                                                    let widgetProps: any = widget.defaultProps || {};
+
+                                                    // Inject real data where applicable
+                                                    if (widget.id === 'schedule') widgetProps = { classes: allClasses.slice(0, 3) };
+                                                    if (widget.id === 'assignments') widgetProps = { assignments: allAssignments.slice(0, 3) };
+                                                    if (widget.id === 'teacher_classes') widgetProps = { classes: allClasses };
+
+                                                    // Inject specific mock data for demo if not provided
+                                                    if (widget.id === 'notifications') widgetProps = { notifications: [{ id: '1', title: 'Thông báo mới', from: 'Hệ thống', time: new Date(), unread: true }] };
+                                                    if (widget.id === 'student_stats') widgetProps = { averageScore: 8.5, attendanceRate: 95, rank: 3 };
+                                                    if (widget.id === 'grading') widgetProps = {
+                                                        assignments: [
+                                                            { id: '1', title: 'Bài tập Đại số', className: '12A1', submissionsToGrade: 5, dueDate: new Date(Date.now() + 86400000) }
+                                                        ]
+                                                    };
+                                                    if (widget.id === 'students_risk') widgetProps = {
+                                                        students: [
+                                                            { id: '1', name: 'Nguyễn Văn A', className: '12A1', reason: 'Điểm thấp', score: 4.5 },
+                                                            { id: '2', name: 'Trần Thị B', className: '12A1', reason: 'Vắng nhiều', score: 6.0 },
+                                                            { id: '3', name: 'Lê Văn C', className: '12A2', reason: 'Không nộp bài', score: 5.5 },
+                                                        ]
+                                                    };
+                                                    if (widget.id === 'recent_activity') widgetProps = {
+                                                        activities: [
+                                                            { id: '1', type: 'submission', title: 'Nộp bài Toán', description: 'Đã nộp sớm 1 ngày', time: new Date() },
+                                                            { id: '2', type: 'grade', title: 'Điểm Vật Lý', description: 'Bạn đạt 9.0 điểm', time: new Date(Date.now() - 86400000) }
+                                                        ]
+                                                    };
+
+                                                    return (
+                                                        <div key={widget.id} className="relative group/widget">
+                                                            <button
+                                                                onClick={() => handleRemoveWidget(widget.id, 'left')}
+                                                                className="absolute -top-1 -right-1 z-10 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover/widget:opacity-100 transition-opacity shadow-md"
+                                                                title="Xóa widget"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                            <WidgetComponent {...widgetProps} />
+                                                        </div>
+                                                    );
+                                                })}
+                                                <WidgetPlaceholder onClick={() => handleOpenWidgetStore('left')} />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Center: Greeting */}
+                                    <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 max-w-3xl mx-auto px-8">
+                                        <div className="relative">
+                                            <div className="w-20 h-20 bg-white border-2 border-gray-100 rounded-2xl flex items-center justify-center shadow-lg">
+                                                <Bot className="w-10 h-10 text-teal-500" />
+                                            </div>
+                                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md border border-gray-100">
+                                                <Sparkles className="w-3.5 h-3.5 text-teal-400" />
                                             </div>
                                         </div>
 
-                                        <div className="space-y-3 mb-8">
-                                            <h1 className="text-[26px] font-bold text-[#202124] tracking-tight">
+                                        <div className="space-y-3">
+                                            <h2 className="text-2xl font-bold text-gray-900">
                                                 Chào bạn, mình là Miqix AI!
-                                            </h1>
-                                            <p className="text-[16px] text-[#70757a] font-medium">
-                                                Bạn cần hỗ trợ gì cho bài tập và lớp học hôm nay?
+                                            </h2>
+                                            <p className="text-base text-gray-500 font-medium max-w-md mx-auto">
+                                                Trợ lý học tập cá nhân của bạn. Sẵn sàng hỗ trợ mọi lúc.
                                             </p>
                                         </div>
 
-                                        {/* Active Mode Chips - Above Input Bar */}
-                                        {(isThinkingEnabled || isCanvasMode) && (
-                                            <div className="flex items-center justify-center gap-2 mb-3">
-                                                {isThinkingEnabled && (
-                                                    <div onClick={() => setIsThinkingEnabled(false)} className="flex items-center gap-1 px-3 py-2 bg-purple-100 text-purple-700 rounded-xl text-[12px] font-bold cursor-pointer">
-                                                        <Activity className="w-3.5 h-3.5 animate-pulse" />
-                                                        <span>Thinking</span>
-                                                        <X className="w-3 h-3 ml-0.5 opacity-50" />
-                                                    </div>
-                                                )}
-                                                {isCanvasMode && (
-                                                    <div onClick={() => setIsCanvasMode(false)} className="flex items-center gap-1 px-3 py-2 bg-indigo-100 text-indigo-700 rounded-xl text-[12px] font-bold cursor-pointer">
-                                                        <LayoutGrid className="w-3.5 h-3.5" />
-                                                        <span>Canvas</span>
-                                                        <X className="w-3 h-3 ml-0.5 opacity-50" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Input Bar - Shown in Empty State */}
-                                        <div className="w-full max-w-2xl mx-auto px-4">
-                                            <div className="bg-[#f1f3f4] rounded-[32px] p-1.5 flex items-center gap-1 shadow-sm border border-gray-100">
+                                        {/* Suggestions Grid */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
+                                            {currentModeInfo.recommendations.map((text, idx) => (
                                                 <button
-                                                    onClick={() => setIsCanvasOpen(!isCanvasOpen)}
-                                                    className={cn(
-                                                        "w-10 h-10 rounded-full transition-all flex items-center justify-center shrink-0 relative group shadow-sm",
-                                                        isCanvasOpen
-                                                            ? "bg-[#1a73e8] text-white ring-2 ring-white shadow-md"
-                                                            : "bg-[#e8f0fe] text-[#1a73e8] hover:bg-[#1a73e8] hover:text-white"
-                                                    )}
+                                                    key={idx}
+                                                    onClick={() => handleSend(text)}
+                                                    className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-teal-200 hover:bg-teal-50/30 rounded-2xl text-sm font-medium text-gray-700 hover:text-teal-700 text-left transition-all shadow-sm hover:shadow-md group"
                                                 >
-                                                    {isCanvasOpen ? <X className="w-5 h-5" /> : <LayoutGrid className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />}
+                                                    <Sparkles className="w-5 h-5 text-teal-400 shrink-0" />
+                                                    <span>{text}</span>
                                                 </button>
+                                            ))}
+                                        </div>
+                                    </div>
 
-                                                {/* Dynamic Context Selector based on mode */}
-                                                {currentModeInfo.contextType === 'assignment' && (
-                                                    <div className="relative">
-                                                        <button
-                                                            onClick={() => setShowAssignmentSelector(!showAssignmentSelector)}
-                                                            className={cn(
-                                                                "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                                                                targetAssignmentId ? "bg-amber-100 text-amber-600" : "hover:bg-gray-200 text-gray-400"
-                                                            )}
-                                                        >
-                                                            <BookMarked className="w-5 h-5" />
-                                                        </button>
+                                    {/* Right Widgets */}
+                                    {!isCanvasOpen && (
+                                        <div className="hidden xl:flex xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
+                                            <div className="flex-1 overflow-y-auto space-y-4 pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                                {getActiveWidgets('right').map((widget) => {
+                                                    const WidgetComponent = widget.component;
+                                                    let widgetProps: any = widget.defaultProps || {};
 
-                                                        <AnimatePresence>
-                                                            {showAssignmentSelector && (
-                                                                <motion.div
-                                                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                                    animate={{ opacity: 1, y: -8, scale: 1 }}
-                                                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                                    className="absolute bottom-full left-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3 z-50 mb-4 max-h-96 overflow-y-auto"
-                                                                >
-                                                                    <div className="mb-3">
-                                                                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2 px-2">Chọn bài tập</p>
-                                                                        <div
-                                                                            onClick={() => {
-                                                                                setTargetAssignmentId(null);
-                                                                                setShowAssignmentSelector(false);
-                                                                            }}
-                                                                            className={cn(
-                                                                                "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all",
-                                                                                !targetAssignmentId ? "bg-gray-100 font-bold" : "hover:bg-gray-50"
-                                                                            )}
-                                                                        >
-                                                                            <X className="w-4 h-4 text-gray-400" />
-                                                                            <span className="text-[13px] text-gray-600">Không chọn</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    {allAssignments.map((assignment) => (
-                                                                        <div
-                                                                            key={assignment.id}
-                                                                            onClick={() => {
-                                                                                setTargetAssignmentId(assignment.id);
-                                                                                setShowAssignmentSelector(false);
-                                                                            }}
-                                                                            className={cn(
-                                                                                "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer mb-1 transition-all",
-                                                                                targetAssignmentId === assignment.id ? "bg-amber-50 border border-amber-200" : "hover:bg-gray-50"
-                                                                            )}
-                                                                        >
-                                                                            <div className={cn(
-                                                                                "w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-bold shrink-0",
-                                                                                targetAssignmentId === assignment.id ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-500"
-                                                                            )}>
-                                                                                {(assignment.subject || "XX").substring(0, 2).toUpperCase()}
-                                                                            </div>
-                                                                            <div className="flex-1 min-w-0">
-                                                                                <p className={cn(
-                                                                                    "text-[13px] font-bold truncate",
-                                                                                    targetAssignmentId === assignment.id ? "text-amber-700" : "text-gray-700"
-                                                                                )}>
-                                                                                    {assignment.title}
-                                                                                </p>
-                                                                                <p className="text-[10px] text-gray-400 truncate">
-                                                                                    {assignment.assignmentClasses?.[0]?.class?.name || "Lớp học"}
-                                                                                </p>
-                                                                            </div>
-                                                                            {targetAssignmentId === assignment.id && (
-                                                                                <CheckCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                                                                            )}
-                                                                        </div>
-                                                                    ))}
-                                                                </motion.div>
-                                                            )}
-                                                        </AnimatePresence>
-                                                    </div>
-                                                )}
+                                                    // Inject real data where applicable
+                                                    if (widget.id === 'grading_progress') widgetProps = { ungradedCount: 5 }; // Mock for now
+                                                    if (widget.id === 'notifications') widgetProps = { notifications: [] };
+                                                    if (widget.id === 'achievements') widgetProps = { streak: 5, badges: 12, rank: 3 };
+                                                    if (widget.id === 'weekly_goals') widgetProps = { completed: 3, total: 5, goal: 'Hoàn thành bài tập Toán' };
+                                                    if (widget.id === 'teacher_classes') widgetProps = { classes: allClasses.length > 0 ? allClasses : [{ id: '1', name: '12A1', code: 'ABC123' }] };
+                                                    if (widget.id === 'students_risk') widgetProps = {
+                                                        students: [
+                                                            { id: '1', name: 'Nguyễn Văn A', className: '12A1', reason: 'Điểm thấp', score: 4.5 },
+                                                            { id: '2', name: 'Trần Thị B', className: '12A1', reason: 'Vắng nhiều', score: 6.0 },
+                                                            { id: '3', name: 'Lê Văn C', className: '12A2', reason: 'Không nộp bài', score: 5.5 },
+                                                        ]
+                                                    };
+                                                    if (widget.id === 'grading') widgetProps = {
+                                                        assignments: [
+                                                            { id: '1', title: 'Bài tập Đại số', className: '12A1', submissionsToGrade: 5, dueDate: new Date(Date.now() + 86400000) }
+                                                        ]
+                                                    };
+                                                    if (widget.id === 'schedule') widgetProps = { classes: allClasses.slice(0, 3) };
+                                                    if (widget.id === 'assignments') widgetProps = { assignments: allAssignments.slice(0, 3) };
+                                                    if (widget.id === 'student_stats') widgetProps = { averageScore: 8.5, attendanceRate: 95, rank: 3 };
+                                                    if (widget.id === 'recent_activity') widgetProps = {
+                                                        activities: [
+                                                            { id: '1', type: 'submission', title: 'Nộp bài Toán', description: 'Đã nộp sớm 1 ngày', time: new Date() },
+                                                            { id: '2', type: 'grade', title: 'Điểm Vật Lý', description: 'Bạn đạt 9.0 điểm', time: new Date(Date.now() - 86400000) }
+                                                        ]
+                                                    };
 
-                                                {currentModeInfo.contextType === 'class' && (
-                                                    <div className="relative">
-                                                        <button
-                                                            onClick={() => setShowClassSelector(!showClassSelector)}
-                                                            className={cn(
-                                                                "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                                                                targetClassId ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200 text-gray-400"
-                                                            )}
-                                                        >
-                                                            <BookOpen className="w-5 h-5" />
-                                                        </button>
-
-                                                        <AnimatePresence>
-                                                            {showClassSelector && (
-                                                                <motion.div
-                                                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                                    animate={{ opacity: 1, y: -8, scale: 1 }}
-                                                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                                    className="absolute bottom-full left-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 p-3 z-50 mb-4 max-h-96 overflow-y-auto"
-                                                                >
-                                                                    <div className="mb-3">
-                                                                        <p className="text-[11px] font-black text-gray-400 uppercase tracking-wider mb-2 px-2">Chọn lớp học</p>
-                                                                        <div
-                                                                            onClick={() => {
-                                                                                setTargetClassId(null);
-                                                                                setShowClassSelector(false);
-                                                                            }}
-                                                                            className={cn(
-                                                                                "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all",
-                                                                                !targetClassId ? "bg-gray-100 font-bold" : "hover:bg-gray-50"
-                                                                            )}
-                                                                        >
-                                                                            <X className="w-4 h-4 text-gray-400" />
-                                                                            <span className="text-[13px] text-gray-600">Không chọn</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    {allClasses.map((cls) => (
-                                                                        <div
-                                                                            key={cls.id}
-                                                                            onClick={() => {
-                                                                                setTargetClassId(cls.id);
-                                                                                setShowClassSelector(false);
-                                                                            }}
-                                                                            className={cn(
-                                                                                "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer mb-1 transition-all",
-                                                                                targetClassId === cls.id ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"
-                                                                            )}
-                                                                        >
-                                                                            <div className={cn(
-                                                                                "w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-bold shrink-0",
-                                                                                targetClassId === cls.id ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-500"
-                                                                            )}>
-                                                                                {cls.name.substring(0, 2).toUpperCase()}
-                                                                            </div>
-                                                                            <div className="flex-1 min-w-0">
-                                                                                <p className={cn(
-                                                                                    "text-[13px] font-bold truncate",
-                                                                                    targetClassId === cls.id ? "text-blue-700" : "text-gray-700"
-                                                                                )}>
-                                                                                    {cls.name}
-                                                                                </p>
-                                                                                <p className="text-[10px] text-gray-400 truncate">
-                                                                                    {cls._count?.students || 0} học sinh
-                                                                                </p>
-                                                                            </div>
-                                                                            {targetClassId === cls.id && (
-                                                                                <CheckCircle className="w-4 h-4 text-blue-600 shrink-0" />
-                                                                            )}
-                                                                        </div>
-                                                                    ))}
-                                                                </motion.div>
-                                                            )}
-                                                        </AnimatePresence>
-                                                    </div>
-                                                )}
-
-                                                <input
-                                                    type="text"
-                                                    value={input}
-                                                    onChange={(e) => setInput(e.target.value)}
-                                                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-                                                    placeholder="Nhập yêu cầu..."
-                                                    className="flex-1 bg-transparent outline-none text-[#202124] placeholder-[#5f6368] px-2 font-medium text-[15px] min-w-[200px]"
-                                                    autoFocus
-                                                />
-
-                                                <div className="flex items-center gap-2 pr-1">
-                                                    <div className="relative" ref={menuRef}>
-                                                        <div
-                                                            onClick={() => setShowModeMenu(!showModeMenu)}
-                                                            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors h-10"
-                                                        >
-                                                            <currentModeInfo.icon className="w-4 h-4 text-[#1a73e8]" />
-                                                            <span className="text-[13px] font-bold text-[#5f6368] whitespace-nowrap">{currentModeInfo.label}</span>
-                                                            <ChevronDown className={cn("w-3.5 h-3.5 text-gray-400 transition-transform", showModeMenu && "rotate-180")} />
+                                                    return (
+                                                        <div key={widget.id} className="relative group/widget">
+                                                            <button
+                                                                onClick={() => handleRemoveWidget(widget.id, 'right')}
+                                                                className="absolute -top-1 -right-1 z-10 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover/widget:opacity-100 transition-opacity shadow-md"
+                                                                title="Xóa widget"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                            <WidgetComponent {...widgetProps} />
                                                         </div>
+                                                    );
+                                                })}
+                                                <WidgetPlaceholder onClick={() => handleOpenWidgetStore('right')} />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                // Chat Messages List
+                                <div className="flex-1 space-y-8 pb-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                    {messages.map((msg, idx) => {
+                                        const isLatest = idx === messages.length - 1;
+                                        return (
+                                            <div
+                                                key={msg.id}
+                                                className={cn(
+                                                    "flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300",
+                                                    msg.role === "user" ? "flex-row-reverse" : "flex-row"
+                                                )}
+                                            >
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm",
+                                                    msg.role === "user" ? "bg-gray-900 text-white" : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+                                                )}>
+                                                    {msg.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+                                                </div>
+                                                <div className={cn(
+                                                    "flex flex-col max-w-[85%] sm:max-w-[75%]",
+                                                    msg.role === "user" ? "items-end" : "items-start"
+                                                )}>
+                                                    <div className={cn(
+                                                        "px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm",
+                                                        msg.role === "user"
+                                                            ? "bg-gray-900 text-white rounded-br-none"
+                                                            : "bg-white border border-gray-100 text-gray-800 rounded-bl-none"
+                                                    )}>
+                                                        {msg.role === "ai" && msg.reasoning && (
+                                                            <ThinkingBar
+                                                                content={msg.reasoning}
+                                                                isExpanded={thinkingExpanded && isLatest}
+                                                                onToggle={() => setThinkingExpanded(prev => !prev)}
+                                                            />
+                                                        )}
 
-                                                        <AnimatePresence>
-                                                            {showModeMenu && (
-                                                                <motion.div
-                                                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                                    animate={{ opacity: 1, y: -8, scale: 1 }}
-                                                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                                    className="absolute bottom-full right-0 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 overflow-hidden z-50 mb-4"
-                                                                >
-                                                                    <div className="px-3 py-2 border-b border-gray-50 mb-1">
-                                                                        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Cấu hình phản hồi</p>
-                                                                    </div>
-
-                                                                    {/* Toggles Section */}
-                                                                    <div className="p-2 space-y-1 border-b border-gray-50 mb-1">
-                                                                        <div
-                                                                            onClick={() => setIsThinkingEnabled(!isThinkingEnabled)}
-                                                                            className={cn(
-                                                                                "flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-colors",
-                                                                                isThinkingEnabled ? "bg-purple-50 text-purple-700" : "hover:bg-gray-50 text-gray-600"
-                                                                            )}
-                                                                        >
-                                                                            <div className="flex items-center gap-2">
-                                                                                <Activity className="w-4 h-4" />
-                                                                                <span className="text-[13px] font-medium">Thinking Mode</span>
-                                                                            </div>
-                                                                            {isThinkingEnabled && <CheckCircle className="w-3.5 h-3.5" />}
-                                                                        </div>
-
-                                                                        <div
-                                                                            onClick={() => setIsCanvasMode(!isCanvasMode)}
-                                                                            className={cn(
-                                                                                "flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-colors",
-                                                                                isCanvasMode ? "bg-indigo-50 text-indigo-700" : "hover:bg-gray-50 text-gray-600"
-                                                                            )}
-                                                                        >
-                                                                            <div className="flex items-center gap-2">
-                                                                                <LayoutGrid className="w-4 h-4" />
-                                                                                <span className="text-[13px] font-medium">Canvas Mode</span>
-                                                                            </div>
-                                                                            {isCanvasMode && <CheckCircle className="w-3.5 h-3.5" />}
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div className="px-3 py-2 border-b border-gray-50 mb-1">
-                                                                        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Chế độ trợ lý</p>
-                                                                    </div>
-                                                                    {MODES.map((mode) => (
-                                                                        <div
-                                                                            key={mode.id}
-                                                                            onClick={() => {
-                                                                                setChatMode(mode.id);
-                                                                                setShowModeMenu(false);
-                                                                            }}
-                                                                            className={cn(
-                                                                                "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-colors group",
-                                                                                chatMode === mode.id ? "bg-[#e8f0fe]" : "hover:bg-gray-50"
-                                                                            )}
-                                                                        >
-                                                                            <div className={cn(
-                                                                                "w-8 h-8 rounded-lg flex items-center justify-center",
-                                                                                chatMode === mode.id ? "bg-white text-[#1a73e8]" : "bg-gray-100 text-gray-500 group-hover:bg-white"
-                                                                            )}>
-                                                                                <mode.icon className="w-4 h-4" />
-                                                                            </div>
-                                                                            <div className="flex-1">
-                                                                                <p className={cn("text-[13px] font-bold", chatMode === mode.id ? "text-[#1a73e8]" : "text-gray-700")}>{mode.label}</p>
-                                                                                <p className="text-[10px] text-gray-400 font-medium">{mode.description}</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                                </motion.div>
-                                                            )}
-                                                        </AnimatePresence>
+                                                        {msg.role === "ai" && isLatest && latestMessageId === msg.id ? (
+                                                            <TypewriterText text={msg.content} onComplete={() => setLatestMessageId(null)} />
+                                                        ) : (
+                                                            <div className="prose prose-sm max-w-none dark:prose-invert">
+                                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{msg.content}</ReactMarkdown>
+                                                            </div>
+                                                        )}
                                                     </div>
-
-                                                    <button
-                                                        onClick={() => handleSend()}
-                                                        disabled={!input.trim() || isTyping}
-                                                        className="w-10 h-10 rounded-full bg-white text-[#5f6368] shadow-sm hover:shadow-md disabled:opacity-40 transition-all flex items-center justify-center"
-                                                    >
-                                                        {isTyping ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 text-[#1a73e8]" />}
-                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                    {isTyping && (
+                                        <div className="flex gap-4 animate-pulse">
+                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shrink-0">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            </div>
+                                            <div className="bg-white border border-gray-100 px-4 py-3 rounded-2xl rounded-bl-none shadow-sm">
+                                                <div className="flex gap-1.5 mt-1">
+                                                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                                    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
                                                 </div>
                                             </div>
                                         </div>
-                                    </motion.div>
-                                </div>
-                            ) : (
-                                <div className="space-y-8 pb-4">
-                                    <AnimatePresence mode="popLayout">
-                                        {messages.map((msg) => (
-                                            <motion.div
-                                                key={msg.timestamp} // Using timestamp as key, assuming unique enough
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ duration: 0.3 }}
-                                                className={cn("flex gap-3 md:gap-4", msg.role === "user" ? "justify-end" : "justify-start")}
-                                            >
-                                                {msg.role === "ai" && (
-                                                    <div className="w-8 h-8 rounded-full bg-[#f0fdfa] border border-[#ccfbf1] flex items-center justify-center shrink-0 mt-1">
-                                                        <Bot className="w-4 h-4 text-[#0d9488]" />
-                                                    </div>
-                                                )}
-
-                                                <div className={cn(
-                                                    "max-w-[90%] px-5 py-3.5 rounded-[22px] text-[15px] shadow-sm break-words",
-                                                    msg.role === "ai"
-                                                        ? "bg-[#f8f9fa] text-[#3c4043] rounded-tl-none border border-gray-100 prose prose-sm prose-slate max-w-none prose-p:my-1 prose-ul:my-2 prose-li:my-0.5 prose-p:leading-loose"
-                                                        : "bg-[#1a73e8] text-white rounded-tr-none"
-                                                )}>
-                                                    {(() => {
-                                                        const { text, payload } = extractPayload(msg.content);
-
-                                                        if (payload) {
-                                                            let previewCard: React.ReactNode = null;
-
-                                                            if (payload.type === 'options' && payload.data) {
-                                                                previewCard = (
-                                                                    <div className="grid grid-cols-1 gap-2 pt-2">
-                                                                        {payload.data.map((opt: any, idx: number) => (
-                                                                            <div
-                                                                                key={idx}
-                                                                                onClick={() => {
-                                                                                    setCanvasContent(opt.content);
-                                                                                    setCanvasViewMode("content");
-                                                                                    setIsCanvasOpen(true);
-                                                                                }}
-                                                                                className="group border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all flex items-center justify-between bg-white shadow-sm"
-                                                                            >
-                                                                                <div className="flex items-center gap-3">
-                                                                                    <div className="w-8 h-8 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 group-hover:text-blue-600 font-bold text-xs">#{idx + 1}</div>
-                                                                                    <div>
-                                                                                        <h4 className="text-sm font-bold text-gray-800 group-hover:text-blue-700 transition-colors">{opt.title}</h4>
-                                                                                        <p className="text-[11px] text-gray-400 line-clamp-1 group-hover:text-blue-500/80">Nhấn để xem chi tiết</p>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <Maximize2 className="w-3.5 h-3.5 text-gray-300 group-hover:text-blue-600" />
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                );
-                                                            } else if (payload.type === 'flashcards') {
-                                                                previewCard = (
-                                                                    <div
-                                                                        onClick={() => {
-                                                                            setCanvasContent(payload);
-                                                                            setCanvasViewMode("flashcards");
-                                                                            setIsCanvasOpen(true);
-                                                                        }}
-                                                                        className="mt-3 cursor-pointer group relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 p-6 text-white shadow-lg transition-transform hover:scale-[1.02]"
-                                                                    >
-                                                                        <div className="relative z-10 flex items-center justify-between">
-                                                                            <div>
-                                                                                <h4 className="text-lg font-bold">Bộ Flashcard Ôn Tập</h4>
-                                                                                <p className="text-xs text-indigo-100 opacity-80">{payload.data.length} thẻ ghi nhớ</p>
-                                                                            </div>
-                                                                            <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                                                                                <Sparkles className="h-5 w-5 text-yellow-300" />
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-white/10 blur-xl transition-all group-hover:bg-white/20" />
-                                                                    </div>
-                                                                );
-                                                            } else if (payload.type === 'structured_content') {
-                                                                previewCard = (
-                                                                    <div
-                                                                        onClick={() => {
-                                                                            setCanvasContent(payload);
-                                                                            setCanvasViewMode("lesson_plan");
-                                                                            setIsCanvasOpen(true);
-                                                                        }}
-                                                                        className="mt-3 cursor-pointer group border border-blue-100 bg-blue-50/50 rounded-2xl p-5 hover:bg-blue-50 hover:border-blue-300 transition-all flex items-center gap-4"
-                                                                    >
-                                                                        <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center shadow-sm text-blue-600">
-                                                                            <FileText className="h-6 w-6" />
-                                                                        </div>
-                                                                        <div>
-                                                                            <h4 className="font-bold text-gray-900 group-hover:text-blue-700">{payload.title || "Tài liệu học tập"}</h4>
-                                                                            <p className="text-xs text-gray-500">Nhấn để mở bản xem đầy đủ</p>
-                                                                        </div>
-                                                                        <ArrowRight className="ml-auto w-4 h-4 text-gray-400 group-hover:text-blue-600" />
-                                                                    </div>
-                                                                );
-                                                            }
-
-                                                            return (
-                                                                <div className="space-y-4">
-                                                                    {text && (
-                                                                        <div className="prose prose-sm max-w-none text-gray-800 prose-p:leading-relaxed">
-                                                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{text}</ReactMarkdown>
-                                                                        </div>
-                                                                    )}
-                                                                    {previewCard}
-                                                                </div>
-                                                            );
-                                                        }
-
-                                                        // Default Render with thinking bar and typewriter
-                                                        return msg.role === 'ai' ? (
-                                                            <div>
-                                                                {/* Thinking Bar - collapsible */}
-                                                                {msg.reasoning && (
-                                                                    <ThinkingBar
-                                                                        content={msg.reasoning}
-                                                                        isExpanded={thinkingExpanded}
-                                                                        onToggle={() => setThinkingExpanded(!thinkingExpanded)}
-                                                                    />
-                                                                )}
-                                                                {/* Main content */}
-                                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                                                    {msg.content}
-                                                                </ReactMarkdown>
-                                                            </div>
-                                                        ) : (
-                                                            <p className="whitespace-pre-wrap">{msg.content}</p>
-                                                        );
-                                                    })()}
-                                                    <span className={cn(
-                                                        "text-[10px] mt-2 block font-medium",
-                                                        msg.role === "ai" ? "opacity-40" : "opacity-70"
-                                                    )}>
-                                                        {format(new Date(msg.timestamp), "HH:mm")}
-                                                    </span>
-                                                </div>
-
-                                                {msg.role === "user" && (
-                                                    <div className="w-8 h-8 rounded-full bg-[#e8f0fe] flex items-center justify-center shrink-0 text-[#1a73e8] font-bold text-[10px] uppercase mt-1">
-                                                        {user.name.charAt(0)}
-                                                    </div>
-                                                )}
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-                                    {isTyping && (
-                                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4">
-                                            <div className="w-8 h-8 rounded-full bg-[#f0fdfa] border border-[#ccfbf1] flex items-center justify-center shrink-0 mt-1">
-                                                <Bot className="w-4 h-4 text-[#0d9488]" />
-                                            </div>
-                                            <div className="bg-[#f8f9fa] px-5 py-4 rounded-[22px] flex items-center gap-1.5 border border-gray-50">
-                                                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                                                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                                                <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                                            </div>
-                                        </motion.div>
                                     )}
                                     <div ref={messagesEndRef} />
                                 </div>
@@ -1362,757 +1202,325 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                         </div>
                     </div>
 
-                    {/* Absolute Input Area - Only shown when there are messages */}
-                    {messages.length > 0 && (
-                        <div className={cn(
-                            "absolute bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md pb-6 pt-2 px-4 border-t border-transparent",
-                            isCanvasOpen ? "border-gray-50" : ""
-                        )}>
-                            <div className="relative flex flex-col gap-3 mx-auto max-w-2xl px-2 sm:px-0">
-                                {/* Active Mode Chips - Above Input Bar */}
-                                {(isThinkingEnabled || isCanvasMode || targetAssignmentId || targetClassId) && (
-                                    <div className="flex items-center gap-2 mb-2 animate-in fade-in slide-in-from-left-2 duration-300">
-                                        {isThinkingEnabled && (
-                                            <div
-                                                onClick={() => setIsThinkingEnabled(false)}
-                                                className="flex items-center gap-1 px-3 py-2 bg-purple-100 text-purple-700 rounded-xl text-[12px] font-bold cursor-pointer hover:bg-purple-200 transition-colors"
-                                            >
-                                                <Activity className="w-3.5 h-3.5 animate-pulse" />
-                                                <span>Thinking</span>
-                                                <X className="w-3 h-3 ml-0.5 opacity-50" />
+                    {/* Chat Input Area */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-10 px-4 md:px-6 z-20">
+                        <div className="max-w-2xl mx-auto bg-white rounded-[2rem] shadow-xl shadow-blue-900/5 border border-gray-100 p-3 relative group focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                            {/* Selected Context Indicators */}
+                            {(targetAssignmentId || targetClassId) && (
+                                <div className="absolute -top-10 left-0 flex gap-2 overflow-x-auto py-2 px-1 max-w-full no-scrollbar">
+                                    {targetAssignmentId && (
+                                        <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                                            <ListTodo className="w-3.5 h-3.5" />
+                                            <span className="truncate max-w-[150px]">
+                                                {allAssignments.find(a => a.id === targetAssignmentId)?.title || "Bài tập"}
+                                            </span>
+                                            <button onClick={() => setTargetAssignmentId(null)} className="hover:bg-blue-200 rounded-full p-0.5"><X className="w-3 h-3" /></button>
+                                        </div>
+                                    )}
+                                    {targetClassId && (
+                                        <div className="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                                            <LayoutGrid className="w-3.5 h-3.5" />
+                                            <span className="truncate max-w-[150px]">
+                                                {allClasses.find(c => c.id === targetClassId)?.name || "Lớp học"}
+                                            </span>
+                                            <button onClick={() => setTargetClassId(null)} className="hover:bg-indigo-200 rounded-full p-0.5"><X className="w-3 h-3" /></button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            <div className="flex items-center gap-2 relative">
+                                <button
+                                    onClick={() => setShowModeMenu(!showModeMenu)}
+                                    className="p-3 bg-gray-50 hover:bg-gray-100 rounded-full text-gray-500 transition-colors shrink-0"
+                                >
+                                    <Plus className={cn("w-5 h-5 transition-transform", showModeMenu && "rotate-45")} />
+                                </button>
+
+                                {/* Mode Menu Popup */}
+                                {showModeMenu && (
+                                    <div
+                                        ref={menuRef}
+                                        className="absolute bottom-full left-0 mb-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
+                                    >
+                                        {/* Header */}
+                                        <div className="flex items-center justify-between mb-3">
+                                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Chọn chế độ</h3>
+                                            <button onClick={() => setShowModeMenu(false)} className="p-1 hover:bg-gray-100 rounded-full">
+                                                <X className="w-4 h-4 text-gray-400" />
+                                            </button>
+                                        </div>
+
+                                        {/* Mode Grid */}
+                                        <div className="grid grid-cols-2 gap-2 mb-4">
+                                            {(user.role === 'teacher' ? TEACHER_MODES : STUDENT_MODES).map((mode) => {
+                                                const IconComponent = mode.icon;
+                                                const isActive = chatMode === mode.id;
+                                                return (
+                                                    <button
+                                                        key={mode.id}
+                                                        onClick={() => {
+                                                            setChatMode(mode.id);
+                                                            setShowModeMenu(false);
+                                                        }}
+                                                        className={cn(
+                                                            "flex items-center gap-2 p-3 rounded-xl text-left transition-all",
+                                                            isActive
+                                                                ? "bg-blue-50 border-2 border-blue-200 text-blue-700"
+                                                                : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent text-gray-700"
+                                                        )}
+                                                    >
+                                                        <IconComponent className="w-4 h-4 shrink-0" />
+                                                        <span className="text-xs font-semibold truncate">{mode.label}</span>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* Divider */}
+                                        <div className="border-t border-gray-100 my-3" />
+
+                                        {/* Context Selectors */}
+                                        <div className="space-y-2">
+                                            {/* Assignment Selector */}
+                                            <div className="space-y-1">
+                                                <button
+                                                    onClick={() => setShowAssignmentSelector(!showAssignmentSelector)}
+                                                    className="w-full flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition-all text-left"
+                                                >
+                                                    <ListTodo className="w-4 h-4" />
+                                                    <div className="flex-1">
+                                                        <span className="text-xs font-semibold">Chọn bài tập</span>
+                                                        {targetAssignmentId && (
+                                                            <p className="text-[10px] text-blue-600 truncate">
+                                                                {allAssignments.find(a => a.id === targetAssignmentId)?.title}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <ChevronDown className={cn("w-4 h-4 opacity-50 transition-transform", showAssignmentSelector && "rotate-180")} />
+                                                </button>
+                                                {showAssignmentSelector && (
+                                                    <div className="max-h-32 overflow-y-auto space-y-1 pl-4">
+                                                        <button
+                                                            onClick={() => { setTargetAssignmentId(null); setShowAssignmentSelector(false); }}
+                                                            className={cn("w-full text-left p-2 rounded-lg text-xs", !targetAssignmentId ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100")}
+                                                        >
+                                                            Không chọn
+                                                        </button>
+                                                        {allAssignments.slice(0, 5).map(a => (
+                                                            <button
+                                                                key={a.id}
+                                                                onClick={() => { setTargetAssignmentId(a.id); setShowAssignmentSelector(false); }}
+                                                                className={cn("w-full text-left p-2 rounded-lg text-xs truncate", targetAssignmentId === a.id ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100")}
+                                                            >
+                                                                {a.title}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                        {isCanvasMode && (
-                                            <div
-                                                onClick={() => setIsCanvasMode(false)}
-                                                className="flex items-center gap-1 px-3 py-2 bg-indigo-100 text-indigo-700 rounded-xl text-[12px] font-bold cursor-pointer hover:bg-indigo-200 transition-colors"
-                                            >
-                                                <LayoutGrid className="w-3.5 h-3.5" />
-                                                <span>Canvas</span>
-                                                <X className="w-3 h-3 ml-0.5 opacity-50" />
+
+                                            {/* Class Selector */}
+                                            <div className="space-y-1">
+                                                <button
+                                                    onClick={() => setShowClassSelector(!showClassSelector)}
+                                                    className="w-full flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-700 transition-all text-left"
+                                                >
+                                                    <LayoutGrid className="w-4 h-4" />
+                                                    <div className="flex-1">
+                                                        <span className="text-xs font-semibold">Chọn lớp học</span>
+                                                        {targetClassId && (
+                                                            <p className="text-[10px] text-indigo-600 truncate">
+                                                                {allClasses.find(c => c.id === targetClassId)?.name}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <ChevronDown className={cn("w-4 h-4 opacity-50 transition-transform", showClassSelector && "rotate-180")} />
+                                                </button>
+                                                {showClassSelector && (
+                                                    <div className="max-h-32 overflow-y-auto space-y-1 pl-4">
+                                                        <button
+                                                            onClick={() => { setTargetClassId(null); setShowClassSelector(false); }}
+                                                            className={cn("w-full text-left p-2 rounded-lg text-xs", !targetClassId ? "bg-indigo-100 text-indigo-700" : "hover:bg-gray-100")}
+                                                        >
+                                                            Không chọn
+                                                        </button>
+                                                        {allClasses.map(c => (
+                                                            <button
+                                                                key={c.id}
+                                                                onClick={() => { setTargetClassId(c.id); setShowClassSelector(false); }}
+                                                                className={cn("w-full text-left p-2 rounded-lg text-xs truncate", targetClassId === c.id ? "bg-indigo-100 text-indigo-700" : "hover:bg-gray-100")}
+                                                            >
+                                                                {c.name}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                        {targetAssignmentId && (
-                                            <div
-                                                onClick={() => setTargetAssignmentId(null)}
-                                                className="flex items-center gap-1 px-3 py-2 bg-amber-100 text-amber-700 rounded-xl text-[12px] font-bold cursor-pointer hover:bg-amber-200 transition-colors max-w-[200px]"
-                                            >
-                                                <BookMarked className="w-3.5 h-3.5 shrink-0" />
-                                                <span className="truncate">{allAssignments.find(a => a.id === targetAssignmentId)?.title || "Bài tập"}</span>
-                                                <X className="w-3 h-3 ml-0.5 opacity-50 shrink-0" />
+                                        </div>
+
+                                        {/* Divider */}
+                                        <div className="border-t border-gray-100 my-3" />
+
+                                        {/* Canvas Toggle */}
+                                        <button
+                                            onClick={() => setIsCanvasMode(!isCanvasMode)}
+                                            className={cn(
+                                                "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left",
+                                                isCanvasMode
+                                                    ? "bg-purple-50 text-purple-700 border border-purple-200"
+                                                    : "bg-gray-50 hover:bg-purple-50 text-gray-700 hover:text-purple-700"
+                                            )}
+                                        >
+                                            <Sparkles className="w-4 h-4" />
+                                            <div className="flex-1">
+                                                <span className="text-xs font-semibold">Canvas Mode</span>
+                                                <p className="text-[10px] opacity-70">
+                                                    {isCanvasMode ? "Đang bật - AI sẽ xuất nội dung ra Canvas" : "Tắt - Trả lời trong chat"}
+                                                </p>
                                             </div>
-                                        )}
-                                        {targetClassId && (
-                                            <div
-                                                onClick={() => setTargetClassId(null)}
-                                                className="flex items-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-xl text-[12px] font-bold cursor-pointer hover:bg-blue-200 transition-colors max-w-[200px]"
-                                            >
-                                                <BookOpen className="w-3.5 h-3.5 shrink-0" />
-                                                <span className="truncate">{allClasses.find(c => c.id === targetClassId)?.name || "Lớp học"}</span>
-                                                <X className="w-3 h-3 ml-0.5 opacity-50 shrink-0" />
+                                            <div className={cn(
+                                                "w-8 h-5 rounded-full transition-colors flex items-center px-0.5",
+                                                isCanvasMode ? "bg-purple-500" : "bg-gray-300"
+                                            )}>
+                                                <div className={cn(
+                                                    "w-4 h-4 bg-white rounded-full shadow transition-transform",
+                                                    isCanvasMode && "translate-x-3"
+                                                )} />
                                             </div>
-                                        )}
+                                        </button>
                                     </div>
                                 )}
+                                <textarea
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleSend();
+                                        }
+                                    }}
+                                    placeholder={currentModeInfo.prompt || "Nhập tin nhắn..."}
+                                    className="flex-1 max-h-32 min-h-[44px] py-3 bg-transparent border-none text-gray-800 placeholder-gray-400 focus:ring-0 focus:outline-none outline-none resize-none font-medium text-[15px]"
+                                    rows={1}
+                                />
 
-                                <div className="bg-[#f1f3f4] rounded-[32px] p-1.5 flex items-center gap-1 shadow-sm border border-gray-100 relative">
-                                    <button
-                                        onClick={() => setIsCanvasOpen(!isCanvasOpen)}
-                                        className={cn(
-                                            "w-10 h-10 rounded-full transition-all flex items-center justify-center shrink-0 relative group shadow-sm",
-                                            isCanvasOpen
-                                                ? "bg-[#1a73e8] text-white ring-2 ring-white shadow-md"
-                                                : "bg-[#e8f0fe] text-[#1a73e8] hover:bg-[#1a73e8] hover:text-white"
-                                        )}
-                                        title={isCanvasOpen ? "Đóng Canvas" : "Mở Canvas"}
-                                    >
-                                        {isCanvasOpen ? <X className="w-5 h-5" /> : <LayoutGrid className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />}
-
-                                        {!isCanvasOpen && (
-                                            <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-white rounded-full flex items-center justify-center shadow-sm z-10">
-                                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-                                            </div>
-                                        )}
-                                    </button>
-
-                                    {/* Dynamic Context Selector based on mode */}
-                                    {currentModeInfo.contextType === 'assignment' && (
-                                        <div className="relative">
-                                            <button
-                                                onClick={() => setShowAssignmentSelector(!showAssignmentSelector)}
-                                                className={cn(
-                                                    "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                                                    targetAssignmentId ? "bg-amber-100 text-amber-600" : "hover:bg-gray-200 text-gray-400"
-                                                )}
-                                                title="Chọn bài tập"
-                                            >
-                                                <BookMarked className="w-5 h-5" />
-                                            </button>
-
-                                            <AnimatePresence>
-                                                {showAssignmentSelector && (
-                                                    <motion.div
-                                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                        className="absolute bottom-full left-0 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 mb-3 overflow-hidden"
-                                                    >
-                                                        {/* Header */}
-                                                        <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                                                            <p className="text-xs font-bold text-gray-600">Chọn bài tập ngữ cảnh</p>
-                                                            {targetAssignmentId && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setTargetAssignmentId(null);
-                                                                        setShowAssignmentSelector(false);
-                                                                    }}
-                                                                    className="text-[10px] text-red-500 font-bold hover:underline"
-                                                                >
-                                                                    Xóa chọn
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                        {/* List */}
-                                                        <div className="max-h-60 overflow-y-auto p-2">
-                                                            {allAssignments.length === 0 ? (
-                                                                <p className="text-center text-gray-400 text-xs py-4">Không có bài tập nào</p>
-                                                            ) : (
-                                                                <div className="space-y-1">
-                                                                    {allAssignments.map((a) => (
-                                                                        <div
-                                                                            key={a.id}
-                                                                            onClick={() => {
-                                                                                setTargetAssignmentId(targetAssignmentId === a.id ? null : a.id);
-                                                                                setShowAssignmentSelector(false);
-                                                                            }}
-                                                                            className={cn(
-                                                                                "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all",
-                                                                                targetAssignmentId === a.id
-                                                                                    ? "bg-amber-50 border border-amber-200"
-                                                                                    : "hover:bg-gray-50 border border-transparent"
-                                                                            )}
-                                                                        >
-                                                                            <div className={cn(
-                                                                                "w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0",
-                                                                                targetAssignmentId === a.id ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-500"
-                                                                            )}>
-                                                                                {(a.subject || "BT").substring(0, 2).toUpperCase()}
-                                                                            </div>
-                                                                            <div className="flex-1 min-w-0">
-                                                                                <p className={cn(
-                                                                                    "text-[13px] font-semibold truncate",
-                                                                                    targetAssignmentId === a.id ? "text-amber-700" : "text-gray-700"
-                                                                                )}>
-                                                                                    {a.title}
-                                                                                </p>
-                                                                                <p className="text-[10px] text-gray-400 truncate">
-                                                                                    {a.assignmentClasses?.[0]?.class?.name || "Lớp học"}
-                                                                                </p>
-                                                                            </div>
-                                                                            {targetAssignmentId === a.id && (
-                                                                                <CheckCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                                                                            )}
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
+                                <button
+                                    onClick={() => setIsThinkingEnabled(!isThinkingEnabled)}
+                                    className={cn(
+                                        "flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all shrink-0",
+                                        isThinkingEnabled ? "bg-purple-100 text-purple-600" : "hover:bg-gray-100 text-gray-400"
                                     )}
+                                    title="Chế độ suy nghĩ sâu"
+                                >
+                                    <BrainCircuit className="w-5 h-5" />
+                                    {isThinkingEnabled && <span className="text-xs font-semibold">Thinking</span>}
+                                </button>
 
-                                    {currentModeInfo.contextType === 'class' && (
-                                        <div className="relative">
-                                            <button
-                                                onClick={() => setShowClassSelector(!showClassSelector)}
-                                                className={cn(
-                                                    "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                                                    targetClassId ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200 text-gray-400"
-                                                )}
-                                                title="Chọn lớp học"
-                                            >
-                                                <BookOpen className="w-5 h-5" />
-                                            </button>
-
-                                            <AnimatePresence>
-                                                {showClassSelector && (
-                                                    <motion.div
-                                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                        className="absolute bottom-full left-0 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 mb-3 overflow-hidden"
-                                                    >
-                                                        {/* Header */}
-                                                        <div className="px-4 py-3 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                                                            <p className="text-xs font-bold text-gray-600">Chọn lớp học</p>
-                                                            {targetClassId && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setTargetClassId(null);
-                                                                        setShowClassSelector(false);
-                                                                    }}
-                                                                    className="text-[10px] text-red-500 font-bold hover:underline"
-                                                                >
-                                                                    Xóa chọn
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                        {/* List */}
-                                                        <div className="max-h-60 overflow-y-auto p-2">
-                                                            {allClasses.length === 0 ? (
-                                                                <p className="text-center text-gray-400 text-xs py-4">Không có lớp học nào</p>
-                                                            ) : (
-                                                                <div className="space-y-1">
-                                                                    {allClasses.map((cls) => (
-                                                                        <div
-                                                                            key={cls.id}
-                                                                            onClick={() => {
-                                                                                setTargetClassId(targetClassId === cls.id ? null : cls.id);
-                                                                                setShowClassSelector(false);
-                                                                            }}
-                                                                            className={cn(
-                                                                                "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all",
-                                                                                targetClassId === cls.id
-                                                                                    ? "bg-blue-50 border border-blue-200"
-                                                                                    : "hover:bg-gray-50 border border-transparent"
-                                                                            )}
-                                                                        >
-                                                                            <div className={cn(
-                                                                                "w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0",
-                                                                                targetClassId === cls.id ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-500"
-                                                                            )}>
-                                                                                {cls.name.substring(0, 2).toUpperCase()}
-                                                                            </div>
-                                                                            <div className="flex-1 min-w-0">
-                                                                                <p className={cn(
-                                                                                    "text-[13px] font-semibold truncate",
-                                                                                    targetClassId === cls.id ? "text-blue-700" : "text-gray-700"
-                                                                                )}>
-                                                                                    {cls.name}
-                                                                                </p>
-                                                                                <p className="text-[10px] text-gray-400">
-                                                                                    {cls._count?.students || 0} học sinh
-                                                                                </p>
-                                                                            </div>
-                                                                            {targetClassId === cls.id && (
-                                                                                <CheckCircle className="w-4 h-4 text-blue-600 shrink-0" />
-                                                                            )}
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
+                                <button
+                                    onClick={() => handleSend()}
+                                    disabled={!inputValue.trim() || isTyping}
+                                    className={cn(
+                                        "p-3 rounded-full transition-all shadow-md",
+                                        !inputValue.trim() || isTyping
+                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                            : "bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 shadow-blue-200"
                                     )}
-
-                                    <input
-                                        type="text"
-                                        value={input}
-                                        onChange={(e) => setInput(e.target.value)}
-                                        onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-                                        placeholder={targetAssignmentId ? "Hỏi về bài tập đã chọn..." : targetClassId ? "Hỏi về lớp học đã chọn..." : "Nhập yêu cầu..."}
-                                        className="flex-1 bg-transparent outline-none text-[#202124] placeholder-[#5f6368] px-2 font-medium text-[15px] min-w-[200px]"
-                                        autoFocus
-                                    />
-
-                                    <div className="flex items-center gap-2 pr-1">
-                                        {/* Thinking Mode Toggle */}
-
-                                        {/* Mode Selector Dropdown */}
-                                        <div className="relative" ref={menuRef}>
-                                            <div
-                                                onClick={() => setShowModeMenu(!showModeMenu)}
-                                                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors select-none h-10"
-                                            >
-                                                <currentModeInfo.icon className="w-4 h-4 text-[#1a73e8]" />
-                                                <span className="text-[13px] font-bold text-[#5f6368] whitespace-nowrap">{currentModeInfo.label}</span>
-                                                <ChevronDown className={cn("w-3.5 h-3.5 text-gray-400 transition-transform", showModeMenu && "rotate-180")} />
-                                            </div>
-                                            <AnimatePresence>
-                                                {showModeMenu && (
-                                                    <motion.div
-                                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                        animate={{ opacity: 1, y: -8, scale: 1 }}
-                                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                                        className="absolute bottom-full right-0 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 overflow-hidden z-50 mb-4"
-                                                    >
-                                                        <div className="px-3 py-2 border-b border-gray-50 mb-1">
-                                                            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Cấu hình phản hồi</p>
-                                                        </div>
-
-                                                        {/* Toggles Section */}
-                                                        <div className="p-2 space-y-1 border-b border-gray-50 mb-1">
-                                                            <div
-                                                                onClick={() => setIsThinkingEnabled(!isThinkingEnabled)}
-                                                                className={cn(
-                                                                    "flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-colors",
-                                                                    isThinkingEnabled ? "bg-purple-50 text-purple-700" : "hover:bg-gray-50 text-gray-600"
-                                                                )}
-                                                            >
-                                                                <div className="flex items-center gap-2">
-                                                                    <Activity className="w-4 h-4" />
-                                                                    <span className="text-[13px] font-medium">Thinking Mode</span>
-                                                                </div>
-                                                                {isThinkingEnabled && <CheckCircle className="w-3.5 h-3.5" />}
-                                                            </div>
-
-                                                            <div
-                                                                onClick={() => setIsCanvasMode(!isCanvasMode)}
-                                                                className={cn(
-                                                                    "flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition-colors",
-                                                                    isCanvasMode ? "bg-indigo-50 text-indigo-700" : "hover:bg-gray-50 text-gray-600"
-                                                                )}
-                                                            >
-                                                                <div className="flex items-center gap-2">
-                                                                    <LayoutGrid className="w-4 h-4" />
-                                                                    <span className="text-[13px] font-medium">Canvas Mode</span>
-                                                                </div>
-                                                                {isCanvasMode && <CheckCircle className="w-3.5 h-3.5" />}
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="px-3 py-2 border-b border-gray-50 mb-1">
-                                                            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Chế độ trợ lý</p>
-                                                        </div>
-                                                        {MODES.map((mode) => (
-                                                            <div
-                                                                key={mode.id}
-                                                                onClick={() => {
-                                                                    setChatMode(mode.id);
-                                                                    setShowModeMenu(false);
-                                                                }}
-                                                                className={cn(
-                                                                    "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-colors group",
-                                                                    chatMode === mode.id ? "bg-[#e8f0fe]" : "hover:bg-gray-50"
-                                                                )}
-                                                            >
-                                                                <div className={cn(
-                                                                    "w-8 h-8 rounded-lg flex items-center justify-center",
-                                                                    chatMode === mode.id ? "bg-white text-[#1a73e8]" : "bg-gray-100 text-gray-500 group-hover:bg-white"
-                                                                )}>
-                                                                    <mode.icon className="w-4 h-4" />
-                                                                </div>
-                                                                <div className="flex-1">
-                                                                    <p className={cn("text-[13px] font-bold", chatMode === mode.id ? "text-[#1a73e8]" : "text-gray-700")}>{mode.label}</p>
-                                                                    <p className="text-[10px] text-gray-400 font-medium">{mode.description}</p>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-
-                                        <button
-                                            onClick={() => handleSend()}
-                                            disabled={!input.trim() || isTyping}
-                                            className="w-10 h-10 rounded-full bg-white text-[#5f6368] shadow-sm hover:shadow-md disabled:opacity-40 transition-all flex items-center justify-center flex-shrink-0"
-                                        >
-                                            {isTyping ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 text-[#1a73e8]" />}
-                                        </button>
-                                    </div>
-                                </div>
+                                >
+                                    {isTyping ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-0.5" />}
+                                </button>
                             </div>
                         </div>
-                    )}
+                    </div>
                 </div>
 
-                {/* RIGHT CANVAS AREA - Pushes the content */}
-                <div className={cn(
-                    "h-screen bg-[#F9FAFB] border-l border-gray-200 transition-[width] duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] flex flex-col",
-                    isCanvasOpen ? "w-1/2 opacity-100" : "w-0 opacity-0 overflow-hidden"
-                )}>
-                    {/* Canvas Header */}
-                    <div className="h-16 border-b border-gray-200 bg-white flex items-center justify-between px-6 shrink-0 z-10 sticky top-0">
-                        <div className="flex items-center gap-3">
-                            <div className={cn(
-                                "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
-                                canvasViewMode === "dashboard" ? "bg-emerald-50 text-emerald-600" : "bg-blue-50 text-blue-600"
-                            )}>
-                                {canvasViewMode === "dashboard" ? <LayoutGrid className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                {/* RIGHT CANVAS AREA */}
+                {isCanvasOpen && (
+                    <div className="w-1/2 bg-gray-50/50 border-l border-gray-200 flex flex-col h-full animate-in slide-in-from-right duration-500 shadow-2xl z-30">
+                        {/* Canvas Header */}
+                        <div className="h-16 px-6 border-b border-gray-200 flex items-center justify-between bg-white shrink-0">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-indigo-50 rounded-xl">
+                                    <Sparkles className="w-5 h-5 text-indigo-600" />
+                                </div>
+                                <div>
+                                    <h2 className="font-bold text-gray-900 leading-tight">Canvas thông minh</h2>
+                                    <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+                                        {canvasViewMode === 'dashboard' ? 'Tổng quan' : canvasViewMode === 'flashcards' ? 'Flashcards' : 'Nội dung'}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h2 className="text-sm font-bold text-gray-900">
-                                    {canvasViewMode === "dashboard" ? "Miqix Dashboard" : "Bản nháp thông minh"}
-                                </h2>
-                                <p className="text-[11px] text-gray-500">
-                                    {canvasViewMode === "dashboard" ? "Quản gia thông minh của bạn" : "Được tạo bởi Miqix AI"}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            {/* View Switcher */}
-                            <div className="hidden bg-gray-100 p-1 rounded-xl sm:flex items-center">
-                                <button
-                                    onClick={() => setCanvasViewMode("dashboard")}
-                                    className={cn(
-                                        "px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                                        canvasViewMode === "dashboard" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-                                    )}
-                                >
-                                    Tổng quan
+                            <div className="flex items-center gap-2">
+                                <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
+                                    <Share2 className="w-5 h-5" />
                                 </button>
-                                {/* Enable "Content" tab even if empty to allow playground usage */}
-                                <button
-                                    onClick={() => {
-                                        setCanvasViewMode("content");
-                                        // Ensure canvas opens when clicking Content if closed
-                                        if (!isCanvasOpen) setIsCanvasOpen(true);
-                                    }}
-                                    className={cn(
-                                        "px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                                        canvasViewMode === "content" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-                                    )}
-                                >
-                                    Nội dung
-                                </button>
-                            </div>
-
-                            <div className="flex items-center border-l border-gray-200 pl-4 ml-2 gap-2">
                                 <button
                                     onClick={() => setIsCanvasOpen(false)}
-                                    className="p-2 rounded-full hover:bg-gray-100 text-gray-500" title="Đóng Canvas"
+                                    className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
                                 >
-                                    <X className="w-4 h-4" />
+                                    <X className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Canvas Body */}
-                    <div className="flex-1 overflow-y-auto p-6 md:p-8 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
-                        {canvasViewMode === "flashcards" && canvasContent?.data ? (
-                            <FlashcardCanvas data={canvasContent.data} />
-                        ) : canvasViewMode === "lesson_plan" && canvasContent ? (
-                            <LessonPlanCanvas title={canvasContent.title} sections={canvasContent.sections} />
-                        ) : canvasViewMode === "content" ? (
-                            <div className="flex flex-col h-full">
-                                {/* Editor Toolbar */}
-                                <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100 shrink-0">
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => setIsEditingContent(!isEditingContent)}
-                                            className={cn(
-                                                "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                                                isEditingContent
-                                                    ? "bg-blue-50 text-blue-600 border border-blue-200"
-                                                    : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                                            )}
-                                        >
-                                            {isEditingContent ? (
-                                                <>
-                                                    <BookOpen className="w-3.5 h-3.5" />
-                                                    Xem trước
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <PenTool className="w-3.5 h-3.5" />
-                                                    Chỉnh sửa
-                                                </>
-                                            )}
-                                        </button>
-
-                                        {isEditingContent && (
-                                            <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Mẫu:</span>
-                                                <button
-                                                    onClick={() => setCanvasContent(`:::payload
-{
-  "type": "flashcards",
-  "data": [
-    {"front": "Tế bào nhân sơ", "back": "Là tế bào chưa có nhân hoàn chỉnh, không có màng nhân ngăn cách chất nhân và tế bào chất."},
-    {"front": "Tế bào nhân thực", "back": "Là tế bào có nhân hoàn chỉnh, vật chất di truyền được bao bọc bởi màng nhân."}
-  ]
-}
-:::`)}
-                                                    className="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-md text-[10px] font-bold transition-colors"
+                        {/* Canvas Content */}
+                        <div className="flex-1 overflow-y-auto p-8 relative" id="canvas-content">
+                            {(canvasContent && canvasContent.type === 'dashboard') || canvasViewMode === 'dashboard' ? (
+                                <CanvasDashboard
+                                    user={user}
+                                    events={upcomingEvents}
+                                    assignments={pendingAssignments}
+                                    allAssignments={allAssignments}
+                                    classes={allClasses}
+                                    analytics={analytics}
+                                    onAction={handleQuickAction}
+                                />
+                            ) : canvasContent && canvasContent.type === 'structured_content' ? (
+                                <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                    {canvasContent.sections?.map((section: any, idx: number) => (
+                                        <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 group hover:shadow-md transition-shadow">
+                                            <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2 group-hover:text-blue-600 transition-colors">
+                                                <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
+                                                {section.heading}
+                                            </h3>
+                                            <div className="prose prose-sm text-gray-600 leading-relaxed">
+                                                <ReactMarkdown
+                                                    remarkPlugins={[remarkMath]}
+                                                    rehypePlugins={[rehypeKatex]}
                                                 >
-                                                    Flashcards
-                                                </button>
-                                                <button
-                                                    onClick={() => setCanvasContent(`:::payload
-{
-  "type": "structured_content",
-  "title": "Giáo án Ngữ Văn 12: Vợ Chồng A Phủ",
-  "sections": [
-    {"heading": "1. Mục tiêu bài học", "content": "- Hiểu được giá trị hiện thực và nhân đạo của tác phẩm.\\n- Phân tích được sức sống tiềm tàng của nhân vật Mị."},
-    {"heading": "2. Hoạt động khởi động", "content": "Chiếu video clip về cuộc sống người dân Tây Bắc."}
-  ]
-}
-:::`)}
-                                                    className="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-md text-[10px] font-bold transition-colors"
-                                                >
-                                                    Giáo án
-                                                </button>
+                                                    {section.content}
+                                                </ReactMarkdown>
                                             </div>
-                                        )}
-                                    </div>
-
-                                    {isEditingContent && (
-                                        <button
-                                            onClick={() => setCanvasContent("")}
-                                            className="text-xs text-red-500 hover:text-red-600 font-medium px-2 py-1 hover:bg-red-50 rounded-md transition-colors"
-                                        >
-                                            Xóa trắng
-                                        </button>
-                                    )}
-                                </div>
-
-                                {/* Content Area */}
-                                <div className="flex-1 overflow-y-auto min-h-0 relative">
-                                    {isEditingContent ? (
-                                        <textarea
-                                            value={typeof canvasContent === 'string' ? canvasContent : JSON.stringify(canvasContent, null, 2)}
-                                            onChange={(e) => setCanvasContent(e.target.value)}
-                                            className="w-full h-full resize-none p-4 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all font-mono text-sm leading-relaxed"
-                                            placeholder="Nhập nội dung markdown hoặc payload JSON..."
-                                        />
-                                    ) : (
-                                        <div className="prose prose-sm md:prose-base max-w-none text-gray-800 prose-headings:text-gray-900 prose-strong:text-gray-900 prose-p:leading-relaxed">
-                                            {typeof canvasContent === 'string' ? (
-                                                (() => {
-                                                    const { text, payload } = extractPayload(canvasContent || "");
-                                                    if (payload) {
-                                                        if (payload.type === 'flashcards') return <FlashcardCanvas data={payload.data} />;
-                                                        if (payload.type === 'structured_content') return <LessonPlanCanvas title={payload.title || "Tài liệu không tên"} sections={payload.sections || []} />;
-                                                    }
-                                                    return <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{text || "_Chưa có nội dung_"}</ReactMarkdown>;
-                                                })()
-                                            ) : (
-                                                <div className="text-gray-400 italic">Dữ liệu dạng Object (Chuyển sang chế độ chỉnh sửa để xem JSON)</div>
-                                            )}
                                         </div>
-                                    )}
+                                    ))}
                                 </div>
-                            </div>
-                        ) : (
-                            <CanvasDashboard
-                                user={user}
-                                events={upcomingEvents}
-                                assignments={pendingAssignments}
-                                allAssignments={allAssignments}
-                                classes={allClasses}
-                                analytics={analytics}
-                                onAction={(act: any) => {
-                                    const prompts: Record<string, string> = user.role === 'teacher' ? {
-                                        assignments: "Liệt kê các bài tập cần chấm điểm ngay.",
-                                        flashcards: "Gợi ý bộ câu hỏi kiểm tra cho học sinh.",
-                                        history: "Xem lại các báo cáo phân tích lớp học cũ.",
-                                        grades: "Hiển thị bảng điểm tổng quát của các lớp."
-                                    } : {
-                                        assignments: "Lập kế hoạch học tập cho các bài tập sắp tới của tôi.",
-                                        flashcards: "Hãy tạo flashcard ôn tập cho nội dung học tập gần đây.",
-                                        history: "Cho mình xem lại nhật ký học tập và các bản tóm tắt cũ.",
-                                        grades: "Cho tôi xem điểm số gần đây của tôi."
-                                    };
-                                    handleSend(prompts[act] || "Hướng dẫn mình cách dùng Miqix.");
-                                }}
-                            />
-                        )}
-                    </div>
-                </div>
-            </div >
-        </div >
-    );
-}
-
-function CanvasDashboard({ user, events, assignments, allAssignments, classes, analytics, onAction }: {
-    user: User,
-    events: ScheduleEvent[],
-    assignments: PendingAssignment[],
-    allAssignments: any[],
-    classes: any[],
-    analytics: any,
-    onAction: (action: "assignments" | "grades" | "flashcards" | "history" | "classes") => void
-}) {
-    // 1. Calculate stats
-    const isTeacher = user.role === 'teacher';
-    const totalAssignments = allAssignments.length;
-    const pendingCount = isTeacher ? analytics?.ungradedCount || 0 : assignments.length;
-
-    return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-10">
-            {/* 1. Statistics Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all col-span-2 lg:col-span-1">
-                    <div className="flex items-center gap-2 mb-2">
-                        <ListTodo className="w-3.5 h-3.5 text-blue-500" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">
-                            {isTeacher ? "Cần chấm bài" : "Bài tập"}
-                        </span>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-black text-gray-900">{pendingCount}</span>
-                        <span className="text-[10px] font-medium text-gray-400">/ {totalAssignments}</span>
-                    </div>
-                </div>
-                <div className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                    <div className="flex items-center gap-2 mb-2">
-                        <Activity className="w-3.5 h-3.5 text-rose-500" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">
-                            {isTeacher ? "ĐTB Lớp" : "Điểm TB"}
-                        </span>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-black text-gray-900">{analytics?.averageScore?.toFixed(1) || analytics?.myAverageScore?.toFixed(1) || "0.0"}</span>
-                        <span className="text-[10px] font-medium text-emerald-500">/ 10</span>
-                    </div>
-                </div>
-                <div className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                    <div className="flex items-center gap-2 mb-2">
-                        <Zap className="w-3.5 h-3.5 text-amber-500" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">
-                            {isTeacher ? "Sĩ số" : "Nộp bài"}
-                        </span>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-black text-gray-900">
-                            {isTeacher ? analytics?.activeStudents || 0 : analytics?.mySubmissionRate || "0"}
-                        </span>
-                        <span className="text-[10px] font-medium text-gray-400">{isTeacher ? "bạn" : "%"}</span>
-                    </div>
-                </div>
-                <div className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                    <div className="flex items-center gap-2 mb-2">
-                        <Target className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Chuyên cần</span>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-black text-gray-900">{analytics?.attendanceRate || analytics?.myAttendanceRate || "100"}</span>
-                        <span className="text-[10px] font-medium text-gray-400">%</span>
-                    </div>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* 2. Priority Tasks Section */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between px-2">
-                        <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                            <ListTodo className="w-3.5 h-3.5" /> {isTeacher ? "Bài tập cần chấm" : "Nhiệm vụ ưu tiên"}
-                        </h3>
-                        <button onClick={() => onAction("assignments")} className="text-[10px] font-bold text-blue-600 hover:underline">Xem tất cả</button>
-                    </div>
-
-                    <div className="space-y-2">
-                        {assignments.length > 0 ? (
-                            assignments.slice(0, 3).map((a, i) => (
-                                <div key={i} className="group flex items-center gap-4 bg-white p-4 rounded-3xl border border-gray-50 hover:border-blue-100 hover:shadow-sm transition-all">
-                                    <div className="w-10 h-10 bg-gray-50 text-gray-600 rounded-2xl flex items-center justify-center font-black text-xs group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-                                        {a.subjectCode?.substring(0, 1) || "B"}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="text-[13px] font-bold text-gray-900 truncate">{a.title}</h4>
-                                        <p className="text-[10px] text-gray-500 flex items-center gap-2">
-                                            <span>{a.className}</span>
-                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                            <span className="font-bold text-amber-600">Hạn: {format(new Date(a.dueDate), "dd/MM")}</span>
-                                        </p>
-                                    </div>
-                                    {isTeacher && (
-                                        <div className="text-right">
-                                            <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">
-                                                Cần chấm
-                                            </span>
-                                        </div>
-                                    )}
+                            ) : canvasContent && canvasContent.type === 'flashcards' ? (
+                                <FlashcardCanvas data={canvasContent.data} />
+                            ) : canvasContent && canvasContent.type === 'text' ? (
+                                <div className="prose prose-lg max-w-none dark:prose-invert p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                        {canvasContent.content}
+                                    </ReactMarkdown>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="bg-gray-50/50 rounded-[2rem] p-8 text-center border border-dashed border-gray-200">
-                                <p className="text-sm text-gray-400 font-medium">Bạn đã hoàn thành mọi {isTeacher ? "chấm điểm" : "nhiệm vụ"}! 🥳</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* 3. Recent Classes Section */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between px-2">
-                        <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                            <LayoutGrid className="w-3.5 h-3.5" /> {isTeacher ? "Lớp học đang dạy" : "Lớp học gần đây"}
-                        </h3>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                        {classes.slice(0, 4).map((c, i) => (
-                            <div key={i} className="group bg-white p-3 rounded-2xl border border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer text-center">
-                                <div className="w-10 h-10 mx-auto bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 font-bold text-xs mb-2 group-hover:bg-white transition-colors">
-                                    {c.name.substring(0, 2).toUpperCase()}
+                            ) : (
+                                <div className="h-full flex flex-col items-center justify-center text-center opacity-50">
+                                    <LayoutGrid className="w-16 h-16 text-gray-300 mb-4" />
+                                    <p className="text-gray-500">Chọn một nội dung để xem chi tiết</p>
                                 </div>
-                                <p className="text-[11px] font-bold text-gray-900 truncate">{c.name}</p>
-                                <p className="text-[9px] text-gray-400">{c.code}</p>
-                            </div>
-                        ))}
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
-            {/* 4. Butler Insights */}
-            <div className="bg-gradient-to-br from-[#1a1c23] to-[#2d313e] p-6 rounded-[2.5rem] text-white relative overflow-hidden shadow-xl border border-white/5">
-                <div className="absolute -top-4 -right-4 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl" />
-                <div className="relative z-10">
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)] animate-pulse" />
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400/80">Miqix Intelligence</span>
-                    </div>
-                    <p className="text-[14px] font-medium leading-[1.6] text-gray-100">
-                        {isTeacher ? (
-                            <>
-                                Kính chào Thầy/Cô {user.name.split(' ').pop()}, hiện tại đang có <b>{analytics?.ungradedCount || 0}</b> bài làm cần được chấm điểm. Thầy/Cô có muốn mình hỗ trợ phân tích và gợi ý chấm điểm nhanh không?
-                            </>
-                        ) : assignments.length > 0 ? (
-                            <>
-                                Chào {user.name.split(' ')[0]}, dựa trên dữ liệu hiện tại, bài <b>{assignments[0].title}</b> cần được hoàn thành sớm nhất. Bạn có muốn mình phân tích đề bài và gợi ý hướng làm không?
-                            </>
-                        ) : (
-                            <>
-                                Tuyệt vời {user.name.split(' ')[0]}! Bạn đang giữ tỷ lệ nộp bài <b>{analytics?.mySubmissionRate}%</b>. Hôm nay chưa có bài tập mới, bạn có muốn mình tóm tắt lại kiến thức cũ không?
-                            </>
-                        )}
-                    </p>
-                    <div className="mt-5 flex gap-2">
-                        <button
-                            onClick={() => onAction("assignments")}
-                            className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-[11px] font-bold transition-colors border border-white/10"
-                        >
-                            Chấp nhận
-                        </button>
-                        <button
-                            onClick={() => onAction("flashcards")}
-                            className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-[11px] font-bold transition-colors"
-                        >
-                            Để sau
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* 5. Quick Tools Hub */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
-                <button onClick={() => onAction("flashcards")} className="flex items-center gap-3 p-4 bg-purple-50/50 hover:bg-purple-50 rounded-2xl border border-purple-100/50 transition-all text-left">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
-                    <span className="text-[11px] font-bold text-gray-700">{isTeacher ? "Tạo câu hỏi" : "Tạo Flashcard"}</span>
-                </button>
-                <button onClick={() => onAction("history")} className="flex items-center gap-3 p-4 bg-emerald-50/50 hover:bg-emerald-50 rounded-2xl border border-emerald-100/50 transition-all text-left">
-                    <History className="w-4 h-4 text-emerald-600" />
-                    <span className="text-[11px] font-bold text-gray-700">{isTeacher ? "Lịch sử dạy" : "Lịch sử AI"}</span>
-                </button>
-                <button onClick={() => onAction("grades")} className="flex items-center gap-3 p-4 bg-blue-50/50 hover:bg-blue-50 rounded-2xl border border-blue-100/50 transition-all text-left">
-                    <Activity className="w-4 h-4 text-blue-600" />
-                    <span className="text-[11px] font-bold text-gray-700">{isTeacher ? "Kết quả học" : "Bảng điểm"}</span>
-                </button>
-                <button onClick={() => onAction("assignments")} className="flex items-center gap-3 p-4 bg-orange-50/50 hover:bg-orange-50 rounded-2xl border border-orange-100/50 transition-all text-left">
-                    <ListTodo className="w-4 h-4 text-orange-600" />
-                    <span className="text-[11px] font-bold text-gray-700">{isTeacher ? "Sổ chấm điểm" : "Việc cần làm"}</span>
-                </button>
-            </div>
+            {/* Widget Store Modal */}
+            <WidgetStore
+                isOpen={isWidgetStoreOpen}
+                onClose={() => setIsWidgetStoreOpen(false)}
+                onAddWidget={handleAddWidget}
+                userRole={user.role as any}
+                currentWidgets={activeWidgetColumn ? widgetsConfig[activeWidgetColumn] : []}
+            />
         </div>
     );
 }
