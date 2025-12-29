@@ -18,7 +18,7 @@ export function AIButler() {
     const [mode, setMode] = useState<"general" | "learning" | "schedule" | "class">("general");
     const [user, setUser] = useState<any>(null);
     const [classes, setClasses] = useState<any[]>([]);
-    const { toggleCanvas, isCanvasOpen } = useAIContext();
+    const { toggleCanvas, isCanvasOpen, setAIPanelOpen } = useAIContext();
 
     // Determined if we are on the main AI Dashboard
     const isDashboard = pathname === "/dashboard" || pathname === "/dashboard/";
@@ -65,24 +65,29 @@ export function AIButler() {
         loadContext();
     }, []);
 
-    const toggleOpen = () => setIsOpen(!isOpen);
+    const toggleOpen = () => {
+        const newState = !isOpen;
+        setIsOpen(newState);
+        setAIPanelOpen(newState);
+    };
 
     const weekStartStr = formatDate(startOfWeek(new Date(), { weekStartsOn: 1 }), "yyyy-MM-dd");
 
     const renderAIContent = () => {
+        const handleClose = () => { setIsOpen(false); setAIPanelOpen(false); };
         switch (mode) {
             case "learning":
-                return <LearningAI onClose={() => setIsOpen(false)} user={user} />;
+                return <LearningAI onClose={handleClose} user={user} />;
             case "schedule":
                 return <ScheduleAI
-                    onClose={() => setIsOpen(false)}
+                    onClose={handleClose}
                     weekStartStr={weekStartStr}
                     onEventAdded={() => window.location.reload()}
                 />;
             case "class":
-                return <ClassAI onClose={() => setIsOpen(false)} user={user} classes={classes} />;
+                return <ClassAI onClose={handleClose} user={user} classes={classes} />;
             default:
-                return <ClassAI onClose={() => setIsOpen(false)} user={user} classes={classes} />;
+                return <ClassAI onClose={handleClose} user={user} classes={classes} />;
         }
     };
 
@@ -155,7 +160,7 @@ export function AIButler() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => { setIsOpen(false); setAIPanelOpen(false); }}
                             className="fixed inset-0 bg-black/5 bg-blur-sm z-[90]"
                         />
 

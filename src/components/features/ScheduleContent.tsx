@@ -3,12 +3,16 @@
 import { useState, useEffect } from "react";
 import { format, startOfWeek, addDays, addWeeks, subWeeks, isSameDay, getHours, getMinutes, differenceInMinutes, setHours, startOfDay, endOfWeek } from "date-fns";
 import { vi } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, Loader2, Sparkles, Filter, CalendarDays, List, Grid3X3, ArrowRight, LayoutGrid, Bot, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, Loader2, Sparkles, Filter, CalendarDays, List, Grid3X3, ArrowRight, LayoutGrid, Bot, Plus, Timer } from "lucide-react";
 import { getAggregatedScheduleAction, ScheduleEvent } from "@/lib/schedule-actions";
+import { createFocusSessionAction } from "@/lib/focus-actions";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScheduleCreationWizard } from "@/components/features/ScheduleCreationWizard";
 import { EventDetailModal } from "@/components/features/EventDetailModal";
+import { FocusSessionModal } from "@/components/features/FocusSessionModal";
+import { FocusAnalyticsWidget } from "@/components/features/FocusAnalyticsWidget";
+import { useAIContext } from "@/contexts/AIContext";
 
 export default function ScheduleContent() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -18,6 +22,10 @@ export default function ScheduleContent() {
     const [loading, setLoading] = useState(true);
     const [now, setNow] = useState(new Date());
     const [refreshKey, setRefreshKey] = useState(0);
+    const [showFocusModal, setShowFocusModal] = useState(false);
+
+    // Get AI panel state for responsive layout
+    const { isAIPanelOpen } = useAIContext();
 
     // Update "now" every minute
     useEffect(() => {
@@ -128,7 +136,10 @@ export default function ScheduleContent() {
     const timeIndicatorTop = getCurrentTimePosition();
 
     return (
-        <div className="flex-1 h-full overflow-hidden flex flex-col p-4 md:p-8">
+        <div className={cn(
+            "flex-1 h-full overflow-hidden flex flex-col p-4 md:p-8 transition-all duration-300",
+            isAIPanelOpen && "md:mr-[450px]"
+        )}>
             <div className="flex flex-col gap-6 w-full max-w-[1600px] mx-auto h-full min-h-0">
                 {/* HERO SECTION - Compact Mode */}
                 <div
@@ -142,6 +153,13 @@ export default function ScheduleContent() {
                     </div>
 
                     <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setShowFocusModal(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 backdrop-blur-md rounded-xl font-semibold transition-all shadow-sm border border-emerald-400/50"
+                        >
+                            <Timer className="w-4 h-4" />
+                            <span>Tập trung</span>
+                        </button>
                         <button
                             onClick={() => setShowCreateModal(true)}
                             className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl font-semibold transition-all shadow-sm border border-white/20"
@@ -192,6 +210,9 @@ export default function ScheduleContent() {
                         </div>
                     </div>
                 </div>
+
+                {/* FOCUS ANALYTICS WIDGET */}
+                {/* <FocusAnalyticsWidget /> */}
 
                 {/* SCHEDULE GRID CARD */}
                 <div
@@ -391,6 +412,23 @@ export default function ScheduleContent() {
                     event={selectedEvent}
                     onClose={() => setSelectedEvent(null)}
                     onEventDeleted={handleRefresh}
+                />
+
+                <FocusSessionModal
+                    isOpen={showFocusModal}
+                    onClose={() => setShowFocusModal(false)}
+                    onSessionComplete={async (data) => {
+                        try {
+                            await createFocusSessionAction({
+                                duration: data.duration,
+                                type: data.type,
+                                subject: data.subject,
+                            });
+                            console.log("Focus session saved:", data);
+                        } catch (error) {
+                            console.error("Failed to save focus session:", error);
+                        }
+                    }}
                 />
             </div>
         </div>

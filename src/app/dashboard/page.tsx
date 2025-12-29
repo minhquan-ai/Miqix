@@ -7,7 +7,7 @@ import { getStudentDashboardAnalyticsAction, getTeacherDashboardAnalyticsAction 
 import { User } from "@/types";
 import { StudentDashboard } from "@/components/features/StudentDashboard";
 import { TeacherDashboard } from "@/components/features/TeacherDashboard";
-import { DashboardSkeleton } from "@/components/skeletons/DashboardSkeleton";
+import { AIPlaygroundSkeleton } from "@/components/skeletons/AIPlaygroundSkeleton";
 import { StudentAnalytics } from "@/lib/student-analytics";
 import { ClassAnalytics } from "@/lib/class-analytics";
 import { AIPlayground } from "@/components/features/ai-playground/AIPlayground";
@@ -45,7 +45,7 @@ export default function DashboardPage() {
   }, []);
 
   if (loading) {
-    return <DashboardSkeleton />;
+    return <AIPlaygroundSkeleton />;
   }
 
   if (!user) return null;

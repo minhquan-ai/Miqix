@@ -2,27 +2,51 @@ import { NextResponse } from 'next/server';
 import { getAssignmentByIdAction } from '@/lib/actions';
 
 const PAYLOAD_INSTRUCTIONS = `
-[QUAN TRỌNG: CẤU TRÚC PAYLOAD ĐẶC BIỆT CHO CANVAS]
-Để hiển thị giao diện tương tác đẹp mắt trên Canvas, hãy sử dụng cú pháp đặc biệt sau:
+[QUAN TRỌNG: GEMINI-STYLE SPLIT RESPONSE]
+Khi trả lời các yêu cầu phức tạp (soạn bài, giải thích chi tiết, tài liệu), BẮT BUỘC chia response thành 2 phần:
 
-1. CHO FLASHCARDS (Khi người dùng hỏi tạo flashcard, ôn tập):
-Bắt đầu bằng dòng ":::payload" và kết thúc bằng ":::", với JSON ở giữa:
-:::payload
-{"type":"flashcards","data":[{"front":"Câu hỏi 1","back":"Đáp án 1"},{"front":"Câu hỏi 2","back":"Đáp án 2"}]}
-:::
+:::chat:::
+[Phần CHAT - Tóm tắt ngắn gọn, thân thiện]
+- Bắt đầu bằng lời chào nếu phù hợp
+- Tóm tắt ý chính (2-4 câu)
+- Có thể kết thúc bằng lời động viên
+- Thông báo nội dung đầy đủ có ở Canvas
+:::end:::
 
-2. CHO NỘI DUNG CẤU TRÚC (Giáo án, Kế hoạch, Bài viết):
-:::payload
-{"type":"structured_content","title":"Tên tài liệu","sections":[{"heading":"Mục 1","content":"Nội dung..."}]}
-:::
+:::canvas:::
+[Phần CANVAS - Nội dung đầy đủ, KHÔNG lời chào]
+- TUYỆT ĐỐI KHÔNG có lời chào hoặc lời động viên
+- CHỈ chứa nội dung thuần túy
+- Sử dụng cấu trúc rõ ràng: Tiêu đề, Mục, Bảng, Danh sách
+- Format như tài liệu chuyên nghiệp (kiểu Google Docs)
+:::end:::
 
-3. CHO CÁC LỰA CHỌN (Drafts, Options):
-:::payload
-{"type":"options","data":[{"title":"Phương án 1","content":"..."},{"title":"Phương án 2","content":"..."}]}
-:::
+VÍ DỤ:
+:::chat:::
+Chào bạn! Mình đã soạn xong bài nghị luận về tác phẩm "Lặng lẽ Sa Pa" rồi nhé. Bài viết gồm 3 phần: Mở bài, Thân bài và Kết luận. Xem chi tiết bên Canvas nhé! 📝
+:::end:::
+:::canvas:::
+# Phân tích tác phẩm "Lặng lẽ Sa Pa"
 
-Nếu không thuộc các trường hợp trên, hãy trả lời bằng Markdown bình thường.
+## I. Mở bài
+Nguyễn Thành Long là một trong những nhà văn...
+
+## II. Thân bài
+### 1. Nhân vật anh thanh niên
+...
+:::end:::
+
+[CÁC TRƯỜNG HỢP ĐẶC BIỆT - BẮT BUỘC DÙNG SPLIT]
+- Soạn bài, giáo án, tài liệu
+- Giải thích dài (> 200 từ)
+- Tạo flashcard, quiz
+- Phân tích văn bản
+
+[NẾU CÂU HỎI ĐƠN GIẢN]
+- Trả lời trực tiếp bằng Markdown thường
+- Không cần split (ví dụ: "Xin chào", "1+1=?", "Hôm nay thứ mấy?")
 `;
+
 
 export async function POST(request: Request) {
     try {
@@ -32,7 +56,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { message, mode, previousMessages = [], context, includeReasoning, targetAssignmentId, targetClassId, userRole, forceCanvas } = body;
+        const { message, mode, previousMessages = [], context, includeReasoning, targetAssignmentId, targetClassId, userRole, forceCanvas, socraticMode = false } = body;
         const isTeacher = userRole === 'teacher';
 
         // 1. Fetch Detailed Assignment Context if targeted
@@ -106,13 +130,23 @@ export async function POST(request: Request) {
                 "- Phong cách: Chuyên nghiệp, sư phạm, chi tiết, hướng dẫn đồng nghiệp.",
                 "- CHÚ Ý: Bạn đang nói chuyện với giáo viên, KHÔNG PHẢI học sinh. Đừng giảng bài cho họ, hãy hỗ trợ công việc của họ."
             ].join("\n")
-            : [
-                "VAI TRÒ: HỌC SINH (STUDENT)",
-                "NHIỆM VỤ:",
-                "- Hỗ trợ giải bài tập (gợi mở, Socratic), tóm tắt kiến thức, ôn thi.",
-                "- Phong cách: Thân thiện, khuyến khích, dễ hiểu, kiên nhẫn.",
-                "- CHÚ Ý: Bạn là gia sư/người bạn đồng hành."
-            ].join("\n");
+            : socraticMode
+                ? [
+                    "VAI TRÒ: GIA SƯ SOCRATIC (STUDENT)",
+                    "PHƯƠNG PHÁP DẠY HỌC:",
+                    "- TUYỆT ĐỐI KHÔNG cho đáp án trực tiếp.",
+                    "- Đặt câu hỏi gợi mở để học sinh tự suy nghĩ.",
+                    "- Ví dụ: 'Em nghĩ yếu tố nào ảnh hưởng đến kết quả này?'",
+                    "- Kiên nhẫn dẫn dắt qua từng bước nhỏ.",
+                    "- CHỈ cung cấp gợi ý khi học sinh thực sự bí.",
+                ].join("\n")
+                : [
+                    "VAI TRÒ: HỌC SINH (STUDENT)",
+                    "NHIỆM VỤ:",
+                    "- Hỗ trợ giải bài tập (gợi mở, Socratic), tóm tắt kiến thức, ôn thi.",
+                    "- Phong cách: Thân thiện, khuyến khích, dễ hiểu, kiên nhẫn.",
+                    "- CHÚ Ý: Bạn là gia sư/người bạn đồng hành."
+                ].join("\n");
 
         // 4. Combine system prompt
         const assistantType = isTeacher ? 'giảng dạy chuyên nghiệp' : 'học tập cá nhân';
@@ -144,7 +178,47 @@ export async function POST(request: Request) {
             "",
             PAYLOAD_INSTRUCTIONS,
             "",
-            canvasInstruction
+            canvasInstruction,
+            "",
+            socraticMode ? `
+            [CHẾ ĐỘ SOCRATIC: KÍCH HOẠT]
+            Bạn là một gia sư Socratic kiên nhẫn. Bạn KHÔNG bao giờ đưa ra đáp án ngay.
+            
+            QUY ĐỊNH OUTPUT (BẮT BUỘC JSON):
+            Bạn phải trả về một JSON object duy nhất (không có text rác xung quanh) theo định dạng sau:
+            
+            {
+                "type": "socratic_step",
+                "status": "question" | "correct_and_next" | "incorrect_hint" | "completion",
+                "question": "Nội dung câu hỏi hoặc gợi ý hoặc lời khen",
+                "context": "Ghi chú ngắn về trạng thái hiện tại (ẩn)",
+                "step_number": <số bước hiện tại>,
+                "is_final": <true nếu đã xong hoàn toàn>
+            }
+            
+            LOGIC PHẢN HỒI:
+            1. NẾU ĐÂY LÀ BẮT ĐẦU:
+               - status: "question"
+               - question: Đặt câu hỏi đầu tiên để phá băng (chia nhỏ vấn đề).
+               - step_number: 1
+               
+            2. NẾU USER TRẢ LỜI ĐÚNG:
+               - status: "correct_and_next"
+               - question: "Đúng rồi! + [Câu hỏi cho bước tiếp theo]"
+               - Tăng step_number lên 1.
+               
+            3. NẾU USER TRẢ LỜI SAI:
+               - status: "incorrect_hint"
+               - question: "Chưa chính xác + [Gợi ý nhỏ] + [Hỏi lại câu hỏi đó theo cách khác]"
+               - Giữ nguyên step_number.
+               
+            4. NẾU ĐÃ GIẢI QUYẾT XONG VẤN ĐỀ:
+               - status: "completion"
+               - question: "Chúc mừng! Bạn đã giải thành công. [Tóm tắt ngắn gọn]"
+               - is_final: true
+
+            HÃY KIÊN NHẪN VÀ KHUYẾN KHÍCH HỌC SINH.
+            ` : ""
         ];
 
         const systemPrompt = systemPromptParts.filter(Boolean).join("\n");
@@ -155,7 +229,13 @@ export async function POST(request: Request) {
             { role: "user", content: message }
         ];
 
-        // 5. Call OpenRouter
+        // 5. Special JSON Mode for Socratic Canvas
+        let responseFormat: { type: "json_object" } | undefined = undefined;
+        if (socraticMode) {
+            responseFormat = { type: "json_object" };
+        }
+
+        // 6. Call OpenRouter
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -167,6 +247,7 @@ export async function POST(request: Request) {
             body: JSON.stringify({
                 model: "xiaomi/mimo-v2-flash:free",
                 messages,
+                response_format: responseFormat, // Enforce JSON for Socratic
                 include_reasoning: includeReasoning,
                 temperature: 0.7,
                 max_tokens: 4096,

@@ -10,6 +10,7 @@ import { User } from "@/types";
 
 import { NotificationBell } from "@/components/features/NotificationBell";
 import { JoinClassModal } from "@/components/features/JoinClassModal";
+import { FocusAnalyticsWidget } from "@/components/features/FocusAnalyticsWidget";
 import { StudentAnalytics } from "@/lib/student-analytics";
 import { motion } from 'framer-motion';
 import { format, formatDistanceToNow, isToday, isTomorrow, isPast } from "date-fns";
@@ -276,6 +277,9 @@ export function StudentDashboard({ user, analytics }: StudentDashboardProps) {
                             {(analytics as any).totalClasses || 0} lớp học
                         </div>
                     </div>
+
+                    {/* Focus Analytics Widget */}
+                    <FocusAnalyticsWidget />
                 </div>
             </div>
 

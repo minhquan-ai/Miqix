@@ -409,3 +409,19 @@ model PersonalEvent {
   @@index([userId])
   @@index([startTime])
 }
+
+model FocusSession {
+  id          String   @id @default(cuid())
+  userId      String
+  duration    Int // in seconds
+  type        String   @default("review") // review, homework, reading, notes
+  subject     String?
+  goal        String?
+  completedAt DateTime @default(now())
+  isCompleted Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([completedAt])
+  @@index([userId, completedAt])
+}
