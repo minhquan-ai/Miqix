@@ -29,7 +29,7 @@ export function LoginForm() {
                     <GraduationCap className="w-6 h-6" />
                 </div>
                 <h1 className="text-2xl font-bold">Đăng nhập</h1>
-                <p className="text-muted-foreground mt-2">Chào mừng bạn quay trở lại với Miqix</p>
+                <p className="text-muted-foreground mt-2">Chào mừng bạn quay trở lại với MiQiX</p>
             </div>
 
             {/* Success message after registration */}
@@ -118,7 +118,7 @@ export function LoginForm() {
                     <button
                         type="button"
                         onClick={() => {
-                            setEmail("teacher@ergonix.edu.vn");
+                            setEmail("teacher@miqix.edu");
                             setPassword("password123");
                         }}
                         className="flex items-center justify-center p-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200 transition-colors text-xs font-bold uppercase tracking-wide"
@@ -128,7 +128,7 @@ export function LoginForm() {
                     <button
                         type="button"
                         onClick={() => {
-                            setEmail("student1@ergonix.edu.vn");
+                            setEmail("student1@miqix.edu");
                             setPassword("password123");
                         }}
                         className="flex items-center justify-center p-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg border border-emerald-200 transition-colors text-xs font-bold uppercase tracking-wide"

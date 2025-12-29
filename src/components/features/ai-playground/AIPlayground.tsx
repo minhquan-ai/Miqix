@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Sparkles,
@@ -292,7 +292,7 @@ const TypewriterText = ({ text, speed = 8, onComplete }: { text: string; speed?:
     const isComplete = displayedChars >= text.length;
 
     return (
-        <div className="prose prose-sm max-w-none dark:prose-invert">
+        <div className="prose prose-sm max-w-none dark:prose-invert break-words">
             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                 {displayed}
             </ReactMarkdown>
@@ -339,7 +339,7 @@ const ThinkingBar = ({ content, isExpanded, onToggle }: { content: string; isExp
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                     >
-                        <div className="mt-2 p-3 bg-purple-50 border border-purple-100 rounded-xl text-xs text-purple-700 max-h-24 overflow-y-auto font-mono">
+                        <div className="mt-2 p-3 bg-purple-50 border border-purple-100 rounded-xl text-xs text-purple-700 max-h-24 overflow-y-auto font-mono break-words">
                             {displayedText}
                             {displayedText.length < content.length && (
                                 <span className="inline-block w-1 h-3 bg-purple-400 ml-0.5 animate-pulse" />
@@ -760,6 +760,21 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
     const COOLDOWN_MS = 2000; // 2 seconds cooldown
 
     const menuRef = useRef<HTMLDivElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // Auto-resize textarea logic
+    const adjustTextareaHeight = useCallback(() => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto'; // Reset height to recalculate
+            const newHeight = Math.min(textarea.scrollHeight, 200); // Limit to 200px
+            textarea.style.height = `${newHeight}px`;
+        }
+    }, []);
+
+    useEffect(() => {
+        adjustTextareaHeight();
+    }, [inputValue, adjustTextareaHeight]);
 
     // State for Socratic Mode
     const [isSocraticMode, setIsSocraticMode] = useState<boolean>(false);
@@ -1258,7 +1273,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                 <Sparkles className="w-4 h-4" />
                             </div>
                             <div>
-                                <p className="text-xs font-bold text-gray-700">Miqix Pro</p>
+                                <p className="text-xs font-bold text-gray-700">MiQiX Pro</p>
                                 <p className="text-[10px] text-gray-500">Mở khóa sức mạnh AI</p>
                             </div>
                         </div>
@@ -1528,7 +1543,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
 
                                                 <div className="space-y-3">
                                                     <h2 className="text-2xl font-bold text-gray-900">
-                                                        Chào bạn, mình là Miqix AI!
+                                                        Chào bạn, mình là MiQiX AI!
                                                     </h2>
                                                     <p className="text-base text-gray-500 font-medium max-w-md mx-auto">
                                                         Trợ lý học tập cá nhân của bạn. Sẵn sàng hỗ trợ mọi lúc.
@@ -1630,7 +1645,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                                     msg.role === "user" ? "items-end" : "items-start"
                                                 )}>
                                                     <div className={cn(
-                                                        "px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm",
+                                                        "px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm break-words overflow-hidden",
                                                         msg.role === "user"
                                                             ? "bg-gray-900 text-white rounded-br-none"
                                                             : "bg-white border border-gray-100 text-gray-800 rounded-bl-none"
@@ -1646,7 +1661,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                                         {msg.role === "ai" && isLatest && latestMessageId === msg.id ? (
                                                             <TypewriterText text={msg.content} onComplete={() => setLatestMessageId(null)} />
                                                         ) : (
-                                                            <div className="prose prose-sm max-w-none dark:prose-invert">
+                                                            <div className="prose prose-sm max-w-none dark:prose-invert break-words">
                                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{msg.content}</ReactMarkdown>
                                                             </div>
                                                         )}
@@ -1979,6 +1994,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                     </div>
                                 )}
                                 <textarea
+                                    ref={textareaRef}
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     onKeyDown={(e) => {
@@ -1988,7 +2004,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                         }
                                     }}
                                     placeholder={currentModeInfo.prompt || "Nhập tin nhắn..."}
-                                    className="flex-1 max-h-32 min-h-[44px] py-3 bg-transparent border-none text-gray-800 placeholder-gray-400 focus:ring-0 focus:outline-none outline-none resize-none font-medium text-[15px]"
+                                    className="flex-1 max-h-[200px] min-h-[44px] py-3 bg-transparent border-none text-gray-800 placeholder-gray-400 focus:ring-0 focus:outline-none outline-none resize-none font-medium text-[15px] thin-scrollbar transition-[height] duration-200"
                                     rows={1}
                                 />
 

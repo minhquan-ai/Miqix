@@ -16,14 +16,16 @@ import {
     Settings,
     HelpCircle,
     LogOut,
-    ChevronDown,
-    ChevronRight,
-    Plus,
+    GraduationCap,
     Menu,
     X,
-    ChevronLeft,
+    Sparkles,
+    PanelLeft,
+    PanelLeftClose,
     Calendar,
-    TrendingUp
+    TrendingUp,
+    ChevronDown,
+    ChevronRight,
 } from "lucide-react";
 import { User as AppUser, Class } from "@/types";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -157,7 +159,7 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
     const menuItems: SidebarItemType[] = [
         {
             id: 'dashboard',
-            label: 'Miqix AI',
+            label: 'MiQiX AI',
             icon: LayoutDashboard,
             href: '/dashboard',
             role: 'all'
@@ -388,13 +390,14 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
 
     if (isLoading) {
         return (
-            <div className="w-64 h-screen bg-card border-r border-border p-4 hidden md:flex flex-col gap-4">
-                <div className="h-8 w-32 bg-muted rounded animate-pulse" />
-                <div className="space-y-2 mt-8">
-                    {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="h-10 w-full bg-muted rounded animate-pulse" />
+            <div className="w-20 h-screen bg-card border-r border-border p-4 hidden md:flex flex-col items-center gap-6">
+                <div className="h-10 w-10 bg-muted rounded-xl animate-pulse mt-2" />
+                <div className="flex-1 space-y-6 mt-8">
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div key={i} className="h-10 w-10 bg-muted rounded-xl animate-pulse" />
                     ))}
                 </div>
+                <div className="h-10 w-10 bg-muted rounded-full animate-pulse mb-2" />
             </div>
         );
     }
@@ -426,8 +429,8 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
                 >
 
 
-                    <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-xl shadow-sm">
-                        E
+                    <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground shadow-sm">
+                        <GraduationCap className="w-5 h-5" />
                     </div>
                     {showExpanded && (
                         <motion.span
@@ -436,7 +439,7 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
                             transition={{ duration: 0.2, delay: 0.05 }}
                             className="font-bold text-xl tracking-tight whitespace-nowrap"
                         >
-                            ERGONIX
+                            MiQiX
                         </motion.span>
                     )}
                 </div>

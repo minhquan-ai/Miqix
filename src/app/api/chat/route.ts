@@ -164,7 +164,7 @@ export async function POST(request: Request) {
         }
 
         const systemPromptParts = [
-            "Bạn là Miqix AI, trợ lý " + assistantType + " thông minh.",
+            "Bạn là MiQiX AI, trợ lý " + assistantType + " thông minh.",
             "Sử dụng Tiếng Việt. Hỗ trợ hiển thị công thức Toán học bằng LaTeX (dùng $ cho inline, $$ cho block).",
             "Phong cách: chuyên nghiệp, gần gũi, Markdown hóa (Bảng, Danh sách, Đậm).",
             "",
@@ -241,7 +241,7 @@ export async function POST(request: Request) {
             headers: {
                 "Authorization": "Bearer " + apiKey,
                 "HTTP-Referer": "https://miqix.edu.vn",
-                "X-Title": "Miqix Learning",
+                "X-Title": "MiQiX Learning",
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -272,7 +272,7 @@ export async function POST(request: Request) {
     } catch (error: any) {
         console.error("[OpenRouter API Error]:", error);
         return NextResponse.json({
-            error: "Lỗi kết nối Miqix AI (OpenRouter)",
+            error: "Lỗi kết nối MiQiX AI (OpenRouter)",
             details: error.message
         }, { status: 500 });
     }

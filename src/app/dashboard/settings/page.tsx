@@ -14,9 +14,9 @@ export default function SettingsPage() {
 
     const handleResetData = () => {
         if (confirm("Bạn có chắc chắn muốn đặt lại toàn bộ dữ liệu? Hành động này không thể hoàn tác.")) {
-            // Clear all ergonix_ keys
+            // Clear all miqix_ keys
             Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('ergonix_')) {
+                if (key.startsWith('miqix_')) {
                     localStorage.removeItem(key);
                 }
             });

@@ -147,7 +147,7 @@ export function SubjectProvider({ children }: { children: React.ReactNode }) {
         const loadSubjects = async () => {
             // TODO: Fetch from API/DB
             // For now, load from localStorage
-            const saved = localStorage.getItem('ergonix_teaching_subjects');
+            const saved = localStorage.getItem('miqix_teaching_subjects');
             if (saved) {
                 try {
                     setTeachingSubjectsState(JSON.parse(saved));
@@ -162,7 +162,7 @@ export function SubjectProvider({ children }: { children: React.ReactNode }) {
 
     const setTeachingSubjects = (subjects: SubjectId[]) => {
         setTeachingSubjectsState(subjects);
-        localStorage.setItem('ergonix_teaching_subjects', JSON.stringify(subjects));
+        localStorage.setItem('miqix_teaching_subjects', JSON.stringify(subjects));
 
         // TODO: Sync to User Profile in DB via Server Action
     };

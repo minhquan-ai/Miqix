@@ -88,7 +88,7 @@ export default function PeopleTabContent({
                     </div>
                     <div className="ml-auto">
                         <a
-                            href={`mailto:teacher@ergonix.edu.vn`}
+                            href={`mailto:teacher@miqix.edu.vn`}
                             className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-primary block"
                         >
                             <Mail className="w-5 h-5" />

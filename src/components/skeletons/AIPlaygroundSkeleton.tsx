@@ -4,16 +4,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 export function AIPlaygroundSkeleton() {
     return (
-        <div className="flex h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 overflow-hidden">
-            {/* Sidebar Skeleton */}
-            <div className="hidden lg:flex flex-col w-64 bg-white/80 backdrop-blur-sm border-r border-gray-100 p-4">
-                <Skeleton className="h-10 w-full rounded-xl mb-6" />
-                <div className="space-y-2">
-                    {[...Array(5)].map((_, i) => (
-                        <Skeleton key={i} className="h-10 w-full rounded-xl" />
-                    ))}
-                </div>
-            </div>
+        <div className="flex-1 flex flex-col relative bg-gradient-to-br from-slate-50 to-blue-50/30 overflow-hidden">
+            {/* Main Content Area Only (Layout already provides Sidebar) */}
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col relative">
@@ -67,26 +59,6 @@ export function AIPlaygroundSkeleton() {
                 </div>
             </div>
 
-            {/* Canvas Panel */}
-            <div className="hidden xl:flex flex-col w-[40%] bg-white/50 backdrop-blur-sm border-l border-gray-100">
-                <div className="h-16 px-6 flex items-center justify-between border-b border-gray-100">
-                    <div className="flex items-center gap-3">
-                        <Skeleton className="h-10 w-10 rounded-xl" />
-                        <div>
-                            <Skeleton className="h-4 w-32 mb-1 rounded" />
-                            <Skeleton className="h-3 w-16 rounded" />
-                        </div>
-                    </div>
-                    <Skeleton className="h-8 w-8 rounded-lg" />
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center space-y-4">
-                        <Skeleton className="h-16 w-16 rounded-2xl mx-auto" />
-                        <Skeleton className="h-5 w-32 mx-auto rounded" />
-                        <Skeleton className="h-4 w-48 mx-auto rounded" />
-                    </div>
-                </div>
-            </div>
         </div>
     );
 }

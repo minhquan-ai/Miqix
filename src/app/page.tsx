@@ -31,7 +31,7 @@ function Navbar() {
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
             <GraduationCap className="w-6 h-6" />
           </div>
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 group-hover:from-primary group-hover:to-purple-600 transition-all duration-500">Miqix</span>
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900 group-hover:from-primary group-hover:to-purple-600 transition-all duration-500">MiQiX</span>
         </Link>
         <nav className="hidden lg:flex items-center gap-10 text-sm font-semibold text-gray-500">
           <Link href="#features" className="hover:text-primary transition-colors relative group">
@@ -43,7 +43,7 @@ function Navbar() {
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
           </Link>
           <Link href="#about" className="hover:text-primary transition-colors relative group">
-            Về Miqix
+            Về MiQiX
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
           </Link>
         </nav>
@@ -106,7 +106,7 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-xl md:text-2xl text-gray-500 mb-14 max-w-3xl mx-auto font-medium"
         >
-          Miqix giúp giáo viên tối ưu 80% thời gian quản lý và hỗ trợ học sinh học tập cá nhân hóa với trợ lý AI thông minh.
+          MiQiX giúp giáo viên tối ưu 80% thời gian quản lý và hỗ trợ học sinh học tập cá nhân hóa với trợ lý AI thông minh.
         </motion.p>
 
         <motion.div
@@ -148,7 +148,7 @@ function HeroSection() {
               {/* Mock UI Background */}
               <img
                 src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2670&auto=format&fit=crop"
-                alt="Miqix Dashboard"
+                alt="MiQiX Dashboard"
                 className="w-full h-full object-cover opacity-60 scale-105"
               />
               <div className="absolute inset-0 bg-white/20 backdrop-blur-[2px] flex items-center justify-center">
@@ -215,7 +215,7 @@ function RoleShowcase() {
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-5xl font-black mb-6">Thiết kế cho thế hệ mới</h2>
           <p className="text-gray-500 text-xl max-w-2xl mx-auto font-medium">
-            Dù bạn là giáo viên muốn tối ưu lớp học hay học sinh muốn chinh phục kiến thức, Miqix đều có lộ trình riêng dành cho bạn.
+            Dù bạn là giáo viên muốn tối ưu lớp học hay học sinh muốn chinh phục kiến thức, MiQiX đều có lộ trình riêng dành cho bạn.
           </p>
         </div>
 
@@ -266,7 +266,7 @@ function RoleShowcase() {
                     </div>
                     <h3 className="text-4xl font-black">Làm chủ lớp học <br />trong lòng bàn tay</h3>
                     <p className="text-gray-500 text-xl leading-relaxed">
-                      Thay vì quay cuồng với sổ sách, Miqix cung cấp bảng điều khiển trung tâm để bạn quản lý mọi thứ từ điểm danh đến kết quả học kì.
+                      Thay vì quay cuồng với sổ sách, MiQiX cung cấp bảng điều khiển trung tâm để bạn quản lý mọi thứ từ điểm danh đến kết quả học kì.
                     </p>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-8 text-left">
@@ -353,7 +353,7 @@ function BentoGridFeatures() {
     <section id="features" className="py-32">
       <div className="container max-w-7xl mx-auto px-6">
         <div className="text-center mb-24">
-          <h2 className="text-4xl md:text-5xl font-black mb-6">Trái tim của Miqix</h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-6">Trái tim của MiQiX</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 max-w-7xl mx-auto">
@@ -452,9 +452,9 @@ function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           className="max-w-4xl mx-auto"
         >
-          <h2 className="text-5xl md:text-7xl font-black mb-10 leading-tight text-gray-900">Bắt đầu hành trình <br />Miqix ngay hôm nay</h2>
+          <h2 className="text-5xl md:text-7xl font-black mb-10 leading-tight text-gray-900">Bắt đầu hành trình <br />MiQiX ngay hôm nay</h2>
           <p className="text-2xl text-gray-500 mb-16 max-w-2xl mx-auto font-medium leading-relaxed">
-            Dù bạn là trường học, giáo viên tự do hay học sinh, Miqix đều có phiên bản dành cho bạn. Tăng hiệu suất, giảm áp lực.
+            Dù bạn là trường học, giáo viên tự do hay học sinh, MiQiX đều có phiên bản dành cho bạn. Tăng hiệu suất, giảm áp lực.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-6">
             <Link
@@ -486,7 +486,7 @@ function Footer() {
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
                 <GraduationCap className="w-6 h-6" />
               </div>
-              <span>Miqix</span>
+              <span>MiQiX</span>
             </div>
             <p className="text-gray-400 text-base leading-relaxed">Kiến tạo tương lai giáo dục dựa trên sức mạnh của Trí tuệ nhân tạo và Tư duy chủ động.</p>
           </div>
@@ -501,7 +501,7 @@ function Footer() {
           <div className="text-left">
             <h4 className="font-black uppercase tracking-widest text-[10px] text-gray-400 mb-6">Công ty</h4>
             <ul className="space-y-4 font-bold text-gray-500">
-              <li><Link href="#about" className="hover:text-primary transition-colors">Về Miqix</Link></li>
+              <li><Link href="#about" className="hover:text-primary transition-colors">Về MiQiX</Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors">Blog</Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors">Tuyển dụng</Link></li>
             </ul>
@@ -509,7 +509,7 @@ function Footer() {
           <div className="text-left">
             <h4 className="font-black uppercase tracking-widest text-[10px] text-gray-400 mb-6">Liên hệ</h4>
             <ul className="space-y-4 font-bold text-gray-500">
-              <li><a href="mailto:hello@ergonix.vn" className="hover:text-primary transition-colors">hello@ergonix.vn</a></li>
+              <li><a href="mailto:hello@miqix.edu.vn" className="hover:text-primary transition-colors">hello@miqix.edu.vn</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Hỗ trợ 24/7</a></li>
             </ul>
           </div>
@@ -519,7 +519,7 @@ function Footer() {
             <Link href="#" className="hover:text-gray-600 transition-colors">Điều khoản dịch vụ</Link>
             <Link href="#" className="hover:text-gray-600 transition-colors">Chính sách bảo mật</Link>
           </div>
-          <p className="text-gray-400 font-medium">&copy; {new Date().getFullYear()} Miqix Platforms. All rights reserved.</p>
+          <p className="text-gray-400 font-medium">&copy; {new Date().getFullYear()} MiQiX Platforms. All rights reserved.</p>
         </div>
       </div>
     </footer>

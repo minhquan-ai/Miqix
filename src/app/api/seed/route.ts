@@ -5,11 +5,11 @@ export async function GET() {
     try {
         // 1. Create Teacher (no password field in schema)
         const teacher = await db.user.upsert({
-            where: { email: 'teacher@ergonix.edu' },
+            where: { email: 'teacher@miqix.edu' },
             update: {},
             create: {
                 name: 'Cô Giáo Hạnh',
-                email: 'teacher@ergonix.edu',
+                email: 'teacher@miqix.edu',
                 role: 'teacher',
                 avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hanh'
             }
@@ -17,9 +17,9 @@ export async function GET() {
 
         // 2. Create Students
         const studentsData = [
-            { name: 'Nguyễn Văn An', email: 'an@ergonix.edu', seed: 'An' },
-            { name: 'Trần Thị Bình', email: 'binh@ergonix.edu', seed: 'Binh' },
-            { name: 'Lê Văn Cường', email: 'cuong@ergonix.edu', seed: 'Cuong' },
+            { name: 'Nguyễn Văn An', email: 'an@miqix.edu', seed: 'An' },
+            { name: 'Trần Thị Bình', email: 'binh@miqix.edu', seed: 'Binh' },
+            { name: 'Lê Văn Cường', email: 'cuong@miqix.edu', seed: 'Cuong' },
         ];
 
         const students: any[] = [];
@@ -165,7 +165,7 @@ Nghiên cứu và trình bày một ứng dụng cụ thể của Toán học (�
 ---
 
 **LIÊN HỆ**
-Nếu có thắc mắc, các em liên hệ cô qua Zalo hoặc email: teacher@ergonix.edu`,
+Nếu có thắc mắc, các em liên hệ cô qua Zalo hoặc email: teacher@miqix.edu`,
                 dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
                 classIds: JSON.stringify([mathClass.id]),
                 teacherId: teacher.id,

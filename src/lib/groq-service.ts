@@ -18,13 +18,13 @@ export const AIService = {
                 headers: {
                     "Authorization": `Bearer ${openRouterKey}`,
                     "Content-Type": "application/json",
-                    "HTTP-Referer": "https://ergonix.vn",
-                    "X-Title": "Miqix Assistant"
+                    "HTTP-Referer": "https://miqix.edu.vn",
+                    "X-Title": "MiQiX Assistant"
                 },
                 body: JSON.stringify({
                     model: OPENROUTER_MODEL,
                     messages: [
-                        { role: "system", content: systemPrompt || "Bạn là Miqix AI." },
+                        { role: "system", content: systemPrompt || "Bạn là MiQiX AI." },
                         { role: "user", content: prompt }
                     ],
                     // Toggle reasoning based on user choice
