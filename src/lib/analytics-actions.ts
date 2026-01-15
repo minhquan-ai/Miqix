@@ -7,12 +7,18 @@ import { User } from "@/types";
 
 import { auth } from "@/auth";
 import { serverCache } from "@/lib/cache";
+import { getClassesAction, getAssignmentsAction } from "./actions";
+import { getAggregatedScheduleAction, ScheduleEvent } from "./schedule-actions";
+import { startOfWeek } from "date-fns";
 
 // --- Combined Dashboard Data (reduces round-trips) ---
 
 export interface DashboardData {
     user: User;
     analytics: StudentAnalytics | ClassAnalytics;
+    schedule: ScheduleEvent[];
+    allAssignments: any[];
+    allClasses: any[];
 }
 
 export async function getDashboardDataAction(): Promise<DashboardData | null> {
@@ -20,17 +26,27 @@ export async function getDashboardDataAction(): Promise<DashboardData | null> {
     if (!session?.user?.id) return null;
 
     const userId = session.user.id;
-    const cacheKey = `dashboard:${userId}`;
+    const cacheKey = `dashboard:v2:${userId}`; // V2 for new structure
 
-    // Try cache first for the combined data
+    // Try cache first for the combined data (shorter TTL as it's a large object)
     const cached = serverCache.get<DashboardData>(cacheKey);
     if (cached) return cached;
 
-    // Fetch user from DB
-    const dbUser = await db.user.findUnique({
+    // Parallel fetch: user and other data
+    const dbUserPromise = db.user.findUnique({
         where: { id: userId },
         select: { id: true, name: true, email: true, role: true, avatarUrl: true }
+    }).catch(err => {
+        console.error("Error fetching user for dashboard:", err);
+        return null;
     });
+
+    const [dbUser, allAssignments, allClasses, scheduleData] = await Promise.all([
+        dbUserPromise,
+        getAssignmentsAction(),
+        getClassesAction(),
+        getAggregatedScheduleAction(startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString())
+    ]);
 
     if (!dbUser) return null;
 
@@ -42,18 +58,20 @@ export async function getDashboardDataAction(): Promise<DashboardData | null> {
         avatarUrl: dbUser.avatarUrl || undefined
     };
 
-    // Get analytics based on role (these functions are already cached internally)
-    let analytics: StudentAnalytics | ClassAnalytics;
+    // Get analytics based on role (already cached internally)
+    const analytics = user.role === 'student'
+        ? await getStudentDashboardAnalyticsAction()
+        : await getTeacherDashboardAnalyticsAction();
 
-    if (user.role === 'student') {
-        analytics = await getStudentDashboardAnalyticsAction();
-    } else {
-        analytics = await getTeacherDashboardAnalyticsAction();
-    }
+    const result: DashboardData = {
+        user,
+        analytics,
+        schedule: scheduleData.events,
+        allAssignments,
+        allClasses
+    };
 
-    const result = { user, analytics };
-
-    // Cache combined result for 30 seconds (shorter since analytics might update)
+    // Cache combined result for 30 seconds
     serverCache.set(cacheKey, result, 30 * 1000);
 
     return result;
@@ -84,8 +102,8 @@ export async function getStudentDashboardAnalyticsAction(): Promise<StudentAnaly
 
     const classIds = enrollments.map(e => e.classId);
 
-    // Parallel fetch: assignments and submissions
-    const [allAssignments, submissions] = await Promise.all([
+    // Parallel fetch: assignments, submissions, sessions, attendance, and all class submissions for average
+    const [allAssignments, submissions, sessions, attendanceRecords, allClassSubmissions] = await Promise.all([
         db.assignment.findMany({
             where: {
                 OR: [
@@ -96,8 +114,37 @@ export async function getStudentDashboardAnalyticsAction(): Promise<StudentAnaly
         }),
         db.submission.findMany({
             where: { studentId: userId }
+        }),
+        db.classSession.findMany({
+            where: { classId: { in: classIds } }
+        }),
+        db.attendanceRecord.findMany({
+            where: { studentId: userId }
+        }),
+        db.submission.findMany({
+            where: {
+                assignment: {
+                    assignmentClasses: {
+                        some: { classId: { in: classIds } }
+                    }
+                },
+                score: { not: null }
+            },
+            select: { score: true }
         })
     ]);
+
+    // Calculate class average score
+    const classAverageScore = allClassSubmissions.length > 0
+        ? allClassSubmissions.reduce((sum, s) => sum + (s.score || 0), 0) / allClassSubmissions.length
+        : 8.0; // Default if no data
+
+    // Calculate Attendance Rate
+    // For each class, we count sessions that happened after the student joined
+    // But for now, let's keep it simple: total present / total sessions across all their classes
+    const totalSessions = sessions.length;
+    const presentCount = attendanceRecords.filter(r => r.status === 'PRESENT' || r.status === 'LATE').length;
+    const myAttendanceRate = totalSessions > 0 ? Math.round((presentCount / totalSessions) * 100) : 100;
 
     // Calculate Stats
     const gradedSubmissions = submissions.filter(s => s.score !== null);
@@ -144,13 +191,13 @@ export async function getStudentDashboardAnalyticsAction(): Promise<StudentAnaly
             };
         });
 
-    // Use mock attendance rate to avoid extra query
+    // Real attendance rate
     const result: StudentAnalytics = {
         myAverageScore,
         mySubmissionRate,
-        myAttendanceRate: 95, // Simplified mock
-        classAverageScore: 7.5,
-        aboveAverage: myAverageScore >= 7.5,
+        myAttendanceRate,
+        classAverageScore,
+        aboveAverage: myAverageScore >= classAverageScore,
         pendingAssignments,
         ungradedSubmissions,
     };
@@ -172,7 +219,7 @@ export async function getTeacherDashboardAnalyticsAction(): Promise<ClassAnalyti
     if (cached) return cached;
 
     // Parallel fetch all data
-    const [classes, assignments, submissions, enrollments] = await Promise.all([
+    const [classes, assignments, submissions, enrollments, sessions, totalAnnouncements, pendingJoins] = await Promise.all([
         db.class.findMany({
             where: { teacherId },
             include: { _count: { select: { enrollments: true } } }
@@ -188,8 +235,40 @@ export async function getTeacherDashboardAnalyticsAction(): Promise<ClassAnalyti
         db.classEnrollment.findMany({
             where: { class: { teacherId } },
             include: { user: true }
+        }),
+        db.classSession.findMany({
+            where: { class: { teacherId } },
+            include: { attendanceRecords: true }
+        }),
+        db.announcement.count({
+            where: { teacherId }
+        }),
+        db.classEnrollment.count({
+            where: {
+                class: { teacherId },
+                status: 'pending'
+            }
         })
     ]);
+
+    // Calculate Real Attendance for Teacher
+    let totalExpectedAttendance = 0;
+    let totalPresentAttendance = 0;
+
+    sessions.forEach(session => {
+        // Expected = number of students in that class at that time
+        // Simplified: using current student count for that class
+        const classData = classes.find(c => c.id === session.classId);
+        const studentCount = classData?._count.enrollments || 0;
+        totalExpectedAttendance += studentCount;
+
+        const presentInSession = session.attendanceRecords.filter(r => r.status === 'PRESENT' || r.status === 'LATE').length;
+        totalPresentAttendance += presentInSession;
+    });
+
+    const attendanceRate = totalExpectedAttendance > 0
+        ? Math.round((totalPresentAttendance / totalExpectedAttendance) * 100)
+        : 100;
 
     const classIds = classes.map(c => c.id);
 
@@ -295,12 +374,12 @@ export async function getTeacherDashboardAnalyticsAction(): Promise<ClassAnalyti
     const result: ClassAnalytics = {
         averageScore,
         submissionRate,
-        attendanceRate: 95, // Mock to avoid extra query
+        attendanceRate, // Real value calculated above
         completionRate,
-        scoreTrend: 'up',
+        scoreTrend: 'stable',
         submissionTrend: 'stable',
         atRiskStudents: atRiskStudents.slice(0, 5),
-        totalAnnouncements: 0,
+        totalAnnouncements,
         totalAssignments: assignments.length,
         activeStudents: students.length,
         upcomingDeadlines,
@@ -308,7 +387,7 @@ export async function getTeacherDashboardAnalyticsAction(): Promise<ClassAnalyti
         gradeDistribution,
         ungradedCount: submissions.filter(s => s.status === 'submitted').length,
         draftCount: assignments.filter(a => a.status === 'draft').length,
-        pendingCount: 0
+        pendingCount: pendingJoins
     };
 
     serverCache.set(cacheKey, result, 60 * 1000);

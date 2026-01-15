@@ -57,8 +57,15 @@ import { WidgetPlaceholder } from "@/components/features/dashboard/WidgetPlaceho
 import { CanvasDashboard } from "./CanvasDashboard";
 import { SocraticCanvas, SocraticStep, SocraticHistoryItem } from "./SocraticCanvas";
 
+import { DashboardData } from "@/lib/analytics-actions";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableWidget } from '@/components/features/dashboard/SortableWidget';
+import { Grip, Edit3, Settings2, Command, Trash2 } from 'lucide-react';
+
 interface AIPlaygroundProps {
     user: UserType;
+    initialData?: DashboardData;
 }
 
 interface WidgetConfig {
@@ -640,7 +647,8 @@ const LessonPlanCanvas = ({ title, sections }: { title: string; sections: any[] 
     );
 };
 
-export function AIPlayground({ user }: AIPlaygroundProps) {
+export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
+    const isTeacher = user?.role === 'teacher';
     // --- State ---
     const chatFetcherRef = useRef<any>(null);
     const {
@@ -669,6 +677,46 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
         left: [],
         right: []
     });
+
+    const [isEditingWidgets, setIsEditingWidgets] = useState(false);
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            setWidgetsConfig((items) => {
+                // Determine which column the widget is in
+                const leftIdx = items.left.indexOf(active.id as string);
+                const rightIdx = items.right.indexOf(active.id as string);
+
+                const column = rightIdx !== -1 ? 'right' : (leftIdx !== -1 ? 'left' : null);
+
+                if (!column) return items;
+
+                const oldIndex = items[column].indexOf(active.id as string);
+                const newIndex = items[column].indexOf(over.id as string);
+
+                if (oldIndex === -1 || newIndex === -1) return items;
+
+                const newConfig = {
+                    ...items,
+                    [column]: arrayMove(items[column], oldIndex, newIndex),
+                };
+
+                // Persist
+                if (user) {
+                    localStorage.setItem(`miqix_widgets_${user.id}`, JSON.stringify(newConfig));
+                }
+                return newConfig;
+            });
+        }
+    };
 
     // --- Load Widget Config ---
     useEffect(() => {
@@ -750,8 +798,8 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
     const [isThinkingEnabled, setIsThinkingEnabled] = useState(false);
     const [isCanvasMode, setIsCanvasMode] = useState(false); // Force Canvas Output
     const [showToolHub, setShowToolHub] = useState(false); // Toggle between greeting and tool hub
-    const [targetAssignmentId, setTargetAssignmentId] = useState<string | null>(null);
-    const [targetClassId, setTargetClassId] = useState<string | null>(null);
+    const [targetAssignmentIds, setTargetAssignmentIds] = useState<string[]>([]);
+    const [targetClassIds, setTargetClassIds] = useState<string[]>([]);
     const [allAssignments, setAllAssignments] = useState<any[]>([]);
     const [allClasses, setAllClasses] = useState<any[]>([]);
     const [showAssignmentSelector, setShowAssignmentSelector] = useState(false);
@@ -784,8 +832,58 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
         adjustTextareaHeight();
     }, [inputValue, adjustTextareaHeight]);
 
+    // Restore Sidebar on Desktop (Fix "UI UX cũ đâu")
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+            setIsHistoryVisible(true);
+        }
+    }, []);
+
     // State for Socratic Mode
     const [isSocraticMode, setIsSocraticMode] = useState<boolean>(false);
+
+    // Slash Commands Definition
+    const SLASH_COMMANDS = [
+        {
+            command: "/reset", description: "Xóa ngữ cảnh & lịch sử", icon: Trash2, color: "text-red-500", action: () => {
+                createNewChat();
+                setTargetAssignmentIds([]);
+                setTargetClassIds([]);
+                setSearchQuery("");
+            }
+        },
+        {
+            command: "/canvas", description: "Mở chế độ Canvas", icon: Sparkles, color: "text-purple-500", action: () => {
+                setIsCanvasMode(true);
+                setSearchQuery("");
+            }
+        },
+        {
+            command: "/web", description: "Tìm kiếm thông tin từ Web", icon: Search, color: "text-blue-500", action: () => {
+                // Mock web search toggle
+                setSearchQuery("");
+                alert("Đã bật chế độ tìm kiếm Web (Mock)");
+            }
+        },
+        {
+            command: "/image", description: "Tạo hình ảnh minh họa", icon: Zap, color: "text-orange-500", action: () => {
+                setSearchQuery("");
+                handleSend("Tạo một hình ảnh về...");
+            }
+        }
+    ];
+
+    const toggleAssignment = (id: string) => {
+        setTargetAssignmentIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+    const toggleClass = (id: string) => {
+        setTargetClassIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
 
     // Initialize state from local storage on mount
     useEffect(() => {
@@ -813,8 +911,8 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
 
     // Reset context selectors when changing AI mode
     useEffect(() => {
-        setTargetAssignmentId(null);
-        setTargetClassId(null);
+        setTargetAssignmentIds([]);
+        setTargetClassIds([]);
         setShowAssignmentSelector(false);
         setShowClassSelector(false);
     }, [chatMode]);
@@ -823,50 +921,90 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
     useEffect(() => {
         async function loadData() {
             try {
-                const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-                const scheduleData = await getAggregatedScheduleAction(weekStart.toISOString());
-                const now = new Date();
-                const todayEvents = scheduleData.events
-                    .filter(e => isToday(new Date(e.start)) && isAfter(new Date(e.end), now))
-                    .slice(0, 3);
-                setUpcomingEvents(todayEvents);
+                // If we have initialData, use it to avoid redundant fetches
+                if (initialData) {
+                    const now = new Date();
+                    const todayEvents = initialData.schedule
+                        .filter(e => isToday(new Date(e.start)) && isAfter(new Date(e.end), now))
+                        .slice(0, 3);
+                    setUpcomingEvents(todayEvents);
+                    setAllAssignments(initialData.allAssignments);
+                    setAllClasses(initialData.allClasses);
+                    setAnalytics(initialData.analytics);
 
-                const assignmentsData = await getAssignmentsAction();
-                setAllAssignments(assignmentsData);
+                    const pending = user.role === 'teacher'
+                        ? initialData.allAssignments
+                            .filter((a: any) => a.teacherId === user.id)
+                            .slice(0, 3)
+                            .map((a: any) => ({
+                                id: a.id,
+                                title: a.title,
+                                className: a.assignmentClasses?.[0]?.class?.name || 'Lớp học',
+                                dueDate: new Date(a.dueDate),
+                                subjectCode: (a.subject || 'Học').substring(0, 3)
+                            }))
+                        : initialData.allAssignments
+                            .filter((a: any) => a.status !== 'completed')
+                            .sort((a: any) => new Date(a.dueDate).getTime() - new Date().getTime())
+                            .slice(0, 3)
+                            .map((a: any) => ({
+                                id: a.id,
+                                title: a.title,
+                                className: a.assignmentClasses?.[0]?.class?.name || 'Lớp học',
+                                dueDate: new Date(a.dueDate),
+                                subjectCode: (a.subject || 'Học').substring(0, 3)
+                            }));
+                    setPendingAssignments(pending);
+                } else {
+                    // Fallback to individual fetches if initialData is not provided
+                    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
 
-                const classesData = await getClassesAction();
-                setAllClasses(classesData);
+                    const [scheduleData, assignmentsData, classesData, analyticsData] = await Promise.all([
+                        getAggregatedScheduleAction(weekStart.toISOString()),
+                        getAssignmentsAction(),
+                        getClassesAction(),
+                        user.role === 'teacher' ? getTeacherDashboardAnalyticsAction() : getStudentDashboardAnalyticsAction()
+                    ]);
 
-                const analyticsData = user.role === 'teacher'
-                    ? await getTeacherDashboardAnalyticsAction()
-                    : await getStudentDashboardAnalyticsAction();
-                setAnalytics(analyticsData);
+                    const now = new Date();
+                    const todayEvents = scheduleData?.events
+                        ? scheduleData.events
+                            .filter(e => isToday(new Date(e.start)) && isAfter(new Date(e.end), now))
+                            .slice(0, 3)
+                        : [];
+                    setUpcomingEvents(todayEvents);
+                    setAllAssignments(assignmentsData || []);
+                    setAllClasses(classesData || []);
+                    setAnalytics(analyticsData);
 
-                const pending = user.role === 'teacher'
-                    ? assignmentsData
-                        .filter((a: any) => a.teacherId === user.id) // Only teacher's assignments
-                        .slice(0, 3)
-                        .map((a: any) => ({
-                            id: a.id,
-                            title: a.title,
-                            className: a.assignmentClasses?.[0]?.class?.name || 'Lớp học',
-                            dueDate: new Date(a.dueDate),
-                            subjectCode: (a.subject || 'Học').substring(0, 3)
-                        }))
-                    : assignmentsData
-                        .filter((a: any) => a.status !== 'completed')
-                        .sort((a: any) => new Date(a.dueDate).getTime() - new Date().getTime()) // Sort by due date, closest first
-                        .slice(0, 3)
-                        .map((a: any) => ({
-                            id: a.id,
-                            title: a.title,
-                            className: a.assignmentClasses?.[0]?.class?.name || 'Lớp học',
-                            dueDate: new Date(a.dueDate),
-                            subjectCode: (a.subject || 'Học').substring(0, 3)
-                        }));
-                setPendingAssignments(pending);
+                    const validAssignments = Array.isArray(assignmentsData) ? assignmentsData : [];
 
-                // Load Chat History
+                    const pending = user.role === 'teacher'
+                        ? validAssignments
+                            .filter((a: any) => a.teacherId === user.id)
+                            .slice(0, 3)
+                            .map((a: any) => ({
+                                id: a.id,
+                                title: a.title,
+                                className: a.assignmentClasses?.[0]?.class?.name || 'Lớp học',
+                                dueDate: new Date(a.dueDate),
+                                subjectCode: (a.subject || 'Học').substring(0, 3)
+                            }))
+                        : validAssignments
+                            .filter((a: any) => a.status !== 'completed')
+                            .sort((a: any) => new Date(a.dueDate).getTime() - new Date().getTime())
+                            .slice(0, 3)
+                            .map((a: any) => ({
+                                id: a.id,
+                                title: a.title,
+                                className: a.assignmentClasses?.[0]?.class?.name || 'Lớp học',
+                                dueDate: new Date(a.dueDate),
+                                subjectCode: (a.subject || 'Học').substring(0, 3)
+                            }));
+                    setPendingAssignments(pending);
+                }
+
+                // Load Chat History (always from local storage for now)
                 const savedSessions = localStorage.getItem("miqix_chat_sessions");
                 if (savedSessions) {
                     const parsed = JSON.parse(savedSessions);
@@ -878,7 +1016,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
         };
 
         loadData();
-    }, []);
+    }, [initialData, user.id, user.role]);
 
     // Session Management Functions
     const createNewChat = () => {
@@ -1001,15 +1139,15 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
             includeReasoning: isThinkingEnabled,
             forceCanvas: isCanvasMode,
             socraticMode: isSocraticMode,
-            targetAssignmentId,
-            targetClassId,
+            targetAssignmentIds,
+            targetClassIds,
             previousMessages: history.slice(-10).map((m: any) => ({
                 role: m.role === 'ai' ? 'assistant' : m.role, // normalize
                 content: m.content
             })),
             context: {
                 assignments: pendingAssignments.slice(0, 5).map(a => `${a.title} (${a.subjectCode}) - Due: ${format(a.dueDate, 'dd/MM')}`),
-                eventsToday: upcomingEvents.filter(e => isToday(e.start)).map(e => `${e.title} at ${format(e.start, 'HH:mm')}`),
+                eventsToday: (upcomingEvents || []).filter(e => isToday(e.start)).map(e => `${e.title} at ${format(e.start, 'HH:mm')}`),
                 analytics: analytics ? {
                     averageScore: analytics.myAverageScore,
                     submissionRate: analytics.mySubmissionRate,
@@ -1121,7 +1259,7 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
             hasCanvasContent: !!canvasDisplayContent
         };
 
-    }, [chatMode, user.role, isThinkingEnabled, isCanvasMode, isSocraticMode, targetAssignmentId, targetClassId, pendingAssignments, upcomingEvents, analytics, socraticCurrentStep, socraticHistory]);
+    }, [chatMode, user.role, isThinkingEnabled, isCanvasMode, isSocraticMode, targetAssignmentIds, targetClassIds, pendingAssignments, upcomingEvents, analytics, socraticCurrentStep, socraticHistory]);
 
     // 2. Sync fetcher to ref
     useEffect(() => {
@@ -1188,11 +1326,11 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
     const currentModeInfo = MODES.find(m => m.id === chatMode) || MODES[0];
 
     return (
-        <div className="page-container !p-0 flex overflow-hidden font-sans text-[#202124]">
+        <div className="page-container !p-0 flex overflow-hidden font-sans text-[#202124] relative">
             {/* LEFT SIDEBAR - CHAT HISTORY */}
             <div className={cn(
-                "fixed inset-y-0 left-0 z-50 w-72 bg-[#f8f9fa] border-r border-gray-200 transition-transform duration-300 transform md:relative md:translate-x-0 flex flex-col",
-                isHistoryVisible ? "translate-x-0" : "-translate-x-full md:absolute md:w-0 md:opacity-0"
+                "fixed inset-y-0 left-0 z-10 w-72 bg-[#f8f9fa] border-r border-gray-200 transition-all duration-300 transform md:relative md:translate-x-0 flex flex-col overflow-hidden",
+                isHistoryVisible ? "translate-x-0" : "-translate-x-full md:absolute md:w-0 md:opacity-0 pointer-events-none"
             )}>
                 <div className="p-4 flex flex-col h-full">
                     <button
@@ -1293,15 +1431,157 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="relative group">
+                            <div className="relative group z-30">
                                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-blue-500 transition-colors" />
                                 <input
                                     type="text"
-                                    placeholder="Tìm kiếm..."
+                                    placeholder="Tìm kiếm, lệnh, tài nguyên..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 pr-4 py-2 w-48 md:w-64 bg-gray-100/50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all outline-none"
+                                    className="pl-10 pr-4 py-2 w-48 md:w-80 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none"
                                 />
+
+                                {/* Smart Search Dropdown */}
+                                <AnimatePresence>
+                                    {searchQuery.trim().length > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                                        >
+                                            <div className="max-h-[60vh] overflow-y-auto thin-scrollbar p-2 space-y-4">
+
+                                                {/* 1. Results from Context (Assignments & Classes) */}
+                                                {(allAssignments.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ||
+                                                    allClasses.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).length > 0) && (
+                                                        <div>
+                                                            <div className="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                                                <Command className="w-3 h-3" /> Tài nguyên & Lệnh
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                {allAssignments.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 3).map(a => {
+                                                                    const isSelected = targetAssignmentIds.includes(a.id);
+                                                                    return (
+                                                                        <button
+                                                                            key={a.id}
+                                                                            onClick={() => toggleAssignment(a.id)}
+                                                                            className={cn(
+                                                                                "w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-colors group",
+                                                                                isSelected ? "bg-blue-50" : "hover:bg-blue-50"
+                                                                            )}
+                                                                        >
+                                                                            <div className={cn(
+                                                                                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110",
+                                                                                isSelected ? "bg-blue-500 text-white" : "bg-blue-100 text-blue-600"
+                                                                            )}>
+                                                                                {isSelected ? <CheckCircle className="w-4 h-4" /> : <ListTodo className="w-4 h-4" />}
+                                                                            </div>
+                                                                            <div>
+                                                                                <div className="text-xs font-bold text-gray-800">{a.title}</div>
+                                                                                <div className="text-[10px] text-blue-600 font-medium">
+                                                                                    {isSelected ? "Đang chọn" : "Thêm vào ngữ cảnh"}
+                                                                                </div>
+                                                                            </div>
+                                                                        </button>
+                                                                    );
+                                                                })}
+                                                                {allClasses.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 3).map(c => {
+                                                                    const isSelected = targetClassIds.includes(c.id);
+                                                                    return (
+                                                                        <button
+                                                                            key={c.id}
+                                                                            onClick={() => toggleClass(c.id)}
+                                                                            className={cn(
+                                                                                "w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-colors group",
+                                                                                isSelected ? "bg-indigo-50" : "hover:bg-indigo-50"
+                                                                            )}
+                                                                        >
+                                                                            <div className={cn(
+                                                                                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110",
+                                                                                isSelected ? "bg-indigo-500 text-white" : "bg-indigo-100 text-indigo-600"
+                                                                            )}>
+                                                                                {isSelected ? <CheckCircle className="w-4 h-4" /> : <LayoutGrid className="w-4 h-4" />}
+                                                                            </div>
+                                                                            <div>
+                                                                                <div className="text-xs font-bold text-gray-800">{c.name}</div>
+                                                                                <div className="text-[10px] text-indigo-600 font-medium">
+                                                                                    {isSelected ? "Đang chọn" : "Thêm vào ngữ cảnh"}
+                                                                                </div>
+                                                                            </div>
+                                                                        </button>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                {/* 2. Results from Current Chat */}
+                                                {messages.filter(m => m.content.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 && (
+                                                    <div>
+                                                        <div className="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                                            <MessageSquare className="w-3 h-3" /> Trong hội thoại này
+                                                        </div>
+                                                        <div className="space-y-1">
+                                                            {messages.filter(m => m.content.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 5).map(m => (
+                                                                <button
+                                                                    key={m.id}
+                                                                    onClick={() => {
+                                                                        const el = document.getElementById(`msg-${m.id}`);
+                                                                        if (el) {
+                                                                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                                            el.classList.add('bg-yellow-50/50'); // Highlight effect
+                                                                            setTimeout(() => el.classList.remove('bg-yellow-50/50'), 2000);
+                                                                        }
+                                                                        setSearchQuery("");
+                                                                    }}
+                                                                    className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-gray-50 text-left transition-colors group"
+                                                                >
+                                                                    <div className={cn(
+                                                                        "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
+                                                                        m.role === 'user' ? "bg-gray-200 text-gray-600" : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+                                                                    )}>
+                                                                        {m.role === 'user' ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3" />}
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <div className="text-xs text-gray-500 mb-0.5 font-medium">{m.role === 'user' ? "Bạn" : "AI"} • <span className="text-[10px] opacity-70">Vừa xong</span></div>
+                                                                        <div className="text-xs text-gray-800 line-clamp-2 leading-relaxed">
+                                                                            {m.content.split(new RegExp(`(${searchQuery})`, 'gi')).map((part, i) =>
+                                                                                part.toLowerCase() === searchQuery.toLowerCase()
+                                                                                    ? <span key={i} className="bg-yellow-200 text-yellow-900 rounded-[2px] px-0.5">{part}</span>
+                                                                                    : part
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Empty State */}
+                                                {messages.filter(m => m.content.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 &&
+                                                    allAssignments.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 &&
+                                                    allClasses.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 &&
+                                                    !searchQuery.startsWith("/") && (
+                                                        <div className="py-8 text-center">
+                                                            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                                <Search className="w-5 h-5 text-gray-300" />
+                                                            </div>
+                                                            <p className="text-xs text-gray-500 font-medium">Không tìm thấy kết quả nào</p>
+                                                        </div>
+                                                    )}
+                                            </div>
+
+                                            {/* Footer */}
+                                            <div className="px-4 py-2 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
+                                                <span className="text-[10px] text-gray-400"><strong>Enter</strong> để chọn kết quả đầu tiên</span>
+                                                <span className="text-[10px] text-gray-400"><strong>Esc</strong> để đóng</span>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                             <div className="hidden sm:flex items-center bg-gray-100 rounded-full px-3 py-1 gap-2">
                                 <Zap className="w-3.5 h-3.5 text-blue-500" />
@@ -1322,51 +1602,76 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                     {/* Left Widgets */}
                                     {!isCanvasOpen && (
                                         <div className="hidden xl:flex xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
-                                            <div className="flex-1 overflow-y-auto space-y-4 pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                                                {getActiveWidgets('left').map((widget) => {
-                                                    const WidgetComponent = widget.component;
-                                                    let widgetProps: any = widget.defaultProps || {};
+                                            {/* Widget Column Header - Left Side */}
+                                            <div className="flex items-center justify-between mb-3 px-1">
+                                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tiện ích</h3>
+                                                <button
+                                                    onClick={() => setIsEditingWidgets(!isEditingWidgets)}
+                                                    className={cn(
+                                                        "p-1.5 rounded-lg transition-colors",
+                                                        isEditingWidgets ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-400"
+                                                    )}
+                                                    title={isEditingWidgets ? "Xong" : "Sắp xếp & Chỉnh sửa"}
+                                                    aria-label={isEditingWidgets ? "Tắt chế độ chỉnh sửa" : "Bật chế độ chỉnh sửa tiện ích"}
+                                                >
+                                                    {isEditingWidgets ? <Settings2 className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
+                                                </button>
+                                            </div>
 
-                                                    // Inject real data where applicable
-                                                    if (widget.id === 'schedule') widgetProps = { classes: allClasses.slice(0, 3) };
-                                                    if (widget.id === 'assignments') widgetProps = { assignments: allAssignments.slice(0, 3) };
-                                                    if (widget.id === 'teacher_classes') widgetProps = { classes: allClasses };
+                                            <div className="flex-1 overflow-y-auto space-y-4 p-3 pt-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                                <DndContext
+                                                    sensors={sensors}
+                                                    collisionDetection={closestCenter}
+                                                    onDragEnd={handleDragEnd}
+                                                >
+                                                    <SortableContext
+                                                        items={widgetsConfig.left}
+                                                        strategy={verticalListSortingStrategy}
+                                                    >
+                                                        {getActiveWidgets('left').map((widget) => {
+                                                            const WidgetComponent = widget.component;
+                                                            let widgetProps: any = widget.defaultProps || {};
 
-                                                    // Inject specific mock data for demo if not provided
-                                                    if (widget.id === 'notifications') widgetProps = { notifications: [{ id: '1', title: 'Thông báo mới', from: 'Hệ thống', time: new Date(), unread: true }] };
-                                                    if (widget.id === 'student_stats') widgetProps = { averageScore: 8.5, attendanceRate: 95, rank: 3 };
-                                                    if (widget.id === 'grading') widgetProps = {
-                                                        assignments: [
-                                                            { id: '1', title: 'Bài tập Đại số', className: '12A1', submissionsToGrade: 5, dueDate: new Date(Date.now() + 86400000) }
-                                                        ]
-                                                    };
-                                                    if (widget.id === 'students_risk') widgetProps = {
-                                                        students: [
-                                                            { id: '1', name: 'Nguyễn Văn A', className: '12A1', reason: 'Điểm thấp', score: 4.5 },
-                                                            { id: '2', name: 'Trần Thị B', className: '12A1', reason: 'Vắng nhiều', score: 6.0 },
-                                                            { id: '3', name: 'Lê Văn C', className: '12A2', reason: 'Không nộp bài', score: 5.5 },
-                                                        ]
-                                                    };
-                                                    if (widget.id === 'recent_activity') widgetProps = {
-                                                        activities: [
-                                                            { id: '1', type: 'submission', title: 'Nộp bài Toán', description: 'Đã nộp sớm 1 ngày', time: new Date() },
-                                                            { id: '2', type: 'grade', title: 'Điểm Vật Lý', description: 'Bạn đạt 9.0 điểm', time: new Date(Date.now() - 86400000) }
-                                                        ]
-                                                    };
+                                                            // Inject real data where applicable
+                                                            if (widget.id === 'schedule') widgetProps = { classes: allClasses.slice(0, 3) };
+                                                            if (widget.id === 'assignments') widgetProps = { assignments: allAssignments.slice(0, 3) };
+                                                            if (widget.id === 'teacher_classes') widgetProps = { classes: allClasses };
 
-                                                    return (
-                                                        <div key={widget.id} className="relative group/widget">
-                                                            <button
-                                                                onClick={() => handleRemoveWidget(widget.id, 'left')}
-                                                                className="absolute -top-1 -right-1 z-10 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover/widget:opacity-100 transition-opacity shadow-md"
-                                                                title="Xóa widget"
-                                                            >
-                                                                <X className="w-3 h-3" />
-                                                            </button>
-                                                            <WidgetComponent {...widgetProps} />
-                                                        </div>
-                                                    );
-                                                })}
+                                                            // Inject specific mock data for demo if not provided
+                                                            if (widget.id === 'notifications') widgetProps = { notifications: [{ id: '1', title: 'Thông báo mới', from: 'Hệ thống', time: new Date(), unread: true }] };
+                                                            if (widget.id === 'student_stats') widgetProps = { averageScore: 8.5, attendanceRate: 95, rank: 3 };
+                                                            if (widget.id === 'grading') widgetProps = {
+                                                                assignments: [
+                                                                    { id: '1', title: 'Bài tập Đại số', className: '12A1', submissionsToGrade: 5, dueDate: new Date(Date.now() + 86400000) }
+                                                                ]
+                                                            };
+                                                            if (widget.id === 'students_risk') widgetProps = {
+                                                                students: [
+                                                                    { id: '1', name: 'Nguyễn Văn A', className: '12A1', reason: 'Điểm thấp', score: 4.5 },
+                                                                    { id: '2', name: 'Trần Thị B', className: '12A1', reason: 'Vắng nhiều', score: 6.0 },
+                                                                    { id: '3', name: 'Lê Văn C', className: '12A2', reason: 'Không nộp bài', score: 5.5 },
+                                                                ]
+                                                            };
+                                                            if (widget.id === 'recent_activity') widgetProps = {
+                                                                activities: [
+                                                                    { id: '1', type: 'submission', title: 'Nộp bài Toán', description: 'Đã nộp sớm 1 ngày', time: new Date() },
+                                                                    { id: '2', type: 'grade', title: 'Điểm Vật Lý', description: 'Bạn đạt 9.0 điểm', time: new Date(Date.now() - 86400000) }
+                                                                ]
+                                                            };
+
+                                                            return (
+                                                                <SortableWidget
+                                                                    key={widget.id}
+                                                                    id={widget.id}
+                                                                    isEditing={isEditingWidgets}
+                                                                    onRemove={() => handleRemoveWidget(widget.id, 'left')}
+                                                                >
+                                                                    <WidgetComponent {...widgetProps} />
+                                                                </SortableWidget>
+                                                            );
+                                                        })}
+                                                    </SortableContext>
+                                                </DndContext>
                                                 <WidgetPlaceholder onClick={() => handleOpenWidgetStore('left')} />
                                             </div>
                                         </div>
@@ -1395,8 +1700,12 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                             <div className="w-full max-w-2xl space-y-6 pt-10">
                                                 {/* AI Greeting */}
                                                 <div className="text-center mb-4">
-                                                    <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Công cụ AI</h2>
-                                                    <p className="text-base text-gray-500">Truy cập nhanh các tính năng hữu ích</p>
+                                                    <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
+                                                        {isTeacher ? "Công cụ Giảng dạy" : "Công cụ Học tập"}
+                                                    </h2>
+                                                    <p className="text-base text-gray-500">
+                                                        {isTeacher ? "Truy cập nhanh các tính năng hỗ trợ giảng dạy" : "Truy cập nhanh các tính năng hữu ích"}
+                                                    </p>
                                                 </div>
 
                                                 {/* Stats Bar - Horizontal compact */}
@@ -1406,8 +1715,13 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                                             <ListTodo className="w-5 h-5 text-blue-500" />
                                                         </div>
                                                         <div>
-                                                            <p className="text-xs text-gray-500 font-medium">Bài tập</p>
-                                                            <p className="text-lg font-bold text-gray-900">{pendingAssignments.length}<span className="text-xs text-gray-400 font-normal ml-1">/ {allAssignments.length}</span></p>
+                                                            <p className="text-xs text-gray-500 font-medium">{isTeacher ? "Cần chấm" : "Bài tập"}</p>
+                                                            <p className="text-lg font-bold text-gray-900">
+                                                                {isTeacher ? (analytics?.ungradedCount || 0) : pendingAssignments.length}
+                                                                <span className="text-xs text-gray-400 font-normal ml-1">
+                                                                    {isTeacher ? " bài" : `/ ${allAssignments.length}`}
+                                                                </span>
+                                                            </p>
                                                         </div>
                                                     </div>
                                                     <div className="w-px h-8 bg-gray-100" />
@@ -1416,8 +1730,13 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                                             <Activity className="w-5 h-5 text-rose-500" />
                                                         </div>
                                                         <div>
-                                                            <p className="text-xs text-gray-500 font-medium">Điểm TB</p>
-                                                            <p className="text-lg font-bold text-gray-900">{analytics?.myAverageScore?.toFixed(1) || "0.0"}<span className="text-xs text-emerald-500 font-normal ml-1">/ 10</span></p>
+                                                            <p className="text-xs text-gray-500 font-medium">{isTeacher ? "Lớp học" : "Điểm TB"}</p>
+                                                            <p className="text-lg font-bold text-gray-900">
+                                                                {isTeacher ? allClasses.length : (analytics?.myAverageScore?.toFixed(1) || "0.0")}
+                                                                <span className={cn("text-xs font-normal ml-1", isTeacher ? "text-gray-400" : "text-emerald-500")}>
+                                                                    {isTeacher ? " lớp" : "/ 10"}
+                                                                </span>
+                                                            </p>
                                                         </div>
                                                     </div>
                                                     <div className="w-px h-8 bg-gray-100" />
@@ -1426,8 +1745,11 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                                             <CheckCircle className="w-5 h-5 text-emerald-500" />
                                                         </div>
                                                         <div>
-                                                            <p className="text-xs text-gray-500 font-medium">Chuyên cần</p>
-                                                            <p className="text-lg font-bold text-gray-900">{analytics?.myAttendanceRate || "100"}<span className="text-xs text-gray-400 font-normal ml-0.5">%</span></p>
+                                                            <p className="text-xs text-gray-500 font-medium">{isTeacher ? "Nộp bài" : "Chuyên cần"}</p>
+                                                            <p className="text-lg font-bold text-gray-900">
+                                                                {isTeacher ? (analytics?.submissionRate || "100") : (analytics?.myAttendanceRate || "100")}
+                                                                <span className="text-xs text-gray-400 font-normal ml-0.5">%</span>
+                                                            </p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1441,14 +1763,19 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                                         <div className="flex-1 min-w-0">
                                                             <p className="text-sm font-medium text-gray-300 mb-1">Gợi ý cho bạn</p>
                                                             <p className="text-base font-medium leading-relaxed">
-                                                                {pendingAssignments.length > 0
-                                                                    ? `Có ${pendingAssignments.length} bài tập cần hoàn thành!`
-                                                                    : `Bạn đang làm rất tốt! Ôn tập thêm nhé?`
-                                                                }
+                                                                {isTeacher
+                                                                    ? (analytics?.ungradedCount > 0
+                                                                        ? `Thầy/Cô có ${analytics.ungradedCount} bài bài làm mới cần được chấm điểm!`
+                                                                        : `Lớp học đang diễn ra rất tốt! Thầy/Cô có muốn soạn bài mới?`)
+                                                                    : (pendingAssignments.length > 0
+                                                                        ? `Có ${pendingAssignments.length} bài tập cần hoàn thành!`
+                                                                        : `Bạn đang làm rất tốt! Ôn tập thêm nhé?`)}
                                                             </p>
                                                         </div>
                                                         <button
-                                                            onClick={() => handleSend(pendingAssignments.length > 0 ? "Giúp mình giải bài tập" : "Tóm tắt kiến thức cho mình")}
+                                                            onClick={() => handleSend(isTeacher
+                                                                ? (analytics?.ungradedCount > 0 ? "Hỗ trợ mình chấm bài" : "Soạn bài giảng mới")
+                                                                : (pendingAssignments.length > 0 ? "Giúp mình giải bài tập" : "Tóm tắt kiến thức cho mình"))}
                                                             className="px-4 py-2 bg-white text-gray-900 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors shrink-0"
                                                         >
                                                             Bắt đầu
@@ -1456,54 +1783,54 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                                     </div>
                                                 </div>
 
-                                                {/* Quick Actions Grid - 2x2 compact */}
+                                                {/* Quick Actions Grid - Role Based */}
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <button
-                                                        onClick={() => handleSend("Tạo flashcard ôn tập cho mình")}
+                                                        onClick={() => handleSend(isTeacher ? "Soạn giáo án cho tiết học mới" : "Tạo flashcard ôn tập cho mình")}
                                                         className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-purple-200 hover:bg-purple-50 rounded-2xl transition-all group"
                                                     >
                                                         <div className="w-10 h-10 rounded-xl bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
                                                             <Sparkles className="w-5 h-5 text-purple-500" />
                                                         </div>
                                                         <div className="text-left">
-                                                            <p className="text-sm font-semibold text-gray-800">Flashcard</p>
-                                                            <p className="text-xs text-gray-500">Ôn tập nhanh</p>
+                                                            <p className="text-sm font-semibold text-gray-800">{isTeacher ? "Soạn giáo án" : "Flashcard"}</p>
+                                                            <p className="text-xs text-gray-500">{isTeacher ? "Thiết kế bài dạy" : "Ôn tập nhanh"}</p>
                                                         </div>
                                                     </button>
                                                     <button
-                                                        onClick={() => handleSend("Lịch học hôm nay của mình là gì?")}
+                                                        onClick={() => handleSend(isTeacher ? "Lịch dạy hôm nay của mình thế nào?" : "Lịch học hôm nay của mình là gì?")}
                                                         className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-blue-200 hover:bg-blue-50 rounded-2xl transition-all group"
                                                     >
                                                         <div className="w-10 h-10 rounded-xl bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
                                                             <Calendar className="w-5 h-5 text-blue-500" />
                                                         </div>
                                                         <div className="text-left">
-                                                            <p className="text-sm font-semibold text-gray-800">Lịch học</p>
+                                                            <p className="text-sm font-semibold text-gray-800">{isTeacher ? "Lịch dạy" : "Lịch học"}</p>
                                                             <p className="text-xs text-gray-500">Hôm nay</p>
                                                         </div>
                                                     </button>
                                                     <button
-                                                        onClick={() => handleSend("Tạo quiz kiểm tra kiến thức")}
+                                                        onClick={() => handleSend(isTeacher ? "Tạo bài tập về nhà cho lớp" : "Tạo quiz kiểm tra kiến thức")}
                                                         className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 rounded-2xl transition-all group"
                                                     >
                                                         <div className="w-10 h-10 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
                                                             <CheckCircle className="w-5 h-5 text-emerald-500" />
                                                         </div>
                                                         <div className="text-left">
-                                                            <p className="text-sm font-semibold text-gray-800">Quiz</p>
-                                                            <p className="text-xs text-gray-500">Tự kiểm tra</p>
+                                                            <p className="text-sm font-semibold text-gray-800">{isTeacher ? "Tạo bài tập" : "Quiz"}</p>
+                                                            <p className="text-xs text-gray-500">{isTeacher ? "Giao bài mới" : "Tự kiểm tra"}</p>
                                                         </div>
                                                     </button>
                                                     <button
-                                                        onClick={() => handleSend("Tóm tắt bài học hôm nay")}
+                                                        onClick={() => handleSend(isTeacher ? "Phân tích tình hình học tập của lớp" : "Tóm tắt bài học hôm nay")}
                                                         className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-amber-200 hover:bg-amber-50 rounded-2xl transition-all group"
                                                     >
                                                         <div className="w-10 h-10 rounded-xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center transition-colors">
-                                                            <FileText className="w-5 h-5 text-amber-500" />
+                                                            <Activity className="w-5 h-5 text-amber-500" />
                                                         </div>
                                                         <div className="text-left">
-                                                            <p className="text-sm font-semibold text-gray-800">Tóm tắt</p>
-                                                            <p className="text-xs text-gray-500">Ghi chú nhanh</p>
+                                                            <p className="text-sm font-semibold text-gray-800">{isTeacher ? "Phân tích lớp" : "Tóm tắt"}</p>
+                                                            <p className="text-xs text-gray-500">{isTeacher ? "Báo cáo hiệu suất" : "Ghi chú nhanh"}</p>
                                                         </div>
                                                     </button>
                                                 </div>
@@ -1522,10 +1849,10 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
 
                                                 <div className="space-y-3">
                                                     <h2 className="text-2xl font-bold text-gray-900">
-                                                        Chào bạn, mình là MiQiX AI!
+                                                        Chào {isTeacher ? "Thầy/Cô" : "bạn"}, mình là MiQiX AI!
                                                     </h2>
                                                     <p className="text-base text-gray-500 font-medium max-w-md mx-auto">
-                                                        Trợ lý học tập cá nhân của bạn. Sẵn sàng hỗ trợ mọi lúc.
+                                                        {isTeacher ? "Trợ lý giảng dạy cá nhân của Thầy/Cô. Sẵn sàng hỗ trợ mọi lúc." : "Trợ lý học tập cá nhân của bạn. Sẵn sàng hỗ trợ mọi lúc."}
                                                     </p>
                                                 </div>
 
@@ -1549,52 +1876,76 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                     {/* Right Widgets */}
                                     {!isCanvasOpen && (
                                         <div className="hidden xl:flex xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
-                                            <div className="flex-1 overflow-y-auto space-y-4 pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                                                {getActiveWidgets('right').map((widget) => {
-                                                    const WidgetComponent = widget.component;
-                                                    let widgetProps: any = widget.defaultProps || {};
+                                            <div className="flex items-center justify-between mb-3 px-1">
+                                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tiện ích</h3>
+                                                <button
+                                                    onClick={() => setIsEditingWidgets(!isEditingWidgets)}
+                                                    className={cn(
+                                                        "p-1.5 rounded-lg transition-colors",
+                                                        isEditingWidgets ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-400"
+                                                    )}
+                                                    title={isEditingWidgets ? "Xong" : "Sắp xếp & Chỉnh sửa"}
+                                                    aria-label={isEditingWidgets ? "Tắt chế độ chỉnh sửa" : "Bật chế độ chỉnh sửa tiện ích"}
+                                                >
+                                                    {isEditingWidgets ? <Settings2 className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
+                                                </button>
+                                            </div>
 
-                                                    // Inject real data where applicable
-                                                    if (widget.id === 'grading_progress') widgetProps = { ungradedCount: 5 }; // Mock for now
-                                                    if (widget.id === 'notifications') widgetProps = { notifications: [] };
-                                                    if (widget.id === 'achievements') widgetProps = { streak: 5, badges: 12, rank: 3 };
-                                                    if (widget.id === 'weekly_goals') widgetProps = { completed: 3, total: 5, goal: 'Hoàn thành bài tập Toán' };
-                                                    if (widget.id === 'teacher_classes') widgetProps = { classes: allClasses.length > 0 ? allClasses : [{ id: '1', name: '12A1', code: 'ABC123' }] };
-                                                    if (widget.id === 'students_risk') widgetProps = {
-                                                        students: [
-                                                            { id: '1', name: 'Nguyễn Văn A', className: '12A1', reason: 'Điểm thấp', score: 4.5 },
-                                                            { id: '2', name: 'Trần Thị B', className: '12A1', reason: 'Vắng nhiều', score: 6.0 },
-                                                            { id: '3', name: 'Lê Văn C', className: '12A2', reason: 'Không nộp bài', score: 5.5 },
-                                                        ]
-                                                    };
-                                                    if (widget.id === 'grading') widgetProps = {
-                                                        assignments: [
-                                                            { id: '1', title: 'Bài tập Đại số', className: '12A1', submissionsToGrade: 5, dueDate: new Date(Date.now() + 86400000) }
-                                                        ]
-                                                    };
-                                                    if (widget.id === 'schedule') widgetProps = { classes: allClasses.slice(0, 3) };
-                                                    if (widget.id === 'assignments') widgetProps = { assignments: allAssignments.slice(0, 3) };
-                                                    if (widget.id === 'student_stats') widgetProps = { averageScore: 8.5, attendanceRate: 95, rank: 3 };
-                                                    if (widget.id === 'recent_activity') widgetProps = {
-                                                        activities: [
-                                                            { id: '1', type: 'submission', title: 'Nộp bài Toán', description: 'Đã nộp sớm 1 ngày', time: new Date() },
-                                                            { id: '2', type: 'grade', title: 'Điểm Vật Lý', description: 'Bạn đạt 9.0 điểm', time: new Date(Date.now() - 86400000) }
-                                                        ]
-                                                    };
+                                            <div className="flex-1 overflow-y-auto space-y-4 p-3 pt-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                                <DndContext
+                                                    sensors={sensors}
+                                                    collisionDetection={closestCenter}
+                                                    onDragEnd={handleDragEnd}
+                                                >
+                                                    <SortableContext
+                                                        items={widgetsConfig.right}
+                                                        strategy={verticalListSortingStrategy}
+                                                    >
+                                                        {getActiveWidgets('right').map((widget) => {
+                                                            const WidgetComponent = widget.component;
+                                                            let widgetProps: any = widget.defaultProps || {};
 
-                                                    return (
-                                                        <div key={widget.id} className="relative group/widget">
-                                                            <button
-                                                                onClick={() => handleRemoveWidget(widget.id, 'right')}
-                                                                className="absolute -top-1 -right-1 z-10 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover/widget:opacity-100 transition-opacity shadow-md"
-                                                                title="Xóa widget"
-                                                            >
-                                                                <X className="w-3 h-3" />
-                                                            </button>
-                                                            <WidgetComponent {...widgetProps} />
-                                                        </div>
-                                                    );
-                                                })}
+                                                            // Inject real data where applicable
+                                                            if (widget.id === 'grading_progress') widgetProps = { ungradedCount: 5 }; // Mock for now
+                                                            if (widget.id === 'notifications') widgetProps = { notifications: [] };
+                                                            if (widget.id === 'achievements') widgetProps = { streak: 5, badges: 12, rank: 3 };
+                                                            if (widget.id === 'weekly_goals') widgetProps = { completed: 3, total: 5, goal: 'Hoàn thành bài tập Toán' };
+                                                            if (widget.id === 'teacher_classes') widgetProps = { classes: allClasses.length > 0 ? allClasses : [{ id: '1', name: '12A1', code: 'ABC123' }] };
+                                                            if (widget.id === 'students_risk') widgetProps = {
+                                                                students: [
+                                                                    { id: '1', name: 'Nguyễn Văn A', className: '12A1', reason: 'Điểm thấp', score: 4.5 },
+                                                                    { id: '2', name: 'Trần Thị B', className: '12A1', reason: 'Vắng nhiều', score: 6.0 },
+                                                                    { id: '3', name: 'Lê Văn C', className: '12A2', reason: 'Không nộp bài', score: 5.5 },
+                                                                ]
+                                                            };
+                                                            if (widget.id === 'grading') widgetProps = {
+                                                                assignments: [
+                                                                    { id: '1', title: 'Bài tập Đại số', className: '12A1', submissionsToGrade: 5, dueDate: new Date(Date.now() + 86400000) }
+                                                                ]
+                                                            };
+                                                            if (widget.id === 'schedule') widgetProps = { classes: allClasses.slice(0, 3) };
+                                                            if (widget.id === 'assignments') widgetProps = { assignments: allAssignments.slice(0, 3) };
+                                                            if (widget.id === 'student_stats') widgetProps = { averageScore: 8.5, attendanceRate: 95, rank: 3 };
+                                                            if (widget.id === 'recent_activity') widgetProps = {
+                                                                activities: [
+                                                                    { id: '1', type: 'submission', title: 'Nộp bài Toán', description: 'Đã nộp sớm 1 ngày', time: new Date() },
+                                                                    { id: '2', type: 'grade', title: 'Điểm Vật Lý', description: 'Bạn đạt 9.0 điểm', time: new Date(Date.now() - 86400000) }
+                                                                ]
+                                                            };
+
+                                                            return (
+                                                                <SortableWidget
+                                                                    key={widget.id}
+                                                                    id={widget.id}
+                                                                    isEditing={isEditingWidgets}
+                                                                    onRemove={() => handleRemoveWidget(widget.id, 'right')}
+                                                                >
+                                                                    <WidgetComponent {...widgetProps} />
+                                                                </SortableWidget>
+                                                            );
+                                                        })}
+                                                    </SortableContext>
+                                                </DndContext>
                                                 <WidgetPlaceholder onClick={() => handleOpenWidgetStore('right')} />
                                             </div>
                                         </div>
@@ -1608,8 +1959,9 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                         return (
                                             <div
                                                 key={msg.id}
+                                                id={`msg-${msg.id}`}
                                                 className={cn(
-                                                    "flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300",
+                                                    "flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 transition-colors rounded-2xl p-2 -mx-2",
                                                     msg.role === "user" ? "flex-row-reverse" : "flex-row"
                                                 )}
                                             >
@@ -1673,32 +2025,34 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                     <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-10 px-4 md:px-6 z-20">
                         <div className="max-w-2xl mx-auto bg-white rounded-[2rem] shadow-xl shadow-blue-900/5 border border-gray-100 p-3 relative group focus-within:ring-2 focus-within:ring-blue-100 transition-all">
                             {/* Selected Context Indicators */}
-                            {(targetAssignmentId || targetClassId || isCanvasMode) && (
-                                <div className="absolute -top-9 left-3 flex items-center gap-1.5">
-                                    {targetAssignmentId && (
+                            {(targetAssignmentIds.length > 0 || targetClassIds.length > 0 || isCanvasMode) && (
+                                <div className="absolute -top-9 left-3 flex items-center gap-1.5 flex-wrap">
+                                    {targetAssignmentIds.map(id => (
                                         <button
-                                            onClick={() => setTargetAssignmentId(null)}
-                                            className="flex items-center gap-1 bg-white border border-gray-200 text-gray-600 pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-gray-50 transition-colors"
+                                            key={id}
+                                            onClick={() => toggleAssignment(id)}
+                                            className="flex items-center gap-1 bg-white border border-gray-200 text-gray-600 pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-gray-50 transition-colors animate-in fade-in zoom-in duration-200"
                                         >
                                             <ListTodo className="w-3 h-3 text-blue-500" />
                                             <span className="truncate max-w-[100px]">
-                                                {allAssignments.find(a => a.id === targetAssignmentId)?.title || "Bài tập"}
+                                                {allAssignments.find(a => a.id === id)?.title || "Bài tập"}
                                             </span>
                                             <X className="w-3 h-3 text-gray-400" />
                                         </button>
-                                    )}
-                                    {targetClassId && (
+                                    ))}
+                                    {targetClassIds.map(id => (
                                         <button
-                                            onClick={() => setTargetClassId(null)}
-                                            className="flex items-center gap-1 bg-white border border-gray-200 text-gray-600 pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-gray-50 transition-colors"
+                                            key={id}
+                                            onClick={() => toggleClass(id)}
+                                            className="flex items-center gap-1 bg-white border border-gray-200 text-gray-600 pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-gray-50 transition-colors animate-in fade-in zoom-in duration-200"
                                         >
                                             <LayoutGrid className="w-3 h-3 text-indigo-500" />
                                             <span className="truncate max-w-[100px]">
-                                                {allClasses.find(c => c.id === targetClassId)?.name || "Lớp học"}
+                                                {allClasses.find(c => c.id === id)?.name || "Lớp học"}
                                             </span>
                                             <X className="w-3 h-3 text-gray-400" />
                                         </button>
-                                    )}
+                                    ))}
                                     {isCanvasMode && (
                                         <button
                                             onClick={() => setIsCanvasMode(false)}
@@ -1734,50 +2088,60 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                 {showModeMenu && (
                                     <div
                                         ref={menuRef}
-                                        className="absolute bottom-full left-0 mb-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
+                                        className="fixed md:absolute bottom-full left-0 md:left-0 mb-5 w-[calc(100vw-32px)] md:w-[420px] lg:w-[500px] bg-white/95 backdrop-blur-2xl rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-gray-100 p-5 z-50 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-300"
                                     >
                                         {/* Header */}
-                                        <div className="flex items-center justify-between mb-3">
-                                            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Chọn chế độ</h3>
-                                            <button onClick={() => setShowModeMenu(false)} className="p-1 hover:bg-gray-100 rounded-full">
-                                                <X className="w-4 h-4 text-gray-400" />
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1 h-4 bg-indigo-500 rounded-full" />
+                                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Chọn chế độ trợ lý</h3>
+                                            </div>
+                                            <button onClick={() => setShowModeMenu(false)} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
+                                                <X className="w-5 h-5 text-gray-400" />
                                             </button>
                                         </div>
 
-                                        {/* Mode Grid */}
-                                        <div className="grid grid-cols-2 gap-3 mb-4">
+                                        {/* Mode Grid - Horizontal style */}
+                                        <div className={cn(
+                                            "grid gap-2.5 mb-5",
+                                            (user.role === 'teacher' ? TEACHER_MODES : STUDENT_MODES).length > 2
+                                                ? "grid-cols-1 md:grid-cols-2"
+                                                : "grid-cols-1 md:grid-cols-2"
+                                        )}>
                                             {(user.role === 'teacher' ? TEACHER_MODES : STUDENT_MODES).map((mode) => {
                                                 const IconComponent = mode.icon;
                                                 const isActive = chatMode === mode.id;
                                                 return (
                                                     <div
                                                         key={mode.id}
-                                                        onClick={() => setChatMode(mode.id)}
+                                                        onClick={() => {
+                                                            setChatMode(mode.id);
+                                                            if (window.innerWidth < 1024) setShowModeMenu(false);
+                                                        }}
                                                         className={cn(
-                                                            "p-3.5 rounded-2xl cursor-pointer border transition-all relative group flex flex-col items-center justify-center gap-2",
+                                                            "p-2.5 rounded-xl cursor-pointer border-2 transition-all relative group flex items-center gap-3 text-left",
                                                             isActive
-                                                                ? "bg-indigo-50/50 border-indigo-200 shadow-[0_0_15px_rgba(99,102,241,0.1)]"
-                                                                : "bg-white border-gray-100 hover:border-gray-200 hover:bg-gray-50/50"
+                                                                ? "bg-white border-indigo-500 shadow-sm"
+                                                                : "bg-gray-50/30 border-transparent hover:border-indigo-100 hover:bg-white"
                                                         )}
                                                     >
                                                         <div className={cn(
-                                                            "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                                                            "w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0",
                                                             isActive
-                                                                ? "bg-white text-indigo-600 shadow-sm scale-110"
-                                                                : "bg-gray-50 text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-500"
+                                                                ? "bg-indigo-500 text-white shadow-sm"
+                                                                : "bg-white text-indigo-400 border border-gray-100 group-hover:bg-indigo-50"
                                                         )}>
                                                             <IconComponent className="w-5 h-5" />
                                                         </div>
-                                                        <h4 className={cn(
-                                                            "font-bold text-[13px] transition-colors",
-                                                            isActive ? "text-indigo-900" : "text-gray-600"
-                                                        )}>
-                                                            {mode.label}
-                                                        </h4>
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className={cn("font-bold text-[14px] leading-tight transition-colors", isActive ? "text-indigo-900" : "text-gray-800")}>
+                                                                {mode.label}
+                                                            </h4>
+                                                        </div>
 
                                                         {isActive && (
-                                                            <div className="absolute top-2 right-2">
-                                                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+                                                            <div className="animate-pulse">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                                                             </div>
                                                         )}
                                                     </div>
@@ -1829,111 +2193,112 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                         {/* Divider */}
                                         <div className="border-t border-gray-100 my-3" />
 
-                                        {/* Context Selectors */}
-                                        <div className="space-y-2">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-3">
                                             {/* Assignment Selector */}
-                                            <div className="space-y-1.5 focus-within:z-10 relative">
+                                            <div className="relative">
                                                 <button
-                                                    onClick={() => setShowAssignmentSelector(!showAssignmentSelector)}
+                                                    onClick={() => {
+                                                        setShowAssignmentSelector(!showAssignmentSelector);
+                                                        setShowClassSelector(false);
+                                                    }}
                                                     className={cn(
-                                                        "w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left group",
-                                                        targetAssignmentId ? "bg-blue-50/50 border border-blue-100 text-blue-700" : "bg-gray-50 border border-transparent hover:border-gray-200 text-gray-700 hover:bg-gray-100/50"
+                                                        "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left",
+                                                        targetAssignmentIds.length > 0 ? "bg-blue-50/80 border border-blue-200 text-blue-700" : "bg-gray-50/50 border border-gray-100 hover:border-gray-300 text-gray-700"
                                                     )}
                                                 >
                                                     <div className={cn(
-                                                        "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
-                                                        targetAssignmentId ? "bg-white shadow-sm" : "bg-white/50"
+                                                        "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
+                                                        targetAssignmentIds.length > 0 ? "bg-white shadow-sm" : "bg-white border border-gray-100"
                                                     )}>
-                                                        <ListTodo className="w-4 h-4" />
+                                                        <ListTodo className="w-3 h-3" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <span className="text-[11px] font-black uppercase tracking-wider opacity-60">Bài tập liên quan</span>
-                                                        <p className="text-[13px] font-bold truncate">
-                                                            {targetAssignmentId ? allAssignments.find(a => a.id === targetAssignmentId)?.title : "Chưa chọn"}
+                                                        <p className="text-[11px] font-bold truncate">
+                                                            {targetAssignmentIds.length > 0 ? `${targetAssignmentIds.length} bài tập` : "Chọn bài tập"}
                                                         </p>
                                                     </div>
-                                                    <ChevronDown className={cn("w-4 h-4 transition-transform", showAssignmentSelector && "rotate-180")} />
+                                                    <ChevronDown className={cn("w-3 h-3 opacity-50 transition-transform", showAssignmentSelector && "rotate-180")} />
                                                 </button>
 
                                                 <AnimatePresence>
                                                     {showAssignmentSelector && (
                                                         <motion.div
-                                                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                                            className="mt-1 absolute w-full top-full left-0 z-[60] bg-white rounded-2xl shadow-xl border border-gray-100 p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
+                                                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                            className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-white rounded-2xl shadow-2xl border border-gray-100 p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
                                                         >
-                                                            <button
-                                                                onClick={() => { setTargetAssignmentId(null); setShowAssignmentSelector(false); }}
-                                                                className={cn("w-full flex items-center gap-2 p-2.5 rounded-xl text-xs font-bold transition-all", !targetAssignmentId ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-500")}
-                                                            >
-                                                                <X className="w-3.5 h-3.5" />
-                                                                Hủy chọn
-                                                            </button>
-                                                            {allAssignments.slice(0, 10).map(a => (
-                                                                <button
-                                                                    key={a.id}
-                                                                    onClick={() => { setTargetAssignmentId(a.id); setShowAssignmentSelector(false); }}
-                                                                    className={cn("w-full flex items-center gap-2 p-2.5 rounded-xl text-xs font-bold transition-all truncate", targetAssignmentId === a.id ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-700")}
-                                                                >
-                                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-300 shrink-0" />
-                                                                    <span className="truncate">{a.title}</span>
-                                                                </button>
-                                                            ))}
+                                                            <div className="p-1 space-y-1">
+                                                                {allAssignments.map(a => (
+                                                                    <button
+                                                                        key={a.id}
+                                                                        onClick={() => toggleAssignment(a.id)}
+                                                                        className={cn(
+                                                                            "w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold transition-all truncate text-left",
+                                                                            targetAssignmentIds.includes(a.id) ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-600"
+                                                                        )}
+                                                                    >
+                                                                        {targetAssignmentIds.includes(a.id) ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : <div className="w-3.5 h-3.5" />}
+                                                                        <span className="truncate">{a.title}</span>
+                                                                    </button>
+                                                                ))}
+                                                                {allAssignments.length === 0 && <p className="text-xs text-gray-400 text-center py-2">Không có dữ liệu</p>}
+                                                            </div>
                                                         </motion.div>
                                                     )}
                                                 </AnimatePresence>
                                             </div>
 
                                             {/* Class Selector */}
-                                            <div className="space-y-1.5 focus-within:z-10 relative">
+                                            <div className="relative">
                                                 <button
-                                                    onClick={() => setShowClassSelector(!showClassSelector)}
+                                                    onClick={() => {
+                                                        setShowClassSelector(!showClassSelector);
+                                                        setShowAssignmentSelector(false);
+                                                    }}
                                                     className={cn(
-                                                        "w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left group",
-                                                        targetClassId ? "bg-indigo-50/50 border border-indigo-100 text-indigo-700" : "bg-gray-50 border border-transparent hover:border-gray-200 text-gray-700 hover:bg-gray-100/50"
+                                                        "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left",
+                                                        targetClassIds.length > 0 ? "bg-indigo-50/80 border border-indigo-200 text-indigo-700" : "bg-gray-50/50 border border-gray-100 hover:border-gray-300 text-gray-700"
                                                     )}
                                                 >
                                                     <div className={cn(
-                                                        "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
-                                                        targetClassId ? "bg-white shadow-sm" : "bg-white/50"
+                                                        "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
+                                                        targetClassIds.length > 0 ? "bg-white shadow-sm" : "bg-white border border-gray-100"
                                                     )}>
-                                                        <LayoutGrid className="w-4 h-4" />
+                                                        <LayoutGrid className="w-3 h-3" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <span className="text-[11px] font-black uppercase tracking-wider opacity-60">Lớp học liên quan</span>
-                                                        <p className="text-[13px] font-bold truncate">
-                                                            {targetClassId ? allClasses.find(c => c.id === targetClassId)?.name : "Chưa chọn"}
+                                                        <p className="text-[11px] font-bold truncate">
+                                                            {targetClassIds.length > 0 ? `${targetClassIds.length} lớp học` : "Chọn lớp học"}
                                                         </p>
                                                     </div>
-                                                    <ChevronDown className={cn("w-4 h-4 transition-transform", showClassSelector && "rotate-180")} />
+                                                    <ChevronDown className={cn("w-3 h-3 opacity-50 transition-transform", showClassSelector && "rotate-180")} />
                                                 </button>
 
                                                 <AnimatePresence>
                                                     {showClassSelector && (
                                                         <motion.div
-                                                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                                                            className="mt-1 absolute w-full top-full left-0 z-[60] bg-white rounded-2xl shadow-xl border border-gray-100 p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
+                                                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                            className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-white rounded-2xl shadow-2xl border border-gray-100 p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
                                                         >
-                                                            <button
-                                                                onClick={() => { setTargetClassId(null); setShowClassSelector(false); }}
-                                                                className={cn("w-full flex items-center gap-2 p-2.5 rounded-xl text-xs font-bold transition-all", !targetClassId ? "bg-indigo-50 text-indigo-700" : "hover:bg-gray-50 text-gray-500")}
-                                                            >
-                                                                <X className="w-3.5 h-3.5" />
-                                                                Hủy chọn
-                                                            </button>
-                                                            {allClasses.map(c => (
-                                                                <button
-                                                                    key={c.id}
-                                                                    onClick={() => { setTargetClassId(c.id); setShowClassSelector(false); }}
-                                                                    className={cn("w-full flex items-center gap-2 p-2.5 rounded-xl text-xs font-bold transition-all truncate", targetClassId === c.id ? "bg-indigo-50 text-indigo-700" : "hover:bg-gray-50 text-gray-700")}
-                                                                >
-                                                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-300 shrink-0" />
-                                                                    <span className="truncate">{c.name}</span>
-                                                                </button>
-                                                            ))}
+                                                            <div className="p-1 space-y-1">
+                                                                {allClasses.map(c => (
+                                                                    <button
+                                                                        key={c.id}
+                                                                        onClick={() => toggleClass(c.id)}
+                                                                        className={cn(
+                                                                            "w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold transition-all truncate text-left",
+                                                                            targetClassIds.includes(c.id) ? "bg-indigo-50 text-indigo-700" : "hover:bg-gray-50 text-gray-600"
+                                                                        )}
+                                                                    >
+                                                                        {targetClassIds.includes(c.id) ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : <div className="w-3.5 h-3.5" />}
+                                                                        <span className="truncate">{c.name}</span>
+                                                                    </button>
+                                                                ))}
+                                                                {allClasses.length === 0 && <p className="text-xs text-gray-400 text-center py-2">Không có dữ liệu</p>}
+                                                            </div>
                                                         </motion.div>
                                                     )}
                                                 </AnimatePresence>
@@ -1947,25 +2312,30 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                                         <button
                                             onClick={() => setIsCanvasMode(!isCanvasMode)}
                                             className={cn(
-                                                "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left",
+                                                "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left mt-2.5 group",
                                                 isCanvasMode
-                                                    ? "bg-purple-50 text-purple-700 border border-purple-200"
-                                                    : "bg-gray-50 hover:bg-purple-50 text-gray-700 hover:text-purple-700"
+                                                    ? "bg-purple-50 border border-purple-200 text-purple-700"
+                                                    : "bg-gray-50/50 hover:bg-purple-50/50 border border-gray-100 hover:border-purple-200 text-gray-600 hover:text-purple-700"
                                             )}
                                         >
-                                            <Sparkles className="w-4 h-4" />
+                                            <div className={cn(
+                                                "w-6 h-6 rounded-lg flex items-center justify-center transition-all",
+                                                isCanvasMode ? "bg-purple-500 text-white shadow-sm" : "bg-white border border-gray-100 text-gray-400 group-hover:text-purple-500"
+                                            )}>
+                                                <Sparkles className="w-3 h-3" />
+                                            </div>
                                             <div className="flex-1">
-                                                <span className="text-xs font-semibold">Canvas Mode</span>
-                                                <p className="text-[10px] opacity-70">
-                                                    {isCanvasMode ? "Đang bật - AI sẽ xuất nội dung ra Canvas" : "Tắt - Trả lời trong chat"}
+                                                <span className="text-[11px] font-bold leading-none block mb-0.5">Canvas Mode</span>
+                                                <p className="text-[9px] opacity-60 font-medium">
+                                                    {isCanvasMode ? "AI sẽ hiển thị nội dung ra vùng làm việc Canvas" : "Kết quả AI sẽ chỉ hiển thị trong ô chat"}
                                                 </p>
                                             </div>
                                             <div className={cn(
-                                                "w-8 h-5 rounded-full transition-colors flex items-center px-0.5",
+                                                "w-7 h-4 rounded-full transition-all flex items-center px-0.5",
                                                 isCanvasMode ? "bg-purple-500" : "bg-gray-300"
                                             )}>
                                                 <div className={cn(
-                                                    "w-4 h-4 bg-white rounded-full shadow transition-transform",
+                                                    "w-3 h-3 bg-white rounded-full shadow-sm transition-transform",
                                                     isCanvasMode && "translate-x-3"
                                                 )} />
                                             </div>
@@ -2017,95 +2387,98 @@ export function AIPlayground({ user }: AIPlaygroundProps) {
                 </div>
 
                 {/* RIGHT CANVAS AREA */}
-                {isCanvasOpen && (
-                    <div className="w-1/2 bg-gray-50/50 border-l border-gray-200 flex flex-col h-full animate-in slide-in-from-right duration-500 shadow-2xl z-30">
-                        {/* Canvas Header */}
-                        <div className="h-16 px-6 border-b border-gray-200 flex items-center justify-between bg-white shrink-0">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-50 rounded-xl">
-                                    <Sparkles className="w-5 h-5 text-indigo-600" />
-                                </div>
-                                <div>
-                                    <h2 className="font-bold text-gray-900 leading-tight">Canvas thông minh</h2>
-                                    <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
-                                        {canvasViewMode === 'dashboard' ? 'Tổng quan' : canvasViewMode === 'flashcards' ? 'Flashcards' : 'Nội dung'}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
-                                    <Share2 className="w-5 h-5" />
-                                </button>
-                                <button
-                                    onClick={() => setIsCanvasOpen(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Canvas Content */}
-                        <div className="flex-1 overflow-y-auto p-8 relative" id="canvas-content">
-                            {canvasContent && canvasContent.type === 'structured_content' ? (
-                                <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    {canvasContent.sections?.map((section: any, idx: number) => (
-                                        <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 group hover:shadow-md transition-shadow">
-                                            <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2 group-hover:text-blue-600 transition-colors">
-                                                <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
-                                                {section.heading}
-                                            </h3>
-                                            <div className="prose prose-sm text-gray-600 leading-relaxed">
-                                                <ReactMarkdown
-                                                    remarkPlugins={[remarkMath]}
-                                                    rehypePlugins={[rehypeKatex]}
-                                                >
-                                                    {section.content}
-                                                </ReactMarkdown>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : canvasContent && canvasContent.type === 'flashcards' ? (
-                                <FlashcardCanvas data={canvasContent.data} />
-                            ) : canvasContent && canvasContent.type === 'quiz' ? (
-                                <QuizCanvas data={canvasContent.data} title={canvasContent.title} />
-                            ) : canvasContent && canvasContent.type === 'mindmap' ? (
-                                <MindMapCanvas data={canvasContent.data} />
-                            ) : canvasContent && canvasContent.type === 'text' ? (
-                                <CanvasContentRenderer content={canvasContent.content} />
-                            ) : canvasViewMode === 'socratic' ? (
-                                <div className="h-full">
-                                    <SocraticCanvas
-                                        currentStep={socraticCurrentStep}
-                                        history={socraticHistory}
-                                        isLoading={isSocraticLoading || isLoading}
-                                        onSendAnswer={(ans) => {
-                                            setIsSocraticLoading(true);
-                                            handleSend(ans);
-                                        }}
-                                    />
-                                </div>
-                            ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-center">
-                                    <div className="p-4 bg-indigo-50 rounded-2xl mb-4">
-                                        <Sparkles className="w-12 h-12 text-indigo-500" />
+                {
+                    isCanvasOpen && (
+                        <div className="w-1/2 bg-gray-50/50 border-l border-gray-200 flex flex-col h-full animate-in slide-in-from-right duration-500 shadow-2xl z-10">
+                            {/* Canvas Header */}
+                            <div className="h-16 px-6 border-b border-gray-200 flex items-center justify-between bg-white shrink-0">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-indigo-50 rounded-xl">
+                                        <Sparkles className="w-5 h-5 text-indigo-600" />
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">Canvas sẵn sàng</h3>
-                                    <p className="text-gray-500 max-w-sm">
-                                        Nội dung AI tạo ra sẽ hiển thị ở đây. Bật Canvas Mode và gửi tin nhắn để bắt đầu!
-                                    </p>
+                                    <div>
+                                        <h2 className="font-bold text-gray-900 leading-tight">Canvas thông minh</h2>
+                                        <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+                                            {canvasViewMode === 'dashboard' ? 'Tổng quan' : canvasViewMode === 'flashcards' ? 'Flashcards' : 'Nội dung'}
+                                        </p>
+                                    </div>
                                 </div>
-                            )}
+                                <div className="flex items-center gap-2">
+                                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
+                                        <Share2 className="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        onClick={() => setIsCanvasOpen(false)}
+                                        className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Canvas Content */}
+                            <div className="flex-1 overflow-y-auto p-8 relative" id="canvas-content">
+                                {canvasContent && canvasContent.type === 'structured_content' ? (
+                                    <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        {canvasContent.sections?.map((section: any, idx: number) => (
+                                            <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 group hover:shadow-md transition-shadow">
+                                                <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2 group-hover:text-blue-600 transition-colors">
+                                                    <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
+                                                    {section.heading}
+                                                </h3>
+                                                <div className="prose prose-sm text-gray-600 leading-relaxed">
+                                                    <ReactMarkdown
+                                                        remarkPlugins={[remarkMath]}
+                                                        rehypePlugins={[rehypeKatex]}
+                                                    >
+                                                        {section.content}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : canvasContent && canvasContent.type === 'flashcards' ? (
+                                    <FlashcardCanvas data={canvasContent.data} />
+                                ) : canvasContent && canvasContent.type === 'quiz' ? (
+                                    <QuizCanvas data={canvasContent.data} title={canvasContent.title} />
+                                ) : canvasContent && canvasContent.type === 'mindmap' ? (
+                                    <MindMapCanvas data={canvasContent.data} />
+                                ) : canvasContent && canvasContent.type === 'text' ? (
+                                    <CanvasContentRenderer content={canvasContent.content} />
+                                ) : canvasViewMode === 'socratic' ? (
+                                    <div className="h-full">
+                                        <SocraticCanvas
+                                            currentStep={socraticCurrentStep}
+                                            history={socraticHistory}
+                                            isLoading={isSocraticLoading || isLoading}
+                                            onSendAnswer={(ans) => {
+                                                setIsSocraticLoading(true);
+                                                handleSend(ans);
+                                            }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="h-full flex flex-col items-center justify-center text-center">
+                                        <div className="p-4 bg-indigo-50 rounded-2xl mb-4">
+                                            <Sparkles className="w-12 h-12 text-indigo-500" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-2">Canvas sẵn sàng</h3>
+                                        <p className="text-gray-500 max-w-sm">
+                                            Nội dung AI tạo ra sẽ hiển thị ở đây. Bật Canvas Mode và gửi tin nhắn để bắt đầu!
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                )}
-            </div>
+                    )
+                }
+            </div >
 
             {/* Widget Store Modal */}
-            <WidgetStore
+            < WidgetStore
                 isOpen={isWidgetStoreOpen}
-                onClose={() => setIsWidgetStoreOpen(false)}
+                onClose={() => setIsWidgetStoreOpen(false)
+                }
                 onAddWidget={handleAddWidget}
                 userRole={user.role as any}
                 currentWidgets={activeWidgetColumn ? widgetsConfig[activeWidgetColumn] : []}

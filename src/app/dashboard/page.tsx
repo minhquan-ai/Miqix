@@ -35,7 +35,7 @@ export default function DashboardPage() {
   return (
     <>
       {data.user.role === 'teacher' || data.user.role === 'student' ? (
-        <AIPlayground user={data.user} />
+        <AIPlayground user={data.user} initialData={data} />
       ) : (
         <div className="text-center py-20">Không thể tải dữ liệu bảng điều khiển.</div>
       )}

@@ -56,15 +56,17 @@ export const WidgetStore = ({ isOpen, onClose, onAddWidget, userRole, currentWid
                                     const isAdded = currentWidgets.includes(widget.id);
 
                                     return (
-                                        <div
+                                        <button
                                             key={widget.id}
                                             className={cn(
-                                                "flex items-start gap-4 p-4 rounded-2xl border transition-all duration-200 relative group",
+                                                "flex items-start gap-4 p-4 rounded-2xl border transition-all duration-200 relative group w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500",
                                                 isAdded
                                                     ? "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
                                                     : "bg-white border-gray-200 hover:border-blue-300 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
                                             )}
                                             onClick={() => !isAdded && onAddWidget(widget.id)}
+                                            disabled={isAdded}
+                                            aria-label={isAdded ? `${widget.title} - Đã thêm` : `Thêm tiện ích ${widget.title}`}
                                         >
                                             <div className={cn(
                                                 "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm flex-shrink-0",
@@ -84,13 +86,13 @@ export const WidgetStore = ({ isOpen, onClose, onAddWidget, userRole, currentWid
                                                     Đã thêm
                                                 </div>
                                             ) : (
-                                                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity">
                                                     <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
                                                         Thêm
                                                     </div>
                                                 </div>
                                             )}
-                                        </div>
+                                        </button>
                                     );
                                 })}
                             </div>

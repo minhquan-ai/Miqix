@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback, useTransition } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface NavigationContextType {
@@ -26,6 +26,7 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
     const [isNavigating, setIsNavigating] = useState(false);
     const [progress, setProgress] = useState(0);
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
@@ -35,15 +36,22 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
         setIsNavigating(false);
         // eslint-disable-next-line
         setProgress(0);
-    }, [pathname]);
+    }, [pathname, searchParams]);
 
-    // Show loading when transition is pending
+    // Sync with transition state
     useEffect(() => {
         if (isPending) {
-            // eslint-disable-next-line
             setIsNavigating(true);
+        } else if (!isPending && isNavigating) {
+            // Only reset if we were navigating and transition is done
+            // Next.js transition might end before the pathname actually changes in some cases, 
+            // but the pathname/searchParams effect will also handle the final reset.
+            const timeout = setTimeout(() => {
+                setIsNavigating(false);
+            }, 100);
+            return () => clearTimeout(timeout);
         }
-    }, [isPending]);
+    }, [isPending, isNavigating]);
 
     // Animate progress bar
     useEffect(() => {

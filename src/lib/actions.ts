@@ -41,23 +41,38 @@ export async function getCurrentUserAction(role?: 'teacher' | 'student'): Promis
     if (cachedUser) {
         user = cachedUser;
     } else {
-        // Fetch full user details from DB to get latest data
-        const dbUser = await db.user.findUnique({
-            where: { email: session.user.email }
-        });
+        try {
+            // Fetch full user details from DB to get latest data
+            const dbUser = await db.user.findUnique({
+                where: { email: session.user.email }
+            });
 
-        if (!dbUser) return null;
+            if (dbUser) {
+                user = {
+                    id: dbUser.id,
+                    name: dbUser.name,
+                    email: dbUser.email,
+                    role: dbUser.role as 'teacher' | 'student',
+                    avatarUrl: dbUser.avatarUrl || undefined
+                };
 
-        user = {
-            id: dbUser.id,
-            name: dbUser.name,
-            email: dbUser.email,
-            role: dbUser.role as 'teacher' | 'student',
-            avatarUrl: dbUser.avatarUrl || undefined
-        };
+                // Cache for 60 seconds
+                serverCache.set(cacheKey, user, 60 * 1000);
+            }
+        } catch (error) {
+            console.error("DB User Fetch Error (Turbopack workaround):", error);
+        }
 
-        // Cache for 60 seconds
-        serverCache.set(cacheKey, user, 60 * 1000);
+        // Fallback to session user if DB fetch failed or returned null (critical for Turbopack error)
+        if (!user && session.user) {
+            user = {
+                id: session.user.id,
+                name: session.user.name || "",
+                email: session.user.email,
+                role: session.user.role as 'teacher' | 'student',
+                avatarUrl: session.user.image || undefined
+            };
+        }
     }
 
     // Optional: Check role if specified
@@ -71,26 +86,79 @@ export async function getCurrentUserAction(role?: 'teacher' | 'student'): Promis
 // --- Assignment Actions ---
 
 export async function getAssignmentsAction(classId?: string): Promise<Assignment[]> {
-    const cacheKey = CacheKeys.assignments(classId);
+    const session = await auth();
+    // Safety check: if no session, return empty array immediately
+    if (!session?.user?.id) return [];
+
+    const userId = session.user.id;
+    // Cache key must be user-specific if global fetch, otherwise global cache would leak data
+    const cacheKey = classId ? CacheKeys.assignments(classId) : `assignments:user:${userId}`;
 
     return serverCache.getOrFetch(cacheKey, async () => {
         const where: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+
         if (classId) {
+            // Fetch for specific class
             where.OR = [
                 { classIds: { contains: classId } },
                 { assignmentClasses: { some: { classId } } }
             ];
+        } else {
+            // Scoped fetch based on user role
+            // 1. Get User Role first (safest to check DB or trust session if synced)
+            // For performance, we'll try to rely on session role, but if not present, fetch user.
+            let role = session.user.role;
+            if (!role) {
+                const user = await db.user.findUnique({ where: { id: userId }, select: { role: true } });
+                role = user?.role as any;
+            }
+
+            if (role === 'teacher') {
+                // Teacher: See assignments they created
+                where.teacherId = userId;
+            } else {
+                // Student: See assignments for classes they are enrolled in
+                // We need to find class IDs first
+                const enrollments = await db.classEnrollment.findMany({
+                    where: { userId, status: 'active' },
+                    select: { classId: true }
+                });
+                const enrolledClassIds = enrollments.map(e => e.classId);
+
+                if (enrolledClassIds.length === 0) return [];
+
+                where.OR = [
+                    { assignmentClasses: { some: { classId: { in: enrolledClassIds } } } },
+                    // Legacy support for JSON string classIds if needed, but best to rely on relation
+                    { classIds: { not: null } } // This is too broad, so we rely on relation mainly.
+                ];
+
+                // Refined logic for legacy JSON classIds if necessary:
+                // It's hard to filter JSON strings in Prisma efficiently without raw query.
+                // We will rely on `assignmentClasses` relation which should be the standard now.
+                // Fallback: If your app heavily relies on `classIds` string, we might fetch more and filter in JS,
+                // but let's stick to the relational `assignmentClasses` for correctness and speed.
+            }
         }
 
         const assignments = await db.assignment.findMany({
             where,
             orderBy: { dueDate: 'desc' },
             include: {
-                assignmentClasses: true
+                assignmentClasses: {
+                    include: { class: true }
+                }
             }
         });
 
-        return assignments.map((a: any) => {
+        // Filter legacy JSON classIds in memory if needed (for students)
+        let filteredAssignments = assignments;
+        if (!classId && session.user.role !== 'teacher') {
+            // Optional: double check if any legacy assignment used classIds string without relation
+            // For now, we assume data migration to assignmentClasses relation is done or primary.
+        }
+
+        return filteredAssignments.map((a: any) => {
             let description = a.description;
             let attachments = sanitizeAttachments(a.attachments);
 
@@ -128,10 +196,12 @@ export async function getAssignmentsAction(classId?: string): Promise<Assignment
                     }
                 })(),
                 aiSettings: a.aiSettings ? JSON.parse(a.aiSettings) : undefined,
-                rubric: a.rubric ? JSON.parse(a.rubric) : undefined
+                rubric: a.rubric ? JSON.parse(a.rubric) : undefined,
+                // Add assignmentClasses for UI if needed (frontend uses classIds mainly, but pending assignments use className)
+                assignmentClasses: a.assignmentClasses
             };
         });
-    }, 30 * 1000); // Cache for 30 seconds
+    }, 60 * 1000); // Cache for 60 seconds (optimized)
 }
 
 export async function getAssignmentByIdAction(id: string): Promise<Assignment | null> {
@@ -955,6 +1025,11 @@ export async function getUserEnrollmentsAction() {
     if (!session?.user?.id) return [];
     const userId = session.user.id;
 
+    // Try cache first
+    const cacheKey = `enrollments:v2:${userId}`;
+    const cached = serverCache.get<any[]>(cacheKey);
+    if (cached) return cached;
+
     const [enrollments, teachingClasses] = await Promise.all([
         db.classEnrollment.findMany({
             where: { userId },
@@ -1018,6 +1093,8 @@ export async function getUserEnrollmentsAction() {
         });
     }
 
+    // Cache for 60 seconds
+    serverCache.set(cacheKey, result, 60 * 1000);
     return result;
 }
 

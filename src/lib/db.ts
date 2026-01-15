@@ -5,7 +5,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // WORKAROUND: Force correct DATABASE_URL if Vercel cache returns wrong value
-const CORRECT_DATABASE_URL = "postgresql://neondb_owner:npg_r4RgBP0LCwiM@ep-still-dust-ahixippp-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require";
+const CORRECT_DATABASE_URL = "postgresql://neondb_owner:npg_r4RgBP0LCwiM@ep-still-dust-ahixippp-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&pgbouncer=true";
 
 let dbUrl = process.env.DATABASE_URL;
 

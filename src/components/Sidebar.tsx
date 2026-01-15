@@ -175,7 +175,11 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
         if (!showExpanded) {
             return (
                 <motion.div key={item.id} variants={menuItemVariants} className="mb-1">
-                    <a href={item.href!} onClick={(e) => handleNavClick(e, item.href!)}>
+                    <Link
+                        href={item.href!}
+                        onClick={() => setIsMobileOpen(false)}
+                        className="block"
+                    >
                         <div className={`relative flex items-center justify-center p-3 rounded-xl transition-all duration-200 group
                             ${active
                                 ? 'bg-primary/10 text-primary shadow-sm'
@@ -196,7 +200,7 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
                                 <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-zinc-900 rotate-45" />
                             </div>
                         </div>
-                    </a>
+                    </Link>
                 </motion.div>
             );
         }
@@ -204,7 +208,11 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
         // Expanded view
         return (
             <motion.div key={item.id} variants={menuItemVariants} className="mb-1">
-                <a href={item.href!} onClick={(e) => handleNavClick(e, item.href!)}>
+                <Link
+                    href={item.href!}
+                    onClick={() => setIsMobileOpen(false)}
+                    className="block"
+                >
                     <div className={`relative flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-medium group
                         ${active
                             ? 'bg-primary/10 text-primary'
@@ -230,7 +238,7 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
                             </span>
                         )}
                     </div>
-                </a>
+                </Link>
             </motion.div>
         );
     };
@@ -322,10 +330,10 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
                                     >
                                         <div className="space-y-1 mt-1">
                                             {recentClasses.map((cls: any) => (
-                                                <a
-                                                    key={cls.id || cls.classId}
-                                                    href={`/dashboard/classes/${cls.id || cls.classId}`}
-                                                    onClick={(e) => handleNavClick(e, `/dashboard/classes/${cls.id || cls.classId}`)}
+                                                <Link
+                                                    key={cls.classId || cls.id}
+                                                    href={`/dashboard/classes/${cls.classId || cls.id}`}
+                                                    onClick={() => setIsMobileOpen(false)}
                                                 >
                                                     <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors group">
                                                         <div
@@ -336,16 +344,16 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
                                                             {cls.name || cls.className}
                                                         </span>
                                                     </div>
-                                                </a>
+                                                </Link>
                                             ))}
-                                            <a
+                                            <Link
                                                 href="/dashboard/classes"
-                                                onClick={(e) => handleNavClick(e, '/dashboard/classes')}
+                                                onClick={() => setIsMobileOpen(false)}
                                             >
                                                 <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs text-primary hover:bg-primary/5 transition-colors font-medium">
                                                     <span>Xem tất cả lớp học →</span>
                                                 </div>
-                                            </a>
+                                            </Link>
                                         </div>
                                     </motion.div>
                                 )}
@@ -362,20 +370,26 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
                             </div>
                             <div className="space-y-1.5 text-xs">
                                 {safeCounts.pendingAssignments > 0 && (
-                                    <a href="/dashboard/assignments?filter=needs-grading" onClick={(e) => handleNavClick(e, '/dashboard/assignments?filter=needs-grading')}>
+                                    <Link
+                                        href="/dashboard/assignments?filter=needs-grading"
+                                        onClick={() => setIsMobileOpen(false)}
+                                    >
                                         <div className="flex items-center justify-between text-muted-foreground hover:text-foreground transition-colors py-1">
                                             <span>Bài cần chấm</span>
                                             <span className="font-bold text-amber-600 dark:text-amber-400">{safeCounts.pendingAssignments}</span>
                                         </div>
-                                    </a>
+                                    </Link>
                                 )}
                                 {safeCounts.draftAssignments > 0 && (
-                                    <a href="/dashboard/assignments?filter=drafts" onClick={(e) => handleNavClick(e, '/dashboard/assignments?filter=drafts')}>
+                                    <Link
+                                        href="/dashboard/assignments?filter=drafts"
+                                        onClick={() => setIsMobileOpen(false)}
+                                    >
                                         <div className="flex items-center justify-between text-muted-foreground hover:text-foreground transition-colors py-1">
                                             <span>Bản nháp</span>
                                             <span className="font-bold text-orange-600 dark:text-orange-400">{safeCounts.draftAssignments}</span>
                                         </div>
-                                    </a>
+                                    </Link>
                                 )}
                             </div>
                         </div>
@@ -400,18 +414,18 @@ export default function Sidebar({ user, classes, isLoading, counts, isCollapsed:
                                     className="absolute bottom-full left-3 right-3 mb-2 bg-white dark:bg-zinc-900 border border-border rounded-xl shadow-2xl z-50 overflow-hidden"
                                 >
                                     <div className="p-2 space-y-0.5">
-                                        <a href="/dashboard/profile" onClick={(e) => { handleNavClick(e, '/dashboard/profile'); setShowProfileMenu(false); }}>
+                                        <Link href="/dashboard/profile" onClick={() => { setIsMobileOpen(false); setShowProfileMenu(false); }}>
                                             <div className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium hover:bg-muted rounded-lg transition-colors">
                                                 <User className="w-4 h-4 text-primary" />
                                                 <span>Hồ sơ của tôi</span>
                                             </div>
-                                        </a>
-                                        <a href="/dashboard/settings" onClick={(e) => { handleNavClick(e, '/dashboard/settings'); setShowProfileMenu(false); }}>
+                                        </Link>
+                                        <Link href="/dashboard/settings" onClick={() => { setIsMobileOpen(false); setShowProfileMenu(false); }}>
                                             <div className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium hover:bg-muted rounded-lg transition-colors">
                                                 <Settings className="w-4 h-4 text-muted-foreground" />
                                                 <span>Cài đặt</span>
                                             </div>
-                                        </a>
+                                        </Link>
                                         <div className="h-px bg-border my-1.5" />
                                         <button
                                             onClick={async () => { await logout(); }}

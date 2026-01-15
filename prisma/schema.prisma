@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -255,6 +256,11 @@ model Submission {
   updatedAt     DateTime   @updatedAt
   student       User       @relation(fields: [studentId], references: [id])
   assignment    Assignment @relation(fields: [assignmentId], references: [id])
+
+  @@index([assignmentId])
+  @@index([studentId])
+  @@index([status])
+  @@index([score])
 }
 
 model Mission {

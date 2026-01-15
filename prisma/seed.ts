@@ -1,313 +1,270 @@
 import { PrismaClient } from '@prisma/client';
+import { hash } from 'bcryptjs';
+import * as dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.local' });
 
 const prisma = new PrismaClient();
 
+const lastNames = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Huỳnh', 'Phan', 'Vũ', 'Võ', 'Đặng', 'Bùi', 'Đỗ', 'Hồ', 'Ngô', 'Dương', 'Lý'];
+const middleNames = ['Văn', 'Thị', 'Hữu', 'Đức', 'Minh', 'Thành', 'Quang', 'Anh', 'Ngọc', 'Khánh', 'Tuấn', 'Sơn', 'Tùng', 'Linh', 'Trang'];
+const firstNames = ['Anh', 'Bảo', 'Cường', 'Dung', 'Em', 'Giang', 'Hoa', 'Hùng', 'Hương', 'Khanh', 'Lan', 'Nam', 'Phong', 'Quân', 'Sơn', 'Thảo', 'Tuấn', 'Vinh', 'Yến', 'Lợi', 'Kha', 'Duy', 'Hải', 'Hậu', 'Trực', 'Ân', 'Khoa', 'Kiên'];
+
+function generateName() {
+    const ln = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const mn = middleNames[Math.floor(Math.random() * middleNames.length)];
+    const fn = firstNames[Math.floor(Math.random() * firstNames.length)];
+    return `${ln} ${mn} ${fn}`;
+}
+
+const subjects = [
+    { name: 'Toán học', color: '#3B82F6', icon: 'Calculator' },
+    { name: 'Vật Lý', color: '#8B5CF6', icon: 'Zap' },
+    { name: 'Hóa Học', color: '#10B981', icon: 'Beaker' },
+    { name: 'Ngữ Văn', color: '#EC4899', icon: 'BookOpen' },
+    { name: 'Tiếng Anh', color: '#F59E0B', icon: 'Languages' },
+    { name: 'Lịch Sử', color: '#EF4444', icon: 'History' },
+    { name: 'Sinh Học', color: '#059669', icon: 'Leaf' },
+];
+
 async function main() {
-    console.log('🌱 Seeding production-ready demo data...');
+    console.log('🌱 Starting massive Miqix demo seed (300 users)...');
 
-    // ============================================
-    // 1. CREATE DEMO ACCOUNTS
-    // ============================================
+    // Clean up existing data to avoid conflicts for the demo
+    // WARNING: This clears the DB. 
+    console.log('🧹 Cleaning up old data...');
+    await prisma.attendanceRecord.deleteMany();
+    await prisma.classSession.deleteMany();
+    await prisma.submission.deleteMany();
+    await prisma.assignmentClass.deleteMany();
+    await prisma.assignment.deleteMany();
+    await prisma.classEnrollment.deleteMany();
+    await prisma.announcement.deleteMany();
+    await prisma.class.deleteMany();
+    await prisma.user.deleteMany();
 
-    // Teacher: Trần Thị Hồng Hà
-    let teacher = await prisma.user.findUnique({
-        where: { email: 'demo@miqix.vn' }
+    const hashedPassword = await hash('Demo2026!', 10);
+
+    // 1. Create Main Admin/Teacher
+    const mainTeacher = await prisma.user.create({
+        data: {
+            id: 'demo-teacher-001',
+            name: 'Trần Thị Hồng Hà',
+            email: 'demo@miqix.vn',
+            password: hashedPassword,
+            role: 'teacher',
+            avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TeacherHa',
+        }
     });
 
-    if (!teacher) {
-        console.log('Creating teacher account...');
-        teacher = await prisma.user.create({
+    // 2. Create 19 more teachers
+    const teachersData = [];
+    for (let i = 2; i <= 20; i++) {
+        const name = generateName();
+        teachersData.push({
+            id: `teacher-${i}`,
+            name,
+            email: `teacher${i}@miqix.vn`,
+            password: hashedPassword,
+            role: 'teacher',
+            avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher${i}`,
+        });
+    }
+    await prisma.user.createMany({ data: teachersData });
+    const allTeachers = await prisma.user.findMany({ where: { role: 'teacher' } });
+    console.log(`✅ Created ${allTeachers.length} teachers`);
+
+    // 3. Create 280 students
+    const studentsData = [
+        {
+            id: 'demo-student-001',
+            name: 'Nguyễn Minh Quân',
+            email: 'hocsinh@miqix.vn',
+            password: hashedPassword,
+            role: 'student',
+            avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=MinhQuan',
+        }
+    ];
+
+    for (let i = 2; i <= 280; i++) {
+        const name = generateName();
+        studentsData.push({
+            id: `student-${i}`,
+            name,
+            email: `student${i}@miqix.vn`,
+            password: hashedPassword,
+            role: 'student',
+            avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=Student${i}`,
+        });
+    }
+    await prisma.user.createMany({ data: studentsData });
+    const allStudents = await prisma.user.findMany({ where: { role: 'student' } });
+    console.log(`✅ Created ${allStudents.length} students`);
+
+    // 4. Create Classes (2-3 per subject)
+    const classes = [];
+    for (let i = 0; i < 20; i++) {
+        const subject = subjects[i % subjects.length];
+        const teacher = allTeachers[i % allTeachers.length];
+        const grade = Math.floor(Math.random() * 3) + 10; // 10, 11, 12
+        const classNames = ['A1', 'A2', 'B1', 'B5', 'C2', 'D1'];
+        const clsName = `${grade}${classNames[i % classNames.length]} - ${subject.name}`;
+
+        const newClass = await prisma.class.create({
             data: {
-                id: 'demo-teacher-001',
-                name: 'Trần Thị Hồng Hà',
-                email: 'demo@miqix.vn',
-                password: 'demo2026',
-                role: 'teacher',
-                avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=HongHa&backgroundColor=ffdfbf',
+                name: clsName,
+                subject: subject.name,
+                code: `${subject.name.substring(0, 2).toUpperCase()}${grade}${i}`,
+                description: `Lớp ${subject.name} dành cho khối ${grade}. Tập trung nâng cao kiến thức và kỹ năng.`,
+                teacherId: teacher.id,
+                grade: grade.toString(),
+                color: subject.color,
+                classType: 'NORMAL'
             }
         });
-        console.log('✅ Teacher account created: demo@miqix.vn');
-    } else {
-        console.log('Teacher account already exists');
+        classes.push(newClass);
     }
+    console.log(`✅ Created ${classes.length} classes`);
 
-    // Student: Nguyễn Minh Quân
-    let mainStudent = await prisma.user.findUnique({
-        where: { email: 'hocsinh@miqix.vn' }
-    });
+    // 5. Enrollments (Randomly distribute)
+    console.log('📋 Enrolling students...');
+    const enrollmentData = [];
+    for (const student of allStudents) {
+        // Each student join 3-5 classes
+        const numClasses = Math.floor(Math.random() * 3) + 3;
+        const shuffledClasses = [...classes].sort(() => 0.5 - Math.random());
+        const studentClasses = shuffledClasses.slice(0, numClasses);
 
-    if (!mainStudent) {
-        console.log('Creating main student account...');
-        mainStudent = await prisma.user.create({
-            data: {
-                id: 'demo-student-001',
-                name: 'Nguyễn Minh Quân',
-                email: 'hocsinh@miqix.vn',
-                password: 'demo2026',
-                role: 'student',
-                avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=MinhQuan&backgroundColor=c0aede',
-            }
-        });
-        console.log('✅ Student account created: hocsinh@miqix.vn');
-    } else {
-        console.log('Main student account already exists');
-    }
-
-    // ============================================
-    // 2. CREATE ADDITIONAL STUDENTS (9 more)
-    // ============================================
-    const additionalStudents = [
-        { id: 'demo-student-002', name: 'Lê Văn Đức', email: 'levanduc@student.miqix.vn' },
-        { id: 'demo-student-003', name: 'Phạm Thu Hà', email: 'phamthuha@student.miqix.vn' },
-        { id: 'demo-student-004', name: 'Hoàng Quốc Bảo', email: 'hoangquocbao@student.miqix.vn' },
-        { id: 'demo-student-005', name: 'Vũ Thị Mai', email: 'vuthimai@student.miqix.vn' },
-        { id: 'demo-student-006', name: 'Đặng Văn Kiên', email: 'dangvankien@student.miqix.vn' },
-        { id: 'demo-student-007', name: 'Bùi Thanh Tùng', email: 'buithanhtung@student.miqix.vn' },
-        { id: 'demo-student-008', name: 'Đinh Thị Ngọc', email: 'dinhthingoc@student.miqix.vn' },
-        { id: 'demo-student-009', name: 'Trịnh Văn Hải', email: 'trinhvanhai@student.miqix.vn' },
-        { id: 'demo-student-010', name: 'Ngô Thị Linh', email: 'ngothilinh@student.miqix.vn' },
-    ];
-
-    const allStudents = [mainStudent];
-    for (const student of additionalStudents) {
-        const existing = await prisma.user.findUnique({ where: { email: student.email } });
-        if (!existing) {
-            const newStudent = await prisma.user.create({
-                data: {
-                    id: student.id,
-                    name: student.name,
-                    email: student.email,
-                    password: 'demo2026',
-                    role: 'student',
-                    avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${student.name.replace(/\s/g, '')}`,
-                }
+        for (const cls of studentClasses) {
+            enrollmentData.push({
+                userId: student.id,
+                classId: cls.id,
+                status: 'active',
+                role: 'student'
             });
-            allStudents.push(newStudent);
-        } else {
-            allStudents.push(existing);
         }
     }
-    console.log(`✅ Created ${allStudents.length} student accounts`);
+    await prisma.classEnrollment.createMany({ data: enrollmentData });
+    console.log(`✅ Created ${enrollmentData.length} enrollments`);
 
-    // ============================================
-    // 3. CREATE CLASSES
-    // ============================================
-    const classesData = [
-        {
-            name: '12A1 - Toán Nâng cao',
-            subject: 'Toán học',
-            code: 'TOAN12A1',
-            description: 'Lớp Toán nâng cao dành cho học sinh khối 12 ôn thi THPTQG. Tập trung vào Giải tích, Hình học không gian và Tổ hợp - Xác suất.',
-            classType: 'NORMAL',
-            grade: '12',
-            teacherId: teacher.id,
-            color: '#3B82F6'
-        },
-        {
-            name: '11B5 - Vật Lý Ứng dụng',
-            subject: 'Vật Lý',
-            code: 'VALY11B5',
-            description: 'Lớp Vật lý với các thí nghiệm thực hành và ứng dụng trong đời sống. Cơ học, Điện học và Quang học.',
-            classType: 'NORMAL',
-            grade: '11',
-            teacherId: teacher.id,
-            color: '#8B5CF6'
-        },
-        {
-            name: '10C2 - Ngữ Văn',
-            subject: 'Ngữ Văn',
-            code: 'VAN10C2',
-            description: 'Lớp Ngữ văn với trọng tâm Văn học Việt Nam hiện đại, nghị luận văn học và nghị luận xã hội.',
-            classType: 'NORMAL',
-            grade: '10',
-            teacherId: teacher.id,
-            color: '#EC4899'
-        }
-    ];
+    // 6. Create Sessions & Attendance (Last 10 days)
+    console.log('📅 Creating sessions and attendance...');
+    const now = new Date();
+    for (const cls of classes) {
+        // Register 5-8 sessions per class
+        const numSessions = Math.floor(Math.random() * 4) + 5;
+        const enrolledInClass = enrollmentData.filter(e => e.classId === cls.id).map(e => e.userId);
 
-    const createdClasses: any[] = [];
-    for (const cls of classesData) {
-        const existing = await prisma.class.findUnique({ where: { code: cls.code } });
-        if (!existing) {
-            const newClass = await prisma.class.create({ data: cls });
-            createdClasses.push(newClass);
-        } else {
-            createdClasses.push(existing);
-        }
-    }
-    console.log(`✅ Created ${createdClasses.length} classes`);
+        for (let s = 0; s < numSessions; s++) {
+            const sessionDate = new Date(now);
+            sessionDate.setDate(now.getDate() - (s * 2)); // Every 2 days
 
-    // ============================================
-    // 4. ENROLL STUDENTS TO CLASSES
-    // ============================================
-    for (const cls of createdClasses) {
-        for (const student of allStudents) {
-            const existingEnrollment = await prisma.classEnrollment.findFirst({
-                where: { classId: cls.id, userId: student.id }
-            });
-            if (!existingEnrollment) {
-                await prisma.classEnrollment.create({
-                    data: {
-                        classId: cls.id,
-                        userId: student.id,
-                        status: 'APPROVED'
-                    }
-                });
-            }
-        }
-    }
-    console.log('✅ Enrolled students to all classes');
-
-    // ============================================
-    // 5. CREATE ASSIGNMENTS
-    // ============================================
-    const mathClass = createdClasses.find(c => c.code === 'TOAN12A1');
-    const physicsClass = createdClasses.find(c => c.code === 'VALY11B5');
-    const literatureClass = createdClasses.find(c => c.code === 'VAN10C2');
-
-    const assignmentsData = [
-        // Math assignments
-        {
-            title: 'Bài tập Đạo hàm và Ứng dụng',
-            description: 'Hoàn thành 15 bài tập về đạo hàm và ứng dụng trong khảo sát hàm số. Yêu cầu trình bày chi tiết các bước giải.',
-            type: 'exercise',
-            dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // +3 days
-            teacherId: teacher.id,
-            subject: 'Toán học',
-            xpReward: 150,
-            classId: mathClass?.id
-        },
-        {
-            title: 'Kiểm tra 15 phút: Logarit',
-            description: 'Bài kiểm tra trắc nghiệm nhanh về hàm số mũ và logarit. 15 câu hỏi, thời gian 15 phút.',
-            type: 'quiz',
-            dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // +1 day
-            teacherId: teacher.id,
-            subject: 'Toán học',
-            xpReward: 50,
-            classId: mathClass?.id
-        },
-        {
-            title: 'Bài tập Tích phân - Phần 1',
-            description: 'Làm các bài tập nguyên hàm và tích phân cơ bản. Chuẩn bị cho bài kiểm tra giữa kỳ.',
-            type: 'exercise',
-            dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // +5 days
-            teacherId: teacher.id,
-            subject: 'Toán học',
-            xpReward: 200,
-            classId: mathClass?.id
-        },
-        // Physics assignments
-        {
-            title: 'Thí nghiệm: Chuyển động ném ngang',
-            description: 'Thực hiện thí nghiệm ném ngang, ghi chép số liệu và viết báo cáo. Vẽ đồ thị quỹ đạo.',
-            type: 'essay',
-            dueDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // +4 days
-            teacherId: teacher.id,
-            subject: 'Vật Lý',
-            xpReward: 180,
-            classId: physicsClass?.id
-        },
-        {
-            title: 'Bài tập Định luật bảo toàn động lượng',
-            description: 'Giải 10 bài tập về va chạm đàn hồi và không đàn hồi.',
-            type: 'exercise',
-            dueDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000), // +6 days
-            teacherId: teacher.id,
-            subject: 'Vật Lý',
-            xpReward: 120,
-            classId: physicsClass?.id
-        },
-        // Literature assignments
-        {
-            title: 'Phân tích nhân vật Huấn Cao',
-            description: 'Viết bài văn nghị luận về vẻ đẹp của nhân vật Huấn Cao trong truyện ngắn "Chữ người tử tù" của Nguyễn Tuân. Độ dài: 1200-1500 chữ.',
-            type: 'essay',
-            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // +7 days
-            teacherId: teacher.id,
-            subject: 'Ngữ Văn',
-            xpReward: 300,
-            classId: literatureClass?.id
-        },
-        {
-            title: 'Đọc hiểu: Văn học hiện thực 1930-1945',
-            description: 'Trả lời câu hỏi đọc hiểu về các tác phẩm văn học hiện thực phê phán.',
-            type: 'quiz',
-            dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // +2 days
-            teacherId: teacher.id,
-            subject: 'Ngữ Văn',
-            xpReward: 80,
-            classId: literatureClass?.id
-        }
-    ];
-
-    for (const asm of assignmentsData) {
-        if (asm.classId) {
-            const existing = await prisma.assignment.findFirst({
-                where: { title: asm.title, teacherId: asm.teacherId }
-            });
-            if (!existing) {
-                await prisma.assignment.create({
-                    data: {
-                        title: asm.title,
-                        description: asm.description,
-                        type: asm.type,
-                        dueDate: asm.dueDate,
-                        teacherId: asm.teacherId,
-                        subject: asm.subject,
-                        xpReward: asm.xpReward,
-                        classIds: asm.classId,
-                        assignmentClasses: {
-                            create: {
-                                classId: asm.classId,
-                                dueDate: asm.dueDate
-                            }
-                        }
-                    }
-                });
-            }
-        }
-    }
-    console.log(`✅ Created ${assignmentsData.length} assignments`);
-
-    // ============================================
-    // 6. CREATE SOME ATTENDANCE RECORDS
-    // ============================================
-    // NOTE: Attendance model has been refactored to AttendanceRecord with sessionId relationship
-    // Skipping attendance seeding until proper ClassSession creation is implemented
-    console.log('⏭️ Skipped attendance records (requires ClassSession)');
-
-    // ============================================
-    // 7. CREATE ANNOUNCEMENTS
-    // ============================================
-    for (const cls of createdClasses) {
-        const existingAnnouncement = await prisma.announcement.findFirst({
-            where: { classId: cls.id }
-        });
-
-        if (!existingAnnouncement) {
-            await prisma.announcement.create({
+            const session = await prisma.classSession.create({
                 data: {
                     classId: cls.id,
-                    teacherId: teacher.id,
-                    content: `Chào mừng các em đến với lớp ${cls.name}! Hãy kiểm tra lịch học và bài tập được giao nhé. Nếu có thắc mắc, các em có thể hỏi AI Tutor hoặc liên hệ trực tiếp với cô.`,
-                    type: 'ANNOUNCEMENT',
-                    isPinned: true
+                    teacherId: cls.teacherId,
+                    date: sessionDate,
+                    period: 1,
+                    subject: cls.subject,
+                    lessonContent: `Nội dung buổi học số ${s + 1}`
                 }
             });
+
+            // Attendance for this session
+            const attendanceRecords = enrolledInClass.map(studentId => {
+                let status = 'PRESENT';
+                const rand = Math.random();
+                if (rand < 0.05) status = 'ABSENT';
+                else if (rand < 0.1) status = 'LATE';
+
+                return {
+                    sessionId: session.id,
+                    studentId: studentId,
+                    status: status
+                };
+            });
+            await prisma.attendanceRecord.createMany({ data: attendanceRecords });
         }
     }
-    console.log('✅ Created announcements');
+    console.log('✅ Attendance records created');
 
-    console.log('\n🎉 Demo data seeding completed!');
-    console.log('\n📋 Demo Accounts:');
-    console.log('   Giáo viên: demo@miqix.vn / demo2026');
-    console.log('   Học sinh:  hocsinh@miqix.vn / demo2026');
+    // 7. Create Assignments (3 per class)
+    console.log('📝 Creating assignments and submissions...');
+    for (const cls of classes) {
+        const enrolledInClass = enrollmentData.filter(e => e.classId === cls.id).map(e => e.userId);
+
+        for (let a = 1; a <= 3; a++) {
+            const dueDate = new Date();
+            dueDate.setDate(now.getDate() + (a * 2));
+
+            const assignment = await prisma.assignment.create({
+                data: {
+                    title: `Bài tập ${cls.subject} số ${a}`,
+                    description: `Yêu cầu học sinh hoàn thành các câu hỏi trong chương ${a}.`,
+                    type: 'exercise',
+                    dueDate: dueDate,
+                    teacherId: cls.teacherId,
+                    subject: cls.subject,
+                    xpReward: 100,
+                    classIds: cls.id,
+                    assignmentClasses: {
+                        create: {
+                            classId: cls.id,
+                            dueDate: dueDate
+                        }
+                    }
+                }
+            });
+
+            // Submissions (Some students submitted, some graded)
+            const submissionData = [];
+            // Random students who already submitted (let's say 80% submission rate)
+            const submitters = enrolledInClass.filter(() => Math.random() < 0.8);
+
+            for (const studentId of submitters) {
+                const isGraded = Math.random() < 0.7; // 70% of submissions are graded
+                submissionData.push({
+                    assignmentId: assignment.id,
+                    studentId: studentId,
+                    content: `Nội dung bài làm của học sinh cho bài tập ${a}.`,
+                    submittedAt: new Date(now.getTime() - Math.random() * 86400000),
+                    status: isGraded ? 'graded' : 'submitted',
+                    score: isGraded ? (Math.random() * 4 + 6) : null, // Score 6-10
+                    feedback: isGraded ? 'Bài làm khá tốt, cần chú ý trình bày.' : null
+                });
+            }
+            if (submissionData.length > 0) {
+                await prisma.submission.createMany({ data: submissionData });
+            }
+        }
+    }
+    console.log('✅ Assignments and submissions created');
+
+    // 8. Announcements
+    console.log('📢 Creating class stream activity...');
+    const announcements = [];
+    for (const cls of classes) {
+        announcements.push({
+            classId: cls.id,
+            teacherId: cls.teacherId,
+            content: `Chào mọi người, tuần này chúng ta sẽ tập trung vào mục tiêu mới. Đừng quên nộp bài tập đúng hạn nhé!`,
+            type: 'NORMAL',
+            isPinned: true
+        });
+    }
+    await prisma.announcement.createMany({ data: announcements });
+
+    console.log('\n🚀 SEED COMPLETED SUCCESSFULLY!');
+    console.log(`- Teachers: 20`);
+    console.log(`- Students: 280`);
+    console.log(`- Classes: 20`);
+    console.log(`- Total Users: 300`);
+    console.log('\nMiqix is now ready for a high-traffic stability demo.');
 }
 
 main()
     .catch((e) => {
-        console.error('❌ Seeding error:', e);
+        console.error(e);
         process.exit(1);
     })
     .finally(async () => {

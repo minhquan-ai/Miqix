@@ -77,7 +77,7 @@ export default function DashboardLayout({
                 className="flex min-h-screen bg-background text-foreground font-sans antialiased"
                 style={{ '--sidebar-width': isSidebarCollapsed ? '80px' : '256px' } as React.CSSProperties}
             >
-                <aside className="fixed inset-y-0 left-0 z-50">
+                <aside className="fixed inset-y-0 left-0 z-[9999]">
                     <Sidebar
                         user={currentUser}
                         classes={userClasses}

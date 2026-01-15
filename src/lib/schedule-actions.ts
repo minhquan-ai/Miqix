@@ -138,7 +138,13 @@ export async function deletePersonalEventAction(eventId: string) {
 }
 
 export async function getAggregatedScheduleAction(weekStartStr?: string) {
-    const user = await getCurrentUserAction();
+    let user = null;
+    try {
+        user = await getCurrentUserAction();
+    } catch (e) {
+        console.error("Error getting user in schedule action:", e);
+    }
+
     if (!user) return { events: [], todo: [] };
 
     const weekStart = weekStartStr ? parseISO(weekStartStr) : startOfWeek(new Date(), { weekStartsOn: 1 });
