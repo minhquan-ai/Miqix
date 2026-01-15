@@ -1,0 +1,7 @@
+{
+  "projectId": "b303cefa-39d9-4253-ad81-01a27b6f20ad",
+  "createdAt": 1766310725254,
+  "startupCommands": [
+    "npm install && npx prisma generate && npm run dev"
+  ]
+}
