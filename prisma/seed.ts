@@ -58,7 +58,7 @@ async function main() {
     });
 
     // 2. Create 19 more teachers
-    const teachersData = [];
+    const teachersData: { id: string; name: string; email: string; password: string; role: string; avatarUrl: string; }[] = [];
     for (let i = 2; i <= 20; i++) {
         const name = generateName();
         teachersData.push({
@@ -102,7 +102,7 @@ async function main() {
     console.log(`✅ Created ${allStudents.length} students`);
 
     // 4. Create Classes (2-3 per subject)
-    const classes = [];
+    const classes: any[] = [];
     for (let i = 0; i < 20; i++) {
         const subject = subjects[i % subjects.length];
         const teacher = allTeachers[i % allTeachers.length];
@@ -128,7 +128,7 @@ async function main() {
 
     // 5. Enrollments (Randomly distribute)
     console.log('📋 Enrolling students...');
-    const enrollmentData = [];
+    const enrollmentData: { userId: string; classId: string; status: string; role: string; }[] = [];
     for (const student of allStudents) {
         // Each student join 3-5 classes
         const numClasses = Math.floor(Math.random() * 3) + 3;
@@ -217,7 +217,7 @@ async function main() {
             });
 
             // Submissions (Some students submitted, some graded)
-            const submissionData = [];
+            const submissionData: any[] = [];
             // Random students who already submitted (let's say 80% submission rate)
             const submitters = enrolledInClass.filter(() => Math.random() < 0.8);
 
@@ -242,7 +242,7 @@ async function main() {
 
     // 8. Announcements
     console.log('📢 Creating class stream activity...');
-    const announcements = [];
+    const announcements: any[] = [];
     for (const cls of classes) {
         announcements.push({
             classId: cls.id,

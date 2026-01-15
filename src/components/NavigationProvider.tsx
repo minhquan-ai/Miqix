@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, useTransition } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useTransition, Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,7 +22,8 @@ export function useNavigation() {
     return useContext(NavigationContext);
 }
 
-export function NavigationProvider({ children }: { children: React.ReactNode }) {
+// Inner component that uses useSearchParams
+function NavigationProviderInner({ children }: { children: React.ReactNode }) {
     const [isNavigating, setIsNavigating] = useState(false);
     const [progress, setProgress] = useState(0);
     const pathname = usePathname();
@@ -127,6 +128,15 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
 
             {children}
         </NavigationContext.Provider>
+    );
+}
+
+// Wrapper that provides Suspense boundary for useSearchParams
+export function NavigationProvider({ children }: { children: React.ReactNode }) {
+    return (
+        <Suspense fallback={<>{children}</>}>
+            <NavigationProviderInner>{children}</NavigationProviderInner>
+        </Suspense>
     );
 }
 

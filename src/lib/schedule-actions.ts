@@ -138,7 +138,7 @@ export async function deletePersonalEventAction(eventId: string) {
 }
 
 export async function getAggregatedScheduleAction(weekStartStr?: string) {
-    let user = null;
+    let user: any = null;
     try {
         user = await getCurrentUserAction();
     } catch (e) {

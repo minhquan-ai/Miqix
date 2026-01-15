@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { getCurrentUserAction, getSubmissionsForTeacherAction, getAssignmentsAction } from "@/lib/actions";
 import { Assignment, Submission } from "@/types";
 import { ArrowLeft, Clock, FileText, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+export const dynamic = 'force-dynamic';
 
 export default function ActivityPage() {
     const router = useRouter();
