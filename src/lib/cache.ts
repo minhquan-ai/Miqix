@@ -70,6 +70,7 @@ export const CacheKeys = {
     classes: (userId: string) => `classes:${userId}`,
     assignments: (classId?: string) => classId ? `assignments:${classId}` : 'assignments:all',
     submissions: () => 'submissions:all',
+    classSubmissions: (classId: string) => `submissions:class:${classId}`,
     classMembers: (classId: string) => `members:${classId}`,
     announcements: (classId: string) => `announcements:${classId}`,
     resources: (classId: string) => `resources:${classId}`,

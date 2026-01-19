@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Plus, Search, BookOpen, Clock, CheckCircle, FileEdit, AlertTriangle, Calendar, MoreVertical, Trash2, Edit2, Archive, Copy, LayoutDashboard, MessageSquare, FolderOpen, Users, Bell, Info, ArrowLeft, ChevronRight, Check } from "lucide-react";
-import { getCurrentUserAction, getAssignmentsAction, getStudentSubmissionAction, getSubmissionsByAssignmentIdAction, createAnnouncementAction, getClassAnnouncementsAction, getTeacherAssignmentsAction, updateClassDetailsAction, getClassResourcesAction, getClassByIdAction, getPendingEnrollmentsAction, getSubmissionsAction } from "@/lib/actions";
+import { getCurrentUserAction, getAssignmentsAction, getStudentSubmissionAction, getSubmissionsByAssignmentIdAction, createAnnouncementAction, getClassAnnouncementsAction, getTeacherAssignmentsAction, updateClassDetailsAction, getClassResourcesAction, getClassByIdAction, getPendingEnrollmentsAction, getClassSubmissionsAction } from "@/lib/actions";
 import { getUserEnrollmentsAction, getClassMembersAction, removeStudentFromClassAction } from "@/lib/class-member-actions";
 import { getClassAttendanceStatsAction, getStudentAttendanceStatsAction } from "@/lib/attendance-actions";
 import StreamTabContent from '@/components/features/StreamTabContent';
@@ -681,29 +681,26 @@ export default function ClassDetailPage() {
 
                 // 3. Dependent UI Data (Submissions, Pending, etc.) in parallel
                 if (user.role === 'teacher') {
-                    const [pending, classStats, allSubs] = await Promise.all([
+                    const [pending, classStats, classSubmissions] = await Promise.all([
                         getPendingEnrollmentsAction(classId),
                         getClassAttendanceStatsAction(classId),
-                        // Optimized: Fetch all submissions and filter locally
-                        getSubmissionsAction()
+                        // Optimized: Fetch only submissions for this class
+                        getClassSubmissionsAction(classId)
                     ]);
 
                     setPendingStudents(pending);
                     setClassAttendanceRate(classStats.rate);
-
-                    const assignmentIds = new Set(classAssignments.map(a => a.id));
-                    const classSubmissions = allSubs.filter(s => assignmentIds.has(s.assignmentId));
                     setSubmissions(classSubmissions);
                 } else {
-                    const [enrollments, attendanceStats, allSubs] = await Promise.all([
+                    const [enrollments, attendanceStats, classSubmissions] = await Promise.all([
                         getUserEnrollmentsAction(),
                         getStudentAttendanceStatsAction(classId, user.id),
-                        getSubmissionsAction()
+                        // Optimized: Fetch only submissions for this class
+                        getClassSubmissionsAction(classId)
                     ]);
 
-                    // Submissions
-                    const assignmentIds = new Set(classAssignments.map(a => a.id));
-                    const mySubmissions = allSubs.filter(s => s.studentId === user.id && assignmentIds.has(s.assignmentId));
+                    // Submissions - filter for current student
+                    const mySubmissions = classSubmissions.filter(s => s.studentId === user.id);
                     setSubmissions(mySubmissions);
 
                     // Enrollment info

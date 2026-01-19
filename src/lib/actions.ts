@@ -582,6 +582,55 @@ export async function getSubmissionsAction(): Promise<Submission[]> {
     }, 30 * 1000); // Cache for 30 seconds
 }
 
+// Optimized: Get submissions for a specific class only
+export async function getClassSubmissionsAction(classId: string): Promise<Submission[]> {
+    const cacheKey = CacheKeys.classSubmissions(classId);
+
+    return serverCache.getOrFetch(cacheKey, async () => {
+        // Get all assignments for this class first
+        const classAssignments = await db.assignment.findMany({
+            where: {
+                assignmentClasses: {
+                    some: {
+                        classId: classId
+                    }
+                }
+            },
+            select: { id: true }
+        });
+
+        const assignmentIds = classAssignments.map(a => a.id);
+
+        // Fetch only submissions for these assignments
+        const submissions = await db.submission.findMany({
+            where: {
+                assignmentId: {
+                    in: assignmentIds
+                }
+            },
+            include: {
+                student: true,
+                assignment: true
+            },
+            orderBy: { submittedAt: 'desc' }
+        });
+
+        return submissions.map((sub: any) => ({
+            id: sub.id,
+            assignmentId: sub.assignmentId,
+            studentId: sub.studentId,
+            content: sub.content,
+            submittedAt: sub.submittedAt.toISOString(),
+            status: sub.status as 'submitted' | 'graded',
+            score: sub.score || undefined,
+            feedback: sub.feedback || undefined,
+            attachments: sanitizeAttachments(sub.attachments),
+            studentName: sub.student.name,
+            errorAnalysis: sub.errorAnalysis ? JSON.parse(sub.errorAnalysis) : undefined
+        }));
+    }, 30 * 1000); // Cache for 30 seconds
+}
+
 // --- Class Actions ---
 
 export async function getClassesAction(): Promise<Class[]> {
