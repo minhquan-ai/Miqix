@@ -371,8 +371,8 @@ const FlashcardCanvas = ({ data }: { data: { front: string; back: string }[] }) 
     return (
         <div className="flex flex-col items-center justify-center h-full p-6 space-y-8">
             <div className="text-center space-y-2">
-                <h3 className="text-2xl font-bold text-gray-800">Flashcard Ôn Tập</h3>
-                <p className="text-sm text-gray-500 font-medium">Thẻ {currentIndex + 1} / {data.length}</p>
+                <h3 className="text-2xl font-bold text-foreground">Flashcard Ôn Tập</h3>
+                <p className="text-sm text-muted-foreground font-medium">Thẻ {currentIndex + 1} / {data.length}</p>
             </div>
 
             <div
@@ -390,15 +390,15 @@ const FlashcardCanvas = ({ data }: { data: { front: string; back: string }[] }) 
                         <span className="text-sm font-bold uppercase tracking-widest opacity-70 mb-4">Câu hỏi / Thuật ngữ</span>
                         <h4 className="text-3xl font-bold leading-tight">{data[currentIndex].front}</h4>
                         <div className="absolute bottom-6 text-xs font-semibold opacity-60 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                            <span className="w-1.5 h-1.5 bg-card rounded-full animate-pulse" />
                             Chạm để lật
                         </div>
                     </div>
 
                     {/* Back */}
-                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white rounded-3xl p-8 flex flex-col items-center justify-center text-center border border-gray-100">
+                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-card rounded-3xl p-8 flex flex-col items-center justify-center text-center border border-border">
                         <span className="text-sm font-bold uppercase tracking-widest text-emerald-500 mb-4">Đáp án</span>
-                        <div className="prose prose-lg text-gray-800 leading-relaxed font-medium">
+                        <div className="prose prose-lg text-foreground leading-relaxed font-medium">
                             {data[currentIndex].back}
                         </div>
                     </div>
@@ -408,7 +408,7 @@ const FlashcardCanvas = ({ data }: { data: { front: string; back: string }[] }) 
             <div className="flex items-center gap-4">
                 <button
                     onClick={handlePrev}
-                    className="p-4 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-indigo-600 hover:border-indigo-200 hover:shadow-lg transition-all"
+                    className="p-4 rounded-full bg-card border border-border text-muted-foreground hover:text-indigo-600 hover:border-indigo-200 hover:shadow-lg transition-all"
                 >
                     <ChevronLeft className="w-6 h-6" />
                 </button>
@@ -481,10 +481,10 @@ const QuizCanvas = ({ data, title }: { data: QuizQuestion[]; title?: string }) =
                     {percentage}%
                 </div>
                 <div className="text-center space-y-2">
-                    <h3 className="text-2xl font-bold text-gray-800">
+                    <h3 className="text-2xl font-bold text-foreground">
                         {percentage >= 80 ? "Xuất sắc! 🎉" : percentage >= 60 ? "Khá tốt! 👍" : "Cần cố gắng thêm! 💪"}
                     </h3>
-                    <p className="text-gray-500">Bạn trả lời đúng {score}/{data.length} câu</p>
+                    <p className="text-muted-foreground">Bạn trả lời đúng {score}/{data.length} câu</p>
                 </div>
                 <button
                     onClick={handleRestart}
@@ -500,7 +500,7 @@ const QuizCanvas = ({ data, title }: { data: QuizQuestion[]; title?: string }) =
         <div className="max-w-2xl mx-auto p-6 space-y-6">
             {/* Progress */}
             <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-gray-500">Câu {currentIndex + 1}/{data.length}</span>
+                <span className="text-sm font-semibold text-muted-foreground">Câu {currentIndex + 1}/{data.length}</span>
                 <div className="flex-1 mx-4 h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
                         className="h-full bg-indigo-500 transition-all duration-300"
@@ -511,8 +511,8 @@ const QuizCanvas = ({ data, title }: { data: QuizQuestion[]; title?: string }) =
             </div>
 
             {/* Question */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <h3 className="text-xl font-bold text-gray-800 mb-6">{currentQuestion.question}</h3>
+            <div className="bg-card dark:bg-card p-6 rounded-2xl border border-border shadow-sm">
+                <h3 className="text-xl font-bold text-foreground mb-6">{currentQuestion.question}</h3>
 
                 <div className="space-y-3">
                     {currentQuestion.options.map((option, idx) => {
@@ -532,10 +532,10 @@ const QuizCanvas = ({ data, title }: { data: QuizQuestion[]; title?: string }) =
                                             ? "bg-emerald-100 text-emerald-800 border-2 border-emerald-500"
                                             : isSelected
                                                 ? "bg-rose-100 text-rose-800 border-2 border-rose-500"
-                                                : "bg-gray-50 text-gray-500"
+                                                : "bg-muted text-muted-foreground"
                                         : isSelected
                                             ? "bg-indigo-100 text-indigo-800 border-2 border-indigo-500"
-                                            : "bg-gray-50 hover:bg-gray-100 text-gray-700"
+                                            : "bg-muted hover:bg-muted text-foreground/80"
                                 )}
                             >
                                 <span className="font-bold mr-2">{String.fromCharCode(65 + idx)}.</span>
@@ -562,7 +562,7 @@ const QuizCanvas = ({ data, title }: { data: QuizQuestion[]; title?: string }) =
                         "px-6 py-3 rounded-xl font-semibold transition-all",
                         answers[currentIndex] !== null
                             ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-gray-100 text-muted-foreground/80 cursor-not-allowed"
                     )}
                 >
                     {currentIndex < data.length - 1 ? "Câu tiếp theo" : "Xem kết quả"}
@@ -584,11 +584,11 @@ const MindMapCanvas = ({ data }: { data: string }) => {
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-center p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Sơ đồ tư duy</h3>
-            <p className="text-sm text-gray-500 mb-6">Copy code và paste vào <a href="https://mermaid.live" target="_blank" rel="noopener" className="text-blue-600 underline">mermaid.live</a> để xem sơ đồ</p>
+            <h3 className="text-xl font-bold text-foreground mb-2">Sơ đồ tư duy</h3>
+            <p className="text-sm text-muted-foreground mb-6">Copy code và paste vào <a href="https://mermaid.live" target="_blank" rel="noopener" className="text-blue-600 underline">mermaid.live</a> để xem sơ đồ</p>
             <div className="w-full max-w-3xl bg-gray-900 rounded-2xl shadow-xl overflow-hidden">
                 <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-                    <span className="text-sm font-mono text-gray-400">mermaid</span>
+                    <span className="text-sm font-mono text-muted-foreground/80">mermaid</span>
                     <button
                         onClick={handleCopy}
                         className={cn(
@@ -610,12 +610,12 @@ const MindMapCanvas = ({ data }: { data: string }) => {
 const LessonPlanCanvas = ({ title, sections }: { title: string; sections: any[] }) => {
     return (
         <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500">
-            <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center space-y-4">
+            <div className="bg-card dark:bg-card rounded-2xl p-8 border border-border shadow-sm text-center space-y-4">
                 <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <BookOpen className="w-8 h-8" />
                 </div>
-                <h1 className="text-3xl font-black text-gray-900 leading-tight">{title}</h1>
-                <div className="flex items-center justify-center gap-2 text-sm font-semibold text-gray-500">
+                <h1 className="text-3xl font-black text-foreground leading-tight">{title}</h1>
+                <div className="flex items-center justify-center gap-2 text-sm font-semibold text-muted-foreground">
                     <span className="bg-gray-100 px-3 py-1 rounded-full">Giáo án</span>
                     <span className="bg-gray-100 px-3 py-1 rounded-full">{sections.length} phần</span>
                 </div>
@@ -623,20 +623,20 @@ const LessonPlanCanvas = ({ title, sections }: { title: string; sections: any[] 
 
             <div className="space-y-6">
                 {sections.map((section, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                    <div key={idx} className="bg-card dark:bg-card rounded-2xl p-6 border border-border shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500" />
-                        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
                             {section.heading}
                         </h3>
-                        <div className="prose prose-sm text-gray-600 max-w-none prose-p:leading-loose">
+                        <div className="prose prose-sm text-muted-foreground max-w-none prose-p:leading-loose">
                             <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{section.content}</ReactMarkdown>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="flex justify-end gap-3 pt-6 border-t border-dashed border-gray-200">
-                <button className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-colors">
+            <div className="flex justify-end gap-3 pt-6 border-t border-dashed border-border">
+                <button className="px-5 py-2.5 bg-gray-100 hover:bg-muted/80 text-foreground/80 rounded-xl font-bold transition-colors">
                     Xuất PDF
                 </button>
                 <button className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-200 transition-colors">
@@ -1083,7 +1083,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
         const hours = diff / (1000 * 60 * 60);
         if (hours < 0) return { text: "Quá hạn", color: "text-red-600 bg-red-50" };
         if (hours < 24) return { text: "Hôm nay", color: "text-orange-500 bg-orange-50" };
-        return { text: format(date, "dd/MM"), color: "text-gray-500 bg-gray-50" };
+        return { text: format(date, "dd/MM"), color: "text-muted-foreground bg-muted" };
     };
 
     const handleQuickAction = (action: "assignments" | "grades" | "flashcards" | "history" | "classes") => {
@@ -1326,25 +1326,25 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
     const currentModeInfo = MODES.find(m => m.id === chatMode) || MODES[0];
 
     return (
-        <div className="page-container !p-0 flex overflow-hidden font-sans text-[#202124] relative">
+        <div className="page-container !p-0 flex overflow-hidden font-sans text-foreground relative">
             {/* LEFT SIDEBAR - CHAT HISTORY */}
             <div className={cn(
-                "fixed inset-y-0 left-0 z-10 w-72 bg-[#f8f9fa] border-r border-gray-200 transition-all duration-300 transform md:relative md:translate-x-0 flex flex-col overflow-hidden",
+                "fixed inset-y-0 left-0 z-10 w-72 bg-muted border-r border-border transition-all duration-300 transform md:relative md:translate-x-0 flex flex-col overflow-hidden",
                 isHistoryVisible ? "translate-x-0" : "-translate-x-full md:absolute md:w-0 md:opacity-0 pointer-events-none"
             )}>
                 <div className="p-4 flex flex-col h-full">
                     <button
                         onClick={createNewChat}
-                        className="flex items-center gap-3 w-full p-3 bg-white hover:bg-gray-100 border border-gray-200 rounded-2xl transition-all shadow-sm mb-6 group"
+                        className="flex items-center gap-3 w-full p-3 bg-card hover:bg-muted border border-border rounded-2xl transition-all shadow-sm mb-6 group"
                     >
                         <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                             <Plus className="w-5 h-5" />
                         </div>
-                        <span className="text-sm font-bold text-gray-700">Đoạn chat mới</span>
+                        <span className="text-sm font-bold text-foreground/80">Đoạn chat mới</span>
                     </button>
 
                     <div className="flex-1 overflow-y-auto space-y-1 pr-1 scrollbar-thin scrollbar-thumb-gray-200">
-                        <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest px-3 mb-2">Gần đây</h3>
+                        <h3 className="text-[11px] font-black text-muted-foreground/80 uppercase tracking-widest px-3 mb-2">Gần đây</h3>
                         {sessions.length > 0 ? (
                             sessions.map(session => (
                                 <div
@@ -1352,20 +1352,20 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                     onClick={() => switchSession(session.id)}
                                     className={cn(
                                         "group flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all",
-                                        currentSessionId === session.id ? "bg-white shadow-sm border border-gray-100" : "hover:bg-gray-200/50"
+                                        currentSessionId === session.id ? "bg-card dark:bg-card shadow-sm border border-border" : "hover:bg-muted/80/50"
                                     )}
                                 >
                                     <div className="flex items-center gap-3 overflow-hidden flex-1">
-                                        <MessageSquare className={cn("w-4 h-4 shrink-0", currentSessionId === session.id ? "text-blue-600" : "text-gray-400")} />
+                                        <MessageSquare className={cn("w-4 h-4 shrink-0", currentSessionId === session.id ? "text-blue-600" : "text-muted-foreground/80")} />
                                         <div className="flex flex-col flex-1 overflow-hidden">
                                             <span className={cn(
                                                 "text-sm truncate",
-                                                currentSessionId === session.id ? "font-bold text-gray-900" : "text-gray-600 font-medium"
+                                                currentSessionId === session.id ? "font-bold text-foreground" : "text-muted-foreground font-medium"
                                             )}>
                                                 {session.title}
                                             </span>
                                             {(session as any).source && (
-                                                <span className="text-[10px] text-gray-400 font-medium">
+                                                <span className="text-[10px] text-muted-foreground/80 font-medium">
                                                     Từ: {(session as any).source}
                                                 </span>
                                             )}
@@ -1373,25 +1373,25 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                     </div>
                                     <button
                                         onClick={(e) => deleteSession(session.id, e)}
-                                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded-md transition-all"
+                                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-muted/80 rounded-md transition-all"
                                     >
-                                        <X className="w-3.5 h-3.5 text-gray-400" />
+                                        <X className="w-3.5 h-3.5 text-muted-foreground/80" />
                                     </button>
                                 </div>
                             ))
                         ) : (
-                            <div className="px-3 py-4 text-xs text-gray-400 font-medium">Chưa có lịch sử.</div>
+                            <div className="px-3 py-4 text-xs text-muted-foreground/80 font-medium">Chưa có lịch sử.</div>
                         )}
                     </div>
 
-                    <div className="pt-4 border-t border-gray-200 mt-auto">
+                    <div className="pt-4 border-t border-border mt-auto">
                         <div className="flex items-center gap-3 p-3">
                             <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
                                 <Sparkles className="w-4 h-4" />
                             </div>
                             <div>
-                                <p className="text-xs font-bold text-gray-700">MiQiX Pro</p>
-                                <p className="text-[10px] text-gray-500">Mở khóa sức mạnh AI</p>
+                                <p className="text-xs font-bold text-foreground/80">MiQiX Pro</p>
+                                <p className="text-[10px] text-muted-foreground">Mở khóa sức mạnh AI</p>
                             </div>
                         </div>
                     </div>
@@ -1413,32 +1413,32 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                     isCanvasOpen ? "w-1/2" : "w-full"
                 )}>
                     {/* Header */}
-                    <header className="h-16 flex items-center justify-between px-6 border-b border-gray-100 shrink-0 sticky top-0 bg-white/80 backdrop-blur-md z-20">
+                    <header className="h-16 flex items-center justify-between px-6 border-b border-border shrink-0 sticky top-0 bg-card/80 backdrop-blur-md z-20">
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => setIsHistoryVisible(!isHistoryVisible)}
-                                className="p-2 hover:bg-gray-100 rounded-xl text-gray-500 transition-colors"
+                                className="p-2 hover:bg-muted rounded-xl text-muted-foreground transition-colors"
                                 title="Lịch sử chat"
                             >
                                 <PanelLeft className="w-5 h-5" />
                             </button>
                             <div className="flex items-center gap-2">
                                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                                <h1 className="font-bold text-gray-900 group flex items-center gap-1.5">
+                                <h1 className="font-bold text-foreground group flex items-center gap-1.5">
                                     {MODES.find(m => m.id === chatMode)?.label}
-                                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                                    <ChevronDown className="w-4 h-4 text-muted-foreground/80" />
                                 </h1>
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="relative group z-30">
-                                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-blue-500 transition-colors" />
+                                <Search className="w-5 h-5 text-muted-foreground/80 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-blue-500 transition-colors" />
                                 <input
                                     type="text"
                                     placeholder="Tìm kiếm, lệnh, tài nguyên..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 pr-4 py-2 w-48 md:w-80 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                    className="pl-10 pr-4 py-2 w-48 md:w-80 bg-muted border border-border rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white transition-all outline-none"
                                 />
 
                                 {/* Smart Search Dropdown */}
@@ -1449,7 +1449,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                             transition={{ duration: 0.2 }}
-                                            className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                                            className="absolute top-full left-0 right-0 mt-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-border overflow-hidden"
                                         >
                                             <div className="max-h-[60vh] overflow-y-auto thin-scrollbar p-2 space-y-4">
 
@@ -1457,7 +1457,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                 {(allAssignments.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ||
                                                     allClasses.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).length > 0) && (
                                                         <div>
-                                                            <div className="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                                            <div className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-2">
                                                                 <Command className="w-3 h-3" /> Tài nguyên & Lệnh
                                                             </div>
                                                             <div className="space-y-1">
@@ -1479,7 +1479,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                                                 {isSelected ? <CheckCircle className="w-4 h-4" /> : <ListTodo className="w-4 h-4" />}
                                                                             </div>
                                                                             <div>
-                                                                                <div className="text-xs font-bold text-gray-800">{a.title}</div>
+                                                                                <div className="text-xs font-bold text-foreground">{a.title}</div>
                                                                                 <div className="text-[10px] text-blue-600 font-medium">
                                                                                     {isSelected ? "Đang chọn" : "Thêm vào ngữ cảnh"}
                                                                                 </div>
@@ -1505,7 +1505,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                                                 {isSelected ? <CheckCircle className="w-4 h-4" /> : <LayoutGrid className="w-4 h-4" />}
                                                                             </div>
                                                                             <div>
-                                                                                <div className="text-xs font-bold text-gray-800">{c.name}</div>
+                                                                                <div className="text-xs font-bold text-foreground">{c.name}</div>
                                                                                 <div className="text-[10px] text-indigo-600 font-medium">
                                                                                     {isSelected ? "Đang chọn" : "Thêm vào ngữ cảnh"}
                                                                                 </div>
@@ -1520,7 +1520,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                 {/* 2. Results from Current Chat */}
                                                 {messages.filter(m => m.content.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 && (
                                                     <div>
-                                                        <div className="px-2 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                                                        <div className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-2">
                                                             <MessageSquare className="w-3 h-3" /> Trong hội thoại này
                                                         </div>
                                                         <div className="space-y-1">
@@ -1536,17 +1536,17 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                                         }
                                                                         setSearchQuery("");
                                                                     }}
-                                                                    className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-gray-50 text-left transition-colors group"
+                                                                    className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-muted text-left transition-colors group"
                                                                 >
                                                                     <div className={cn(
                                                                         "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-                                                                        m.role === 'user' ? "bg-gray-200 text-gray-600" : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+                                                                        m.role === 'user' ? "bg-gray-200 text-muted-foreground" : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
                                                                     )}>
                                                                         {m.role === 'user' ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3" />}
                                                                     </div>
                                                                     <div className="flex-1 min-w-0">
-                                                                        <div className="text-xs text-gray-500 mb-0.5 font-medium">{m.role === 'user' ? "Bạn" : "AI"} • <span className="text-[10px] opacity-70">Vừa xong</span></div>
-                                                                        <div className="text-xs text-gray-800 line-clamp-2 leading-relaxed">
+                                                                        <div className="text-xs text-muted-foreground mb-0.5 font-medium">{m.role === 'user' ? "Bạn" : "AI"} • <span className="text-[10px] opacity-70">Vừa xong</span></div>
+                                                                        <div className="text-xs text-foreground line-clamp-2 leading-relaxed">
                                                                             {m.content.split(new RegExp(`(${searchQuery})`, 'gi')).map((part, i) =>
                                                                                 part.toLowerCase() === searchQuery.toLowerCase()
                                                                                     ? <span key={i} className="bg-yellow-200 text-yellow-900 rounded-[2px] px-0.5">{part}</span>
@@ -1566,18 +1566,18 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                     allClasses.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 &&
                                                     !searchQuery.startsWith("/") && (
                                                         <div className="py-8 text-center">
-                                                            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                            <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
                                                                 <Search className="w-5 h-5 text-gray-300" />
                                                             </div>
-                                                            <p className="text-xs text-gray-500 font-medium">Không tìm thấy kết quả nào</p>
+                                                            <p className="text-xs text-muted-foreground font-medium">Không tìm thấy kết quả nào</p>
                                                         </div>
                                                     )}
                                             </div>
 
                                             {/* Footer */}
-                                            <div className="px-4 py-2 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between">
-                                                <span className="text-[10px] text-gray-400"><strong>Enter</strong> để chọn kết quả đầu tiên</span>
-                                                <span className="text-[10px] text-gray-400"><strong>Esc</strong> để đóng</span>
+                                            <div className="px-4 py-2 bg-muted/50 border-t border-border flex items-center justify-between">
+                                                <span className="text-[10px] text-muted-foreground/80"><strong>Enter</strong> để chọn kết quả đầu tiên</span>
+                                                <span className="text-[10px] text-muted-foreground/80"><strong>Esc</strong> để đóng</span>
                                             </div>
                                         </motion.div>
                                     )}
@@ -1585,7 +1585,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                             </div>
                             <div className="hidden sm:flex items-center bg-gray-100 rounded-full px-3 py-1 gap-2">
                                 <Zap className="w-3.5 h-3.5 text-blue-500" />
-                                <span className="text-[11px] font-black text-gray-600 uppercase tracking-wider">MiMo V2 Flash</span>
+                                <span className="text-[11px] font-black text-muted-foreground uppercase tracking-wider">MiMo V2 Flash</span>
                             </div>
                         </div>
                     </header>
@@ -1604,12 +1604,12 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                         <div className="hidden xl:flex xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
                                             {/* Widget Column Header - Left Side */}
                                             <div className="flex items-center justify-between mb-3 px-1">
-                                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tiện ích</h3>
+                                                <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider">Tiện ích</h3>
                                                 <button
                                                     onClick={() => setIsEditingWidgets(!isEditingWidgets)}
                                                     className={cn(
                                                         "p-1.5 rounded-lg transition-colors",
-                                                        isEditingWidgets ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-400"
+                                                        isEditingWidgets ? "bg-blue-100 text-blue-600" : "hover:bg-muted text-muted-foreground/80"
                                                     )}
                                                     title={isEditingWidgets ? "Xong" : "Sắp xếp & Chỉnh sửa"}
                                                     aria-label={isEditingWidgets ? "Tắt chế độ chỉnh sửa" : "Bật chế độ chỉnh sửa tiện ích"}
@@ -1687,7 +1687,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                     "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all shadow-md",
                                                     showToolHub
                                                         ? "bg-gray-900 text-white hover:bg-gray-800"
-                                                        : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+                                                        : "bg-card dark:bg-card text-foreground/80 hover:bg-muted border border-border"
                                                 )}
                                             >
                                                 <LayoutGrid className="w-4 h-4" />
@@ -1700,25 +1700,25 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                             <div className="w-full max-w-2xl space-y-6 pt-10">
                                                 {/* AI Greeting */}
                                                 <div className="text-center mb-4">
-                                                    <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
+                                                    <h2 className="text-3xl font-bold text-foreground tracking-tight mb-2">
                                                         {isTeacher ? "Công cụ Giảng dạy" : "Công cụ Học tập"}
                                                     </h2>
-                                                    <p className="text-base text-gray-500">
+                                                    <p className="text-base text-muted-foreground">
                                                         {isTeacher ? "Truy cập nhanh các tính năng hỗ trợ giảng dạy" : "Truy cập nhanh các tính năng hữu ích"}
                                                     </p>
                                                 </div>
 
                                                 {/* Stats Bar - Horizontal compact */}
-                                                <div className="flex items-center justify-between bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                                                <div className="flex items-center justify-between bg-card rounded-2xl p-4 border border-border shadow-sm">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
                                                             <ListTodo className="w-5 h-5 text-blue-500" />
                                                         </div>
                                                         <div>
-                                                            <p className="text-xs text-gray-500 font-medium">{isTeacher ? "Cần chấm" : "Bài tập"}</p>
-                                                            <p className="text-lg font-bold text-gray-900">
+                                                            <p className="text-xs text-muted-foreground font-medium">{isTeacher ? "Cần chấm" : "Bài tập"}</p>
+                                                            <p className="text-lg font-bold text-foreground">
                                                                 {isTeacher ? (analytics?.ungradedCount || 0) : pendingAssignments.length}
-                                                                <span className="text-xs text-gray-400 font-normal ml-1">
+                                                                <span className="text-xs text-muted-foreground/80 font-normal ml-1">
                                                                     {isTeacher ? " bài" : `/ ${allAssignments.length}`}
                                                                 </span>
                                                             </p>
@@ -1730,10 +1730,10 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                             <Activity className="w-5 h-5 text-rose-500" />
                                                         </div>
                                                         <div>
-                                                            <p className="text-xs text-gray-500 font-medium">{isTeacher ? "Lớp học" : "Điểm TB"}</p>
-                                                            <p className="text-lg font-bold text-gray-900">
+                                                            <p className="text-xs text-muted-foreground font-medium">{isTeacher ? "Lớp học" : "Điểm TB"}</p>
+                                                            <p className="text-lg font-bold text-foreground">
                                                                 {isTeacher ? allClasses.length : (analytics?.myAverageScore?.toFixed(1) || "0.0")}
-                                                                <span className={cn("text-xs font-normal ml-1", isTeacher ? "text-gray-400" : "text-emerald-500")}>
+                                                                <span className={cn("text-xs font-normal ml-1", isTeacher ? "text-muted-foreground/80" : "text-emerald-500")}>
                                                                     {isTeacher ? " lớp" : "/ 10"}
                                                                 </span>
                                                             </p>
@@ -1745,10 +1745,10 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                             <CheckCircle className="w-5 h-5 text-emerald-500" />
                                                         </div>
                                                         <div>
-                                                            <p className="text-xs text-gray-500 font-medium">{isTeacher ? "Nộp bài" : "Chuyên cần"}</p>
-                                                            <p className="text-lg font-bold text-gray-900">
+                                                            <p className="text-xs text-muted-foreground font-medium">{isTeacher ? "Nộp bài" : "Chuyên cần"}</p>
+                                                            <p className="text-lg font-bold text-foreground">
                                                                 {isTeacher ? (analytics?.submissionRate || "100") : (analytics?.myAttendanceRate || "100")}
-                                                                <span className="text-xs text-gray-400 font-normal ml-0.5">%</span>
+                                                                <span className="text-xs text-muted-foreground/80 font-normal ml-0.5">%</span>
                                                             </p>
                                                         </div>
                                                     </div>
@@ -1776,7 +1776,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                             onClick={() => handleSend(isTeacher
                                                                 ? (analytics?.ungradedCount > 0 ? "Hỗ trợ mình chấm bài" : "Soạn bài giảng mới")
                                                                 : (pendingAssignments.length > 0 ? "Giúp mình giải bài tập" : "Tóm tắt kiến thức cho mình"))}
-                                                            className="px-4 py-2 bg-white text-gray-900 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors shrink-0"
+                                                            className="px-4 py-2 bg-card text-foreground rounded-xl text-sm font-semibold hover:bg-muted transition-colors shrink-0"
                                                         >
                                                             Bắt đầu
                                                         </button>
@@ -1787,50 +1787,50 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <button
                                                         onClick={() => handleSend(isTeacher ? "Soạn giáo án cho tiết học mới" : "Tạo flashcard ôn tập cho mình")}
-                                                        className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-purple-200 hover:bg-purple-50 rounded-2xl transition-all group"
+                                                        className="flex items-center gap-3 p-4 bg-card border border-border hover:border-purple-200 hover:bg-purple-50 rounded-2xl transition-all group"
                                                     >
                                                         <div className="w-10 h-10 rounded-xl bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
                                                             <Sparkles className="w-5 h-5 text-purple-500" />
                                                         </div>
                                                         <div className="text-left">
-                                                            <p className="text-sm font-semibold text-gray-800">{isTeacher ? "Soạn giáo án" : "Flashcard"}</p>
-                                                            <p className="text-xs text-gray-500">{isTeacher ? "Thiết kế bài dạy" : "Ôn tập nhanh"}</p>
+                                                            <p className="text-sm font-semibold text-foreground">{isTeacher ? "Soạn giáo án" : "Flashcard"}</p>
+                                                            <p className="text-xs text-muted-foreground">{isTeacher ? "Thiết kế bài dạy" : "Ôn tập nhanh"}</p>
                                                         </div>
                                                     </button>
                                                     <button
                                                         onClick={() => handleSend(isTeacher ? "Lịch dạy hôm nay của mình thế nào?" : "Lịch học hôm nay của mình là gì?")}
-                                                        className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-blue-200 hover:bg-blue-50 rounded-2xl transition-all group"
+                                                        className="flex items-center gap-3 p-4 bg-card border border-border hover:border-blue-200 hover:bg-blue-50 rounded-2xl transition-all group"
                                                     >
                                                         <div className="w-10 h-10 rounded-xl bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
                                                             <Calendar className="w-5 h-5 text-blue-500" />
                                                         </div>
                                                         <div className="text-left">
-                                                            <p className="text-sm font-semibold text-gray-800">{isTeacher ? "Lịch dạy" : "Lịch học"}</p>
-                                                            <p className="text-xs text-gray-500">Hôm nay</p>
+                                                            <p className="text-sm font-semibold text-foreground">{isTeacher ? "Lịch dạy" : "Lịch học"}</p>
+                                                            <p className="text-xs text-muted-foreground">Hôm nay</p>
                                                         </div>
                                                     </button>
                                                     <button
                                                         onClick={() => handleSend(isTeacher ? "Tạo bài tập về nhà cho lớp" : "Tạo quiz kiểm tra kiến thức")}
-                                                        className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50 rounded-2xl transition-all group"
+                                                        className="flex items-center gap-3 p-4 bg-card border border-border hover:border-emerald-200 hover:bg-emerald-50 rounded-2xl transition-all group"
                                                     >
                                                         <div className="w-10 h-10 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
                                                             <CheckCircle className="w-5 h-5 text-emerald-500" />
                                                         </div>
                                                         <div className="text-left">
-                                                            <p className="text-sm font-semibold text-gray-800">{isTeacher ? "Tạo bài tập" : "Quiz"}</p>
-                                                            <p className="text-xs text-gray-500">{isTeacher ? "Giao bài mới" : "Tự kiểm tra"}</p>
+                                                            <p className="text-sm font-semibold text-foreground">{isTeacher ? "Tạo bài tập" : "Quiz"}</p>
+                                                            <p className="text-xs text-muted-foreground">{isTeacher ? "Giao bài mới" : "Tự kiểm tra"}</p>
                                                         </div>
                                                     </button>
                                                     <button
                                                         onClick={() => handleSend(isTeacher ? "Phân tích tình hình học tập của lớp" : "Tóm tắt bài học hôm nay")}
-                                                        className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-amber-200 hover:bg-amber-50 rounded-2xl transition-all group"
+                                                        className="flex items-center gap-3 p-4 bg-card border border-border hover:border-amber-200 hover:bg-amber-50 rounded-2xl transition-all group"
                                                     >
                                                         <div className="w-10 h-10 rounded-xl bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center transition-colors">
                                                             <Activity className="w-5 h-5 text-amber-500" />
                                                         </div>
                                                         <div className="text-left">
-                                                            <p className="text-sm font-semibold text-gray-800">{isTeacher ? "Phân tích lớp" : "Tóm tắt"}</p>
-                                                            <p className="text-xs text-gray-500">{isTeacher ? "Báo cáo hiệu suất" : "Ghi chú nhanh"}</p>
+                                                            <p className="text-sm font-semibold text-foreground">{isTeacher ? "Phân tích lớp" : "Tóm tắt"}</p>
+                                                            <p className="text-xs text-muted-foreground">{isTeacher ? "Báo cáo hiệu suất" : "Ghi chú nhanh"}</p>
                                                         </div>
                                                     </button>
                                                 </div>
@@ -1839,19 +1839,19 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                             /* Greeting View (Default) */
                                             <div className="text-center space-y-6">
                                                 <div className="relative inline-block">
-                                                    <div className="w-20 h-20 bg-white border-2 border-gray-100 rounded-2xl flex items-center justify-center shadow-lg">
+                                                    <div className="w-20 h-20 bg-card border-2 border-border rounded-2xl flex items-center justify-center shadow-lg">
                                                         <Bot className="w-10 h-10 text-teal-500" />
                                                     </div>
-                                                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md border border-gray-100">
+                                                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-card rounded-full flex items-center justify-center shadow-md border border-border">
                                                         <Sparkles className="w-3.5 h-3.5 text-teal-400" />
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    <h2 className="text-2xl font-bold text-gray-900">
+                                                    <h2 className="text-2xl font-bold text-foreground">
                                                         Chào {isTeacher ? "Thầy/Cô" : "bạn"}, mình là MiQiX AI!
                                                     </h2>
-                                                    <p className="text-base text-gray-500 font-medium max-w-md mx-auto">
+                                                    <p className="text-base text-muted-foreground font-medium max-w-md mx-auto">
                                                         {isTeacher ? "Trợ lý giảng dạy cá nhân của Thầy/Cô. Sẵn sàng hỗ trợ mọi lúc." : "Trợ lý học tập cá nhân của bạn. Sẵn sàng hỗ trợ mọi lúc."}
                                                     </p>
                                                 </div>
@@ -1862,7 +1862,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                         <button
                                                             key={idx}
                                                             onClick={() => handleSend(text)}
-                                                            className="flex items-center gap-3 p-4 bg-white border border-gray-100 hover:border-teal-200 hover:bg-teal-50/30 rounded-2xl text-sm font-medium text-gray-700 hover:text-teal-700 text-left transition-all shadow-sm hover:shadow-md group"
+                                                            className="flex items-center gap-3 p-4 bg-card border border-border hover:border-teal-200 hover:bg-teal-50/30 rounded-2xl text-sm font-medium text-foreground/80 hover:text-teal-700 text-left transition-all shadow-sm hover:shadow-md group"
                                                         >
                                                             <Sparkles className="w-5 h-5 text-teal-400 shrink-0" />
                                                             <span>{text}</span>
@@ -1877,12 +1877,12 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                     {!isCanvasOpen && (
                                         <div className="hidden xl:flex xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
                                             <div className="flex items-center justify-between mb-3 px-1">
-                                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tiện ích</h3>
+                                                <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider">Tiện ích</h3>
                                                 <button
                                                     onClick={() => setIsEditingWidgets(!isEditingWidgets)}
                                                     className={cn(
                                                         "p-1.5 rounded-lg transition-colors",
-                                                        isEditingWidgets ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-400"
+                                                        isEditingWidgets ? "bg-blue-100 text-blue-600" : "hover:bg-muted text-muted-foreground/80"
                                                     )}
                                                     title={isEditingWidgets ? "Xong" : "Sắp xếp & Chỉnh sửa"}
                                                     aria-label={isEditingWidgets ? "Tắt chế độ chỉnh sửa" : "Bật chế độ chỉnh sửa tiện ích"}
@@ -1979,7 +1979,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                         "px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm break-words overflow-hidden",
                                                         msg.role === "user"
                                                             ? "bg-gray-900 text-white rounded-br-none"
-                                                            : "bg-white border border-gray-100 text-gray-800 rounded-bl-none"
+                                                            : "bg-card dark:bg-card border border-border text-foreground rounded-bl-none"
                                                     )}>
                                                         {(msg.role === "ai" || msg.role === 'assistant') && msg.reasoning && (
                                                             <ThinkingBar
@@ -2006,7 +2006,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shrink-0">
                                                 <Loader2 className="w-4 h-4 animate-spin" />
                                             </div>
-                                            <div className="bg-white border border-gray-100 px-4 py-3 rounded-2xl rounded-bl-none shadow-sm">
+                                            <div className="bg-card dark:bg-card border border-border px-4 py-3 rounded-2xl rounded-bl-none shadow-sm">
                                                 <div className="flex gap-1.5 mt-1">
                                                     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
                                                     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
@@ -2023,7 +2023,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
 
                     {/* Chat Input Area */}
                     <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-10 px-4 md:px-6 z-20">
-                        <div className="max-w-2xl mx-auto bg-white rounded-[2rem] shadow-xl shadow-blue-900/5 border border-gray-100 p-3 relative group focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                        <div className="max-w-2xl mx-auto bg-card rounded-[2rem] shadow-xl shadow-blue-900/5 border border-border p-3 relative group focus-within:ring-2 focus-within:ring-blue-100 transition-all">
                             {/* Selected Context Indicators */}
                             {(targetAssignmentIds.length > 0 || targetClassIds.length > 0 || isCanvasMode) && (
                                 <div className="absolute -top-9 left-3 flex items-center gap-1.5 flex-wrap">
@@ -2031,26 +2031,26 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                         <button
                                             key={id}
                                             onClick={() => toggleAssignment(id)}
-                                            className="flex items-center gap-1 bg-white border border-gray-200 text-gray-600 pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-gray-50 transition-colors animate-in fade-in zoom-in duration-200"
+                                            className="flex items-center gap-1 bg-card border border-border text-muted-foreground pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-muted transition-colors animate-in fade-in zoom-in duration-200"
                                         >
                                             <ListTodo className="w-3 h-3 text-blue-500" />
                                             <span className="truncate max-w-[100px]">
                                                 {allAssignments.find(a => a.id === id)?.title || "Bài tập"}
                                             </span>
-                                            <X className="w-3 h-3 text-gray-400" />
+                                            <X className="w-3 h-3 text-muted-foreground/80" />
                                         </button>
                                     ))}
                                     {targetClassIds.map(id => (
                                         <button
                                             key={id}
                                             onClick={() => toggleClass(id)}
-                                            className="flex items-center gap-1 bg-white border border-gray-200 text-gray-600 pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-gray-50 transition-colors animate-in fade-in zoom-in duration-200"
+                                            className="flex items-center gap-1 bg-card border border-border text-muted-foreground pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-muted transition-colors animate-in fade-in zoom-in duration-200"
                                         >
                                             <LayoutGrid className="w-3 h-3 text-indigo-500" />
                                             <span className="truncate max-w-[100px]">
                                                 {allClasses.find(c => c.id === id)?.name || "Lớp học"}
                                             </span>
-                                            <X className="w-3 h-3 text-gray-400" />
+                                            <X className="w-3 h-3 text-muted-foreground/80" />
                                         </button>
                                     ))}
                                     {isCanvasMode && (
@@ -2079,7 +2079,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                             <div className="flex items-center gap-2 relative">
                                 <button
                                     onClick={() => setShowModeMenu(!showModeMenu)}
-                                    className="p-3 bg-gray-50 hover:bg-gray-100 rounded-full text-gray-500 transition-colors shrink-0"
+                                    className="p-3 bg-muted hover:bg-muted rounded-full text-muted-foreground transition-colors shrink-0"
                                 >
                                     <Plus className={cn("w-5 h-5 transition-transform", showModeMenu && "rotate-45")} />
                                 </button>
@@ -2088,16 +2088,16 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                 {showModeMenu && (
                                     <div
                                         ref={menuRef}
-                                        className="fixed md:absolute bottom-full left-0 md:left-0 mb-5 w-[calc(100vw-32px)] md:w-[420px] lg:w-[500px] bg-white/95 backdrop-blur-2xl rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-gray-100 p-5 z-50 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-300"
+                                        className="fixed md:absolute bottom-full left-0 md:left-0 mb-5 w-[calc(100vw-32px)] md:w-[420px] lg:w-[500px] bg-white/95 backdrop-blur-2xl rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-border p-5 z-50 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-300"
                                     >
                                         {/* Header */}
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-1 h-4 bg-indigo-500 rounded-full" />
-                                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Chọn chế độ trợ lý</h3>
+                                                <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-[0.2em]">Chọn chế độ trợ lý</h3>
                                             </div>
-                                            <button onClick={() => setShowModeMenu(false)} className="p-2 hover:bg-gray-50 rounded-xl transition-all">
-                                                <X className="w-5 h-5 text-gray-400" />
+                                            <button onClick={() => setShowModeMenu(false)} className="p-2 hover:bg-muted rounded-xl transition-all">
+                                                <X className="w-5 h-5 text-muted-foreground/80" />
                                             </button>
                                         </div>
 
@@ -2121,20 +2121,20 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                         className={cn(
                                                             "p-2.5 rounded-xl cursor-pointer border-2 transition-all relative group flex items-center gap-3 text-left",
                                                             isActive
-                                                                ? "bg-white border-indigo-500 shadow-sm"
-                                                                : "bg-gray-50/30 border-transparent hover:border-indigo-100 hover:bg-white"
+                                                                ? "bg-card dark:bg-card border-indigo-500 shadow-sm"
+                                                                : "bg-muted/30 border-transparent hover:border-indigo-100 hover:bg-white"
                                                         )}
                                                     >
                                                         <div className={cn(
                                                             "w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0",
                                                             isActive
                                                                 ? "bg-indigo-500 text-white shadow-sm"
-                                                                : "bg-white text-indigo-400 border border-gray-100 group-hover:bg-indigo-50"
+                                                                : "bg-card dark:bg-card text-indigo-400 border border-border group-hover:bg-indigo-50"
                                                         )}>
                                                             <IconComponent className="w-5 h-5" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className={cn("font-bold text-[14px] leading-tight transition-colors", isActive ? "text-indigo-900" : "text-gray-800")}>
+                                                            <h4 className={cn("font-bold text-[14px] leading-tight transition-colors", isActive ? "text-indigo-900" : "text-foreground")}>
                                                                 {mode.label}
                                                             </h4>
                                                         </div>
@@ -2161,12 +2161,12 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                     <div className="p-3 bg-gradient-to-br from-indigo-50/50 to-white rounded-2xl border border-indigo-100/50 shadow-sm">
                                                         <div className="flex items-center justify-between gap-3">
                                                             <div className="flex items-center gap-2.5">
-                                                                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-indigo-500 shadow-sm">
+                                                                <div className="w-8 h-8 bg-card rounded-lg flex items-center justify-center text-indigo-500 shadow-sm">
                                                                     <GraduationCap className="w-4 h-4" />
                                                                 </div>
                                                                 <div>
-                                                                    <p className="text-[12px] font-bold text-gray-800">Phương pháp Socratic</p>
-                                                                    <p className="text-[10px] text-gray-500 font-medium">AI gợi mở thay vì trả lời ngay</p>
+                                                                    <p className="text-[12px] font-bold text-foreground">Phương pháp Socratic</p>
+                                                                    <p className="text-[10px] text-muted-foreground font-medium">AI gợi mở thay vì trả lời ngay</p>
                                                                 </div>
                                                             </div>
                                                             <button
@@ -2180,7 +2180,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                                 )}
                                                             >
                                                                 <span className={cn(
-                                                                    "inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-sm",
+                                                                    "inline-block h-3.5 w-3.5 transform rounded-full bg-card transition-transform shadow-sm",
                                                                     isSocraticMode ? "translate-x-4.5" : "translate-x-1"
                                                                 )} />
                                                             </button>
@@ -2191,7 +2191,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                         </AnimatePresence>
 
                                         {/* Divider */}
-                                        <div className="border-t border-gray-100 my-3" />
+                                        <div className="border-t border-border my-3" />
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-3">
                                             {/* Assignment Selector */}
@@ -2203,12 +2203,12 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                     }}
                                                     className={cn(
                                                         "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left",
-                                                        targetAssignmentIds.length > 0 ? "bg-blue-50/80 border border-blue-200 text-blue-700" : "bg-gray-50/50 border border-gray-100 hover:border-gray-300 text-gray-700"
+                                                        targetAssignmentIds.length > 0 ? "bg-blue-50/80 border border-blue-200 text-blue-700" : "bg-muted/50 border border-border hover:border-gray-300 text-foreground/80"
                                                     )}
                                                 >
                                                     <div className={cn(
                                                         "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
-                                                        targetAssignmentIds.length > 0 ? "bg-white shadow-sm" : "bg-white border border-gray-100"
+                                                        targetAssignmentIds.length > 0 ? "bg-card dark:bg-card shadow-sm" : "bg-card dark:bg-card border border-border"
                                                     )}>
                                                         <ListTodo className="w-3 h-3" />
                                                     </div>
@@ -2226,7 +2226,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                             initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                                             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                                            className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-white rounded-2xl shadow-2xl border border-gray-100 p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
+                                                            className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-card rounded-2xl shadow-2xl border border-border p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
                                                         >
                                                             <div className="p-1 space-y-1">
                                                                 {allAssignments.map(a => (
@@ -2235,14 +2235,14 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                                         onClick={() => toggleAssignment(a.id)}
                                                                         className={cn(
                                                                             "w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold transition-all truncate text-left",
-                                                                            targetAssignmentIds.includes(a.id) ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50 text-gray-600"
+                                                                            targetAssignmentIds.includes(a.id) ? "bg-blue-50 text-blue-700" : "hover:bg-muted text-muted-foreground"
                                                                         )}
                                                                     >
                                                                         {targetAssignmentIds.includes(a.id) ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : <div className="w-3.5 h-3.5" />}
                                                                         <span className="truncate">{a.title}</span>
                                                                     </button>
                                                                 ))}
-                                                                {allAssignments.length === 0 && <p className="text-xs text-gray-400 text-center py-2">Không có dữ liệu</p>}
+                                                                {allAssignments.length === 0 && <p className="text-xs text-muted-foreground/80 text-center py-2">Không có dữ liệu</p>}
                                                             </div>
                                                         </motion.div>
                                                     )}
@@ -2258,12 +2258,12 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                     }}
                                                     className={cn(
                                                         "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left",
-                                                        targetClassIds.length > 0 ? "bg-indigo-50/80 border border-indigo-200 text-indigo-700" : "bg-gray-50/50 border border-gray-100 hover:border-gray-300 text-gray-700"
+                                                        targetClassIds.length > 0 ? "bg-indigo-50/80 border border-indigo-200 text-indigo-700" : "bg-muted/50 border border-border hover:border-gray-300 text-foreground/80"
                                                     )}
                                                 >
                                                     <div className={cn(
                                                         "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
-                                                        targetClassIds.length > 0 ? "bg-white shadow-sm" : "bg-white border border-gray-100"
+                                                        targetClassIds.length > 0 ? "bg-card dark:bg-card shadow-sm" : "bg-card dark:bg-card border border-border"
                                                     )}>
                                                         <LayoutGrid className="w-3 h-3" />
                                                     </div>
@@ -2281,7 +2281,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                             initial={{ opacity: 0, scale: 0.95, y: 10 }}
                                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                                             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                                            className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-white rounded-2xl shadow-2xl border border-gray-100 p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
+                                                            className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-card rounded-2xl shadow-2xl border border-border p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
                                                         >
                                                             <div className="p-1 space-y-1">
                                                                 {allClasses.map(c => (
@@ -2290,14 +2290,14 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                                         onClick={() => toggleClass(c.id)}
                                                                         className={cn(
                                                                             "w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold transition-all truncate text-left",
-                                                                            targetClassIds.includes(c.id) ? "bg-indigo-50 text-indigo-700" : "hover:bg-gray-50 text-gray-600"
+                                                                            targetClassIds.includes(c.id) ? "bg-indigo-50 text-indigo-700" : "hover:bg-muted text-muted-foreground"
                                                                         )}
                                                                     >
                                                                         {targetClassIds.includes(c.id) ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : <div className="w-3.5 h-3.5" />}
                                                                         <span className="truncate">{c.name}</span>
                                                                     </button>
                                                                 ))}
-                                                                {allClasses.length === 0 && <p className="text-xs text-gray-400 text-center py-2">Không có dữ liệu</p>}
+                                                                {allClasses.length === 0 && <p className="text-xs text-muted-foreground/80 text-center py-2">Không có dữ liệu</p>}
                                                             </div>
                                                         </motion.div>
                                                     )}
@@ -2306,7 +2306,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                         </div>
 
                                         {/* Divider */}
-                                        <div className="border-t border-gray-100 my-3" />
+                                        <div className="border-t border-border my-3" />
 
                                         {/* Canvas Toggle */}
                                         <button
@@ -2315,12 +2315,12 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                 "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left mt-2.5 group",
                                                 isCanvasMode
                                                     ? "bg-purple-50 border border-purple-200 text-purple-700"
-                                                    : "bg-gray-50/50 hover:bg-purple-50/50 border border-gray-100 hover:border-purple-200 text-gray-600 hover:text-purple-700"
+                                                    : "bg-muted/50 hover:bg-purple-50/50 border border-border hover:border-purple-200 text-muted-foreground hover:text-purple-700"
                                             )}
                                         >
                                             <div className={cn(
                                                 "w-6 h-6 rounded-lg flex items-center justify-center transition-all",
-                                                isCanvasMode ? "bg-purple-500 text-white shadow-sm" : "bg-white border border-gray-100 text-gray-400 group-hover:text-purple-500"
+                                                isCanvasMode ? "bg-purple-500 text-white shadow-sm" : "bg-card dark:bg-card border border-border text-muted-foreground/80 group-hover:text-purple-500"
                                             )}>
                                                 <Sparkles className="w-3 h-3" />
                                             </div>
@@ -2335,7 +2335,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                 isCanvasMode ? "bg-purple-500" : "bg-gray-300"
                                             )}>
                                                 <div className={cn(
-                                                    "w-3 h-3 bg-white rounded-full shadow-sm transition-transform",
+                                                    "w-3 h-3 bg-card rounded-full shadow-sm transition-transform",
                                                     isCanvasMode && "translate-x-3"
                                                 )} />
                                             </div>
@@ -2353,7 +2353,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                         }
                                     }}
                                     placeholder={currentModeInfo.prompt || "Nhập tin nhắn..."}
-                                    className="flex-1 max-h-[200px] min-h-[44px] py-3 bg-transparent border-none text-gray-800 placeholder-gray-400 focus:ring-0 focus:outline-none outline-none resize-none font-medium text-[15px] thin-scrollbar transition-[height] duration-200"
+                                    className="flex-1 max-h-[200px] min-h-[44px] py-3 bg-transparent border-none text-foreground placeholder-gray-400 focus:ring-0 focus:outline-none outline-none resize-none font-medium text-[15px] thin-scrollbar transition-[height] duration-200"
                                     rows={1}
                                 />
 
@@ -2361,7 +2361,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                     onClick={() => setIsThinkingEnabled(!isThinkingEnabled)}
                                     className={cn(
                                         "flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all shrink-0",
-                                        isThinkingEnabled ? "bg-purple-100 text-purple-600" : "hover:bg-gray-100 text-gray-400"
+                                        isThinkingEnabled ? "bg-purple-100 text-purple-600" : "hover:bg-muted text-muted-foreground/80"
                                     )}
                                     title="Chế độ suy nghĩ sâu"
                                 >
@@ -2375,7 +2375,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                     className={cn(
                                         "p-3 rounded-full transition-all shadow-md",
                                         !inputValue.trim() || isLoading
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                            ? "bg-gray-100 text-muted-foreground/80 cursor-not-allowed"
                                             : "bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 shadow-blue-200"
                                     )}
                                 >
@@ -2389,27 +2389,27 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                 {/* RIGHT CANVAS AREA */}
                 {
                     isCanvasOpen && (
-                        <div className="w-1/2 bg-gray-50/50 border-l border-gray-200 flex flex-col h-full animate-in slide-in-from-right duration-500 shadow-2xl z-10">
+                        <div className="w-1/2 bg-muted/50 border-l border-border flex flex-col h-full animate-in slide-in-from-right duration-500 shadow-2xl z-10">
                             {/* Canvas Header */}
-                            <div className="h-16 px-6 border-b border-gray-200 flex items-center justify-between bg-white shrink-0">
+                            <div className="h-16 px-6 border-b border-border flex items-center justify-between bg-card shrink-0">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-indigo-50 rounded-xl">
                                         <Sparkles className="w-5 h-5 text-indigo-600" />
                                     </div>
                                     <div>
-                                        <h2 className="font-bold text-gray-900 leading-tight">Canvas thông minh</h2>
-                                        <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+                                        <h2 className="font-bold text-foreground leading-tight">Canvas thông minh</h2>
+                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
                                             {canvasViewMode === 'dashboard' ? 'Tổng quan' : canvasViewMode === 'flashcards' ? 'Flashcards' : 'Nội dung'}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors">
+                                    <button className="p-2 hover:bg-muted rounded-lg text-muted-foreground transition-colors">
                                         <Share2 className="w-5 h-5" />
                                     </button>
                                     <button
                                         onClick={() => setIsCanvasOpen(false)}
-                                        className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
+                                        className="p-2 hover:bg-muted rounded-lg text-muted-foreground transition-colors"
                                     >
                                         <X className="w-5 h-5" />
                                     </button>
@@ -2421,12 +2421,12 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                 {canvasContent && canvasContent.type === 'structured_content' ? (
                                     <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                         {canvasContent.sections?.map((section: any, idx: number) => (
-                                            <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 group hover:shadow-md transition-shadow">
-                                                <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2 group-hover:text-blue-600 transition-colors">
+                                            <div key={idx} className="bg-card dark:bg-card p-6 rounded-2xl shadow-sm border border-border group hover:shadow-md transition-shadow">
+                                                <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2 group-hover:text-blue-600 transition-colors">
                                                     <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
                                                     {section.heading}
                                                 </h3>
-                                                <div className="prose prose-sm text-gray-600 leading-relaxed">
+                                                <div className="prose prose-sm text-muted-foreground leading-relaxed">
                                                     <ReactMarkdown
                                                         remarkPlugins={[remarkMath]}
                                                         rehypePlugins={[rehypeKatex]}
@@ -2462,8 +2462,8 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                         <div className="p-4 bg-indigo-50 rounded-2xl mb-4">
                                             <Sparkles className="w-12 h-12 text-indigo-500" />
                                         </div>
-                                        <h3 className="text-lg font-bold text-gray-900 mb-2">Canvas sẵn sàng</h3>
-                                        <p className="text-gray-500 max-w-sm">
+                                        <h3 className="text-lg font-bold text-foreground mb-2">Canvas sẵn sàng</h3>
+                                        <p className="text-muted-foreground max-w-sm">
                                             Nội dung AI tạo ra sẽ hiển thị ở đây. Bật Canvas Mode và gửi tin nhắn để bắt đầu!
                                         </p>
                                     </div>

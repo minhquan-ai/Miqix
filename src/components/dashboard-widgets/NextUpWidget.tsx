@@ -13,9 +13,9 @@ export default function NextUpWidget({ assignments }: NextUpWidgetProps) {
 
     if (!nextAssignment) {
         return (
-            <div className="bg-white rounded-2xl p-6 border border-border/50 shadow-sm h-full flex flex-col items-center justify-center text-center">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                    <Calendar className="w-6 h-6 text-green-600" />
+            <div className="bg-card rounded-2xl p-6 border border-border shadow-sm h-full flex flex-col items-center justify-center text-center">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-3">
+                    <Calendar className="w-6 h-6 text-green-600 dark:text-green-400" />
                 </div>
                 <h3 className="text-lg font-bold text-foreground">Bạn đã hoàn thành hết!</h3>
                 <p className="text-sm text-muted-foreground mt-1">Không có bài tập nào cần làm ngay.</p>
@@ -24,7 +24,7 @@ export default function NextUpWidget({ assignments }: NextUpWidgetProps) {
     }
 
     return (
-        <div className="bg-white rounded-2xl p-6 border border-border/50 shadow-sm h-full flex flex-col">
+        <div className="bg-card rounded-2xl p-6 border border-border shadow-sm h-full flex flex-col">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                     <Clock className="w-5 h-5 text-blue-600" />

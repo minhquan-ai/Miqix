@@ -51,7 +51,7 @@ export default function KPIGrid({ analytics, classId }: KPIGridProps) {
                                 {/* Trend indicator placeholder */}
                                 {metric.trend === 'up' && <TrendingUp className="w-4 h-4 text-green-500 mb-1" />}
                                 {metric.trend === 'down' && <TrendingDown className="w-4 h-4 text-red-500 mb-1" />}
-                                {metric.trend === 'stable' && <Minus className="w-4 h-4 text-gray-400 mb-1" />}
+                                {metric.trend === 'stable' && <Minus className="w-4 h-4 text-muted-foreground mb-1" />}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">{metric.subtext}</p>
                         </div>

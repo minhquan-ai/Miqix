@@ -76,8 +76,8 @@ export default function QuickActionsWidget({ classId, role }: QuickActionsWidget
     };
 
     return (
-        <div className="bg-gradient-to-br from-white/95 via-white/90 to-gray-50/80 backdrop-blur-xl rounded-2xl border border-gray-200/40 p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900 mb-5">Quick Actions</h3>
+        <div className="bg-gradient-to-br from-white/95 via-white/90 to-gray-50/80 backdrop-blur-xl rounded-2xl border border-border/40 p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-foreground mb-5">Quick Actions</h3>
 
             <div className="grid grid-cols-2 gap-3">
                 {actions.map((action) => {

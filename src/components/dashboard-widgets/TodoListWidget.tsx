@@ -92,15 +92,15 @@ export default function TodoListWidget() {
     };
 
     return (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200/60 h-full flex flex-col">
+        <div className="bg-card dark:bg-card rounded-2xl p-6 shadow-sm border border-border h-full flex flex-col">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <div className="p-2 bg-pink-50 text-pink-600 rounded-lg">
+                    <div className="p-2 bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-lg">
                         <CheckSquare className="w-5 h-5" />
                     </div>
-                    <h3 className="font-bold text-gray-800">Việc cần làm</h3>
+                    <h3 className="font-bold text-foreground">Việc cần làm</h3>
                 </div>
-                <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded-full">
+                <span className="text-xs text-muted-foreground font-medium bg-muted px-2 py-1 rounded-full">
                     {todos.filter(t => !t.completed).length} còn lại
                 </span>
             </div>
@@ -112,7 +112,7 @@ export default function TodoListWidget() {
                     value={newItem}
                     onChange={(e) => setNewItem(e.target.value)}
                     placeholder="Thêm công việc mới..."
-                    className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-100 focus:border-pink-300 transition-all"
+                    className="w-full pl-4 pr-10 py-2.5 bg-muted border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-pink-100 dark:focus:ring-pink-900/30 focus:border-pink-300 dark:focus:border-pink-700 transition-all"
                     disabled={adding}
                 />
                 <button
@@ -125,13 +125,13 @@ export default function TodoListWidget() {
             </form>
 
             {/* List */}
-            <div className="flex-1 overflow-y-auto space-y-2 min-h-[200px] pr-1 scrollbar-thin scrollbar-thumb-gray-200">
+            <div className="flex-1 overflow-y-auto space-y-2 min-h-[200px] pr-1 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
                 {loading ? (
                     <div className="flex justify-center py-8">
-                        <Loader2 className="w-6 h-6 text-gray-300 animate-spin" />
+                        <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
                     </div>
                 ) : todos.length === 0 ? (
-                    <div className="text-center py-8 text-gray-400 text-sm">
+                    <div className="text-center py-8 text-muted-foreground text-sm">
                         <p>Đang rảnh rỗi! 🎉</p>
                         <p className="text-xs mt-1">Thêm công việc để bắt đầu</p>
                     </div>
@@ -147,8 +147,8 @@ export default function TodoListWidget() {
                                 className={cn(
                                     "group flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer hover:shadow-sm",
                                     todo.completed
-                                        ? "bg-gray-50/50 border-gray-100 opacity-60"
-                                        : "bg-white border-gray-100 hover:border-pink-200"
+                                        ? "bg-muted/50 border-border opacity-60"
+                                        : "bg-card border-border hover:border-pink-200 dark:hover:border-pink-800"
                                 )}
                             >
                                 <button
@@ -157,7 +157,7 @@ export default function TodoListWidget() {
                                         "flex-shrink-0 w-5 h-5 rounded-md border flex items-center justify-center transition-colors",
                                         todo.completed
                                             ? "bg-pink-500 border-pink-500 text-white"
-                                            : "border-gray-300 hover:border-pink-400 text-transparent"
+                                            : "border-muted-foreground/30 hover:border-pink-400 dark:hover:border-pink-600 text-transparent"
                                     )}
                                 >
                                     <Check className="w-3.5 h-3.5" strokeWidth={3} />
@@ -165,7 +165,7 @@ export default function TodoListWidget() {
 
                                 <span className={cn(
                                     "flex-1 text-sm font-medium transition-all select-none truncate",
-                                    todo.completed ? "text-gray-400 line-through" : "text-gray-700"
+                                    todo.completed ? "text-muted-foreground line-through" : "text-foreground"
                                 )}>
                                     {todo.content}
                                 </span>
@@ -175,7 +175,7 @@ export default function TodoListWidget() {
                                         e.stopPropagation();
                                         handleDelete(todo.id);
                                     }}
-                                    className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                    className="opacity-0 group-hover:opacity-100 p-1.5 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>

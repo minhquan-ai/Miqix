@@ -24,8 +24,8 @@ export default function MyAssignmentsWidget({ analytics, classId }: MyAssignment
     };
 
     return (
-        <div className="bg-gradient-to-br from-white/95 via-white/90 to-gray-50/80 backdrop-blur-xl rounded-2xl border border-gray-200/40 p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center gap-2">
+        <div className="bg-gradient-to-br from-white/95 via-white/90 to-gray-50/80 backdrop-blur-xl rounded-2xl border border-border/40 p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-foreground mb-5 flex items-center gap-2">
                 <ClipboardList className="w-5 h-5 text-blue-600" />
                 Bài tập của bạn
             </h3>
@@ -34,7 +34,7 @@ export default function MyAssignmentsWidget({ analytics, classId }: MyAssignment
                 {/* Pending Assignments */}
                 {pendingAssignments.length > 0 ? (
                     <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
                             <AlertCircle className="w-4 h-4 text-red-500" />
                             Chưa nộp ({pendingAssignments.length})
                         </div>
@@ -44,15 +44,15 @@ export default function MyAssignmentsWidget({ analytics, classId }: MyAssignment
                                 href={`/assignments/${assignment.id}`}
                                 className={`block p-3 rounded-xl border transition-all hover:shadow-md ${assignment.urgent
                                     ? "bg-gradient-to-r from-red-50 to-orange-50 border-red-200 hover:border-red-300"
-                                    : "bg-white border-gray-200 hover:border-blue-300"
+                                    : "bg-card border-border hover:border-blue-300"
                                     }`}
                             >
                                 <div className="flex items-start justify-between gap-2">
                                     <div className="flex-1 min-w-0">
-                                        <div className="font-medium text-gray-900 truncate">
+                                        <div className="font-medium text-foreground truncate">
                                             {assignment.title}
                                         </div>
-                                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-600">
+                                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                                             <span className="flex items-center gap-1">
                                                 <Clock className="w-3 h-3" />
                                                 {formatDueDate(assignment.dueDate)}
@@ -82,7 +82,7 @@ export default function MyAssignmentsWidget({ analytics, classId }: MyAssignment
                 {/* Ungraded Submissions */}
                 {ungradedSubmissions.length > 0 ? (
                     <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
                             <Clock className="w-4 h-4 text-yellow-600" />
                             Chờ chấm điểm ({ungradedSubmissions.length})
                         </div>
@@ -91,10 +91,10 @@ export default function MyAssignmentsWidget({ analytics, classId }: MyAssignment
                                 key={submission.assignmentId}
                                 className="p-3 rounded-xl bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200"
                             >
-                                <div className="font-medium text-gray-900 text-sm">
+                                <div className="font-medium text-foreground text-sm">
                                     {submission.assignmentTitle}
                                 </div>
-                                <div className="text-xs text-gray-600 mt-1">
+                                <div className="text-xs text-muted-foreground mt-1">
                                     Nộp: {submission.submittedAt.toLocaleDateString('vi-VN')}
                                 </div>
                             </div>
@@ -106,10 +106,10 @@ export default function MyAssignmentsWidget({ analytics, classId }: MyAssignment
                 {pendingAssignments.length === 0 && ungradedSubmissions.length === 0 && (
                     <div className="text-center py-8">
                         <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                        <div className="text-gray-600 font-medium">
+                        <div className="text-muted-foreground font-medium">
                             Tuyệt vời! Tất cả bài tập đã hoàn thành
                         </div>
-                        <div className="text-sm text-gray-500 mt-1">
+                        <div className="text-sm text-muted-foreground mt-1">
                             Bạn đã nộp và được chấm điểm hết rồi 🎉
                         </div>
                     </div>

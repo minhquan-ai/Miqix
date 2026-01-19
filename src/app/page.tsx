@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import Aurora from "@/components/ui/Aurora";
 
 // --- Landing Page based on actual Miqix features ---
 // Primary: #F26C21 (Orange)  
@@ -53,7 +54,7 @@ function Navbar() {
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#F26C21] transition-all group-hover:w-full" />
           </Link>
         </nav>
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4">
           <Link
             href="/login"
             className="text-sm font-bold text-gray-600 dark:text-gray-300 hover:text-[#F26C21] transition-colors hidden sm:block"
@@ -76,19 +77,29 @@ function Navbar() {
 function HeroSection() {
   return (
     <section className="relative pt-32 pb-24 md:pt-48 md:pb-32 overflow-hidden">
+      {/* Gradient Mesh Background - Bottom layer */}
+      <div className="absolute inset-0 bg-mesh-landing -z-30" />
+
       {/* Animated Grid Background */}
-      <div className="absolute inset-0 bg-grid-pattern -z-10" />
+      <div className="absolute inset-0 bg-grid-pattern -z-20 opacity-50" />
 
-      {/* Gradient Mesh Background */}
-      <div className="absolute inset-0 bg-mesh-landing -z-10" />
-
-      {/* Decorative Blobs - Static for better performance */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl -z-10 pointer-events-none">
-        <div className="absolute top-20 left-[5%] w-[400px] h-[400px] bg-[#F26C21]/8 dark:bg-[#F26C21]/15 rounded-full blur-[100px]" />
-        <div className="absolute top-40 right-[5%] w-[400px] h-[400px] bg-[#00D9A5]/8 dark:bg-[#00D9A5]/15 rounded-full blur-[100px]" />
+      {/* Decorative Blobs */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl -z-15 pointer-events-none">
+        <div className="absolute top-20 left-[5%] w-[400px] h-[400px] bg-[#F26C21]/10 dark:bg-[#F26C21]/25 rounded-full blur-[100px]" />
+        <div className="absolute top-40 right-[5%] w-[400px] h-[400px] bg-[#00D9A5]/10 dark:bg-[#00D9A5]/25 rounded-full blur-[100px]" />
       </div>
 
-      <div className="container max-w-7xl mx-auto px-6 text-center">
+      {/* Aurora Background - Smooth animated gradient effect */}
+      <div className="absolute inset-0 z-0">
+        <Aurora
+          colorStops={["#F26C21", "#7C3AED", "#00D9A5"]}
+          amplitude={1.2}
+          blend={0.6}
+          speed={0.8}
+        />
+      </div>
+
+      <div className="container max-w-7xl mx-auto px-6 text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -573,17 +584,30 @@ function Footer() {
 }
 
 export default function Home() {
+  useEffect(() => {
+    // Force dark mode for landing page
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('theme', 'dark');
+
+    // Cleanup: remove dark mode when leaving landing page
+    return () => {
+      // Don't remove dark class on cleanup to avoid flash
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#050505] text-gray-900 dark:text-white font-sans selection:bg-[#F26C21]/20">
-      <Navbar />
-      <main>
-        <HeroSection />
-        <FeaturesSection />
-        <ForTeachersSection />
-        <ForStudentsSection />
-        <CTASection />
-      </main>
-      <Footer />
+    <div className="dark">
+      <div className="min-h-screen bg-white dark:bg-[#050505] text-gray-900 dark:text-white font-sans selection:bg-[#F26C21]/20">
+        <Navbar />
+        <main>
+          <HeroSection />
+          <FeaturesSection />
+          <ForTeachersSection />
+          <ForStudentsSection />
+          <CTASection />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

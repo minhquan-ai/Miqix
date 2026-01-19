@@ -54,7 +54,7 @@ export default function PerformanceWidget({ analytics }: PerformanceWidgetProps)
             case 'down':
                 return <TrendingDown className="w-4 h-4 text-red-600" />;
             default:
-                return <Minus className="w-4 h-4 text-gray-400" />;
+                return <Minus className="w-4 h-4 text-muted-foreground" />;
         }
     };
 
@@ -69,12 +69,12 @@ export default function PerformanceWidget({ analytics }: PerformanceWidgetProps)
     };
 
     return (
-        <div className="relative bg-gradient-to-br from-white/95 via-white/90 to-gray-50/80 backdrop-blur-xl rounded-2xl border border-gray-200/40 p-6 shadow-lg overflow-hidden">
+        <div className="relative bg-gradient-to-br from-white/95 via-white/90 to-gray-50/80 backdrop-blur-xl rounded-2xl border border-border/40 p-6 shadow-lg overflow-hidden">
             {/* Decorative gradient orb */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl" />
 
             <div className="relative z-10">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center gap-2">
                     <Activity className="w-5 h-5 text-blue-600" />
                     Hiệu suất lớp học
                 </h3>
@@ -88,15 +88,15 @@ export default function PerformanceWidget({ analytics }: PerformanceWidgetProps)
                             <div key={metric.label} className="relative group space-y-3">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <Icon className="w-4 h-4 text-gray-700" />
-                                        <span className="text-sm font-medium text-gray-700">{metric.label}</span>
+                                        <Icon className="w-4 h-4 text-foreground" />
+                                        <span className="text-sm font-medium text-foreground">{metric.label}</span>
                                     </div>
                                     {getTrendIcon(metric.trend)}
                                 </div>
 
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-3xl font-bold text-gray-900">{metric.value}</span>
-                                    <span className="text-sm text-gray-500">/ {metric.max}</span>
+                                    <span className="text-3xl font-bold text-foreground">{metric.value}</span>
+                                    <span className="text-sm text-muted-foreground">/ {metric.max}</span>
                                 </div>
 
                                 {/* Enhanced Progress bar with glow */}

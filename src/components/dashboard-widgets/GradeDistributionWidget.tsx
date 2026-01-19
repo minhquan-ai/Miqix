@@ -8,7 +8,7 @@ export default function GradeDistributionWidget({ distribution }: GradeDistribut
     const maxCount = Math.max(...distribution.map(d => d.count), 1); // Avoid division by zero
 
     return (
-        <div className="bg-white p-6 rounded-2xl border border-border/50 shadow-sm h-full">
+        <div className="bg-card p-6 rounded-2xl border border-border/50 shadow-sm h-full">
             <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-purple-600" />
                 Phân bố điểm số

@@ -47,6 +47,12 @@ export default function DashboardLayout({
         loadData();
     }, []);
 
+    // Force light mode for dashboard
+    useEffect(() => {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    }, []);
+
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     // Sync sidebar state with localStorage

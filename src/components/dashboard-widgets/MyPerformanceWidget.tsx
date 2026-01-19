@@ -45,28 +45,28 @@ export default function MyPerformanceWidget({ analytics }: MyPerformanceWidgetPr
 
 
     return (
-        <div className="relative bg-gradient-to-br from-white/95 via-white/90 to-gray-50/80 backdrop-blur-xl rounded-2xl border border-gray-200/40 p-6 shadow-lg overflow-hidden">
+        <div className="relative bg-gradient-to-br from-white/95 via-white/90 to-gray-50/80 backdrop-blur-xl rounded-2xl border border-border/40 p-6 shadow-lg overflow-hidden">
             {/* Decorative gradient orb */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl" />
 
             <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                         <Award className="w-5 h-5 text-blue-600" />
                         Tổng quan kết quả
                     </h3>
                 </div>
 
-                <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="mb-6 p-4 bg-muted rounded-xl border border-border">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">
+                        <span className="text-sm font-medium text-foreground">
                             So với trung bình lớp
                         </span>
                         <span className={`text-sm font-bold ${analytics.aboveAverage ? 'text-green-600' : 'text-amber-600'}`}>
                             {analytics.aboveAverage ? "Trên trung bình" : "Cần cố gắng thêm"}
                         </span>
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-muted-foreground">
                         Điểm TB lớp: <span className="font-semibold">{analytics.classAverageScore.toFixed(1)}</span> •
                         Của bạn: <span className="font-semibold">{analytics.myAverageScore.toFixed(1)}</span>
                     </div>
@@ -81,13 +81,13 @@ export default function MyPerformanceWidget({ analytics }: MyPerformanceWidgetPr
                         return (
                             <div key={metric.label} className="space-y-2">
                                 <div className="flex items-center gap-2">
-                                    <Icon className="w-4 h-4 text-gray-700" />
-                                    <span className="text-sm font-medium text-gray-700">{metric.label}</span>
+                                    <Icon className="w-4 h-4 text-foreground" />
+                                    <span className="text-sm font-medium text-foreground">{metric.label}</span>
                                 </div>
 
-                                <div className="text-2xl font-bold text-gray-900">
+                                <div className="text-2xl font-bold text-foreground">
                                     {metric.value}
-                                    {metric.max && <span className="text-sm text-gray-500 ml-1">/ {metric.max}</span>}
+                                    {metric.max && <span className="text-sm text-muted-foreground ml-1">/ {metric.max}</span>}
                                 </div>
 
                                 {/* Progress bar with glow */}

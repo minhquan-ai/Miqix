@@ -15,15 +15,15 @@ interface RecentFeedbackWidgetProps {
 export default function RecentFeedbackWidget({ feedback }: RecentFeedbackWidgetProps) {
     if (!feedback) {
         return (
-            <div className="bg-white rounded-2xl p-6 border border-border/50 shadow-sm h-full flex flex-col items-center justify-center text-center opacity-60">
-                <MessageSquare className="w-8 h-8 text-gray-400 mb-2" />
+            <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-sm h-full flex flex-col items-center justify-center text-center opacity-60">
+                <MessageSquare className="w-8 h-8 text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">Chưa có phản hồi mới</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-white rounded-2xl p-6 border border-border/50 shadow-sm h-full flex flex-col">
+        <div className="bg-card rounded-2xl p-6 border border-border/50 shadow-sm h-full flex flex-col">
             <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-purple-600" />
                 Phản hồi mới nhất
@@ -44,8 +44,8 @@ export default function RecentFeedbackWidget({ feedback }: RecentFeedbackWidgetP
                     </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-700 italic border border-gray-100 relative">
-                    <div className="absolute -top-2 left-4 w-4 h-4 bg-gray-50 border-t border-l border-gray-100 transform rotate-45" />
+                <div className="bg-muted rounded-xl p-3 text-sm text-foreground italic border border-border relative">
+                    <div className="absolute -top-2 left-4 w-4 h-4 bg-muted border-t border-l border-border transform rotate-45" />
                     &quot;{feedback.feedback || "Làm tốt lắm!"}&quot;
                 </div>
             </div>
