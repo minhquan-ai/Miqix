@@ -631,6 +631,36 @@ export async function getClassSubmissionsAction(classId: string): Promise<Submis
     }, 30 * 1000); // Cache for 30 seconds
 }
 
+// Optimized: Get submissions for a specific user only
+export async function getUserSubmissionsAction(userId: string): Promise<Submission[]> {
+    const cacheKey = CacheKeys.userSubmissions(userId);
+
+    return serverCache.getOrFetch(cacheKey, async () => {
+        const submissions = await db.submission.findMany({
+            where: { studentId: userId },
+            include: {
+                student: true,
+                assignment: true
+            },
+            orderBy: { submittedAt: 'desc' }
+        });
+
+        return submissions.map((sub: any) => ({
+            id: sub.id,
+            assignmentId: sub.assignmentId,
+            studentId: sub.studentId,
+            content: sub.content,
+            submittedAt: sub.submittedAt.toISOString(),
+            status: sub.status as 'submitted' | 'graded',
+            score: sub.score || undefined,
+            feedback: sub.feedback || undefined,
+            attachments: sanitizeAttachments(sub.attachments),
+            studentName: sub.student.name,
+            errorAnalysis: sub.errorAnalysis ? JSON.parse(sub.errorAnalysis) : undefined
+        }));
+    }, 30 * 1000); // Cache for 30 seconds
+}
+
 // --- Class Actions ---
 
 export async function getClassesAction(): Promise<Class[]> {

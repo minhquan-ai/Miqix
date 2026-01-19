@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, CheckCircle, Clock, Plus, Search, FileEdit } from "lucide-react";
-import { getCurrentUserAction, getAssignmentsAction, getSubmissionsAction } from "@/lib/actions";
+import { getCurrentUserAction, getAssignmentsAction, getUserSubmissionsAction, getSubmissionsForTeacherAction } from "@/lib/actions";
 import { Assignment, Submission, User } from "@/types";
 import { AssignmentsPageSkeleton } from "@/components/skeletons";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,11 +33,9 @@ function AssignmentsContent() {
 
                 const [allAssignments, allSubmissions] = await Promise.all([
                     getAssignmentsAction(currentUser.role === 'student' ? (currentUser as any).classId : undefined),
-                    getSubmissionsAction().then(subs =>
-                        currentUser.role === 'teacher'
-                            ? subs
-                            : subs.filter(s => s.studentId === currentUser.id)
-                    )
+                    currentUser.role === 'teacher'
+                        ? getSubmissionsForTeacherAction(currentUser.id)
+                        : getUserSubmissionsAction(currentUser.id)
                 ]);
 
                 setAssignments(allAssignments);

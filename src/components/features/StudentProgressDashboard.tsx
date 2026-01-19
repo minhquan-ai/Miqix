@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, Target, BookOpen, Award, AlertCircle } from 'lucide-react';
-import { getSubmissionsAction, getAssignmentsAction } from '@/lib/actions';
+import { getUserSubmissionsAction, getAssignmentsAction } from '@/lib/actions';
 import { Assignment, Submission } from '@/types';
 import {
     calculateTopicPerformance,
@@ -22,8 +22,8 @@ export function StudentProgressDashboard({ studentId }: { studentId: string }) {
     useEffect(() => {
         async function loadData() {
             try {
-                const allSubmissions = await getSubmissionsAction();
-                const studentSubs = allSubmissions.filter(s => s.studentId === studentId);
+                // Optimized: Fetch only submissions for this specific student
+                const studentSubs = await getUserSubmissionsAction(studentId);
                 setSubmissions(studentSubs);
 
                 const allAssignments = await getAssignmentsAction();
