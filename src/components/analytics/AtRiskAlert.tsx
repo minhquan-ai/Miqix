@@ -3,6 +3,7 @@
 import { getEnhancedAtRiskStudents, EnhancedAtRiskStudent } from "@/lib/analytics";
 import { User, Submission } from "@/types";
 import { AlertTriangle, TrendingDown, CheckCircle2 } from "lucide-react";
+import { formatScore } from "@/lib/score-utils";
 
 interface AtRiskAlertProps {
     users: User[];
@@ -72,7 +73,7 @@ function AtRiskCard({ student }: { student: EnhancedAtRiskStudent }) {
                             Nguy cơ: {riskLabels[student.riskLevel]}
                         </span>
                     </h4>
-                    <p className="text-sm opacity-75">Điểm TB: {Math.round(student.averageScore)}/100</p>
+                    <p className="text-sm opacity-75">Điểm TB: {formatScore(student.averageScore / 10)}/10</p>
                 </div>
                 <TrendingDown className="w-5 h-5" />
             </div>

@@ -10,6 +10,7 @@ import Editor from "./ui/Editor";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "./ui/Toast";
 import { MultimediaRecorder } from "./ui/MultimediaRecorder";
+import { formatScore } from "@/lib/score-utils";
 
 interface SubmissionViewProps {
     assignmentId: string;
@@ -284,18 +285,19 @@ export default function SubmissionView({ assignmentId, submission, currentUser, 
                     <h3 className="font-semibold text-lg">Chấm điểm & Nhận xét</h3>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1.5">Điểm số (0-100)</label>
+                        <label className="block text-sm font-medium mb-1.5">Điểm số (0-10)</label>
                         <div className="relative">
                             <input
                                 type="number"
                                 min="0"
-                                max="100"
+                                max="10"
+                                step="0.1"
                                 required
                                 className="w-full pl-4 pr-12 py-2.5 rounded-lg border border-input bg-background font-medium text-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                 value={score}
-                                onChange={e => setScore(parseInt(e.target.value))}
+                                onChange={e => setScore(parseFloat(e.target.value) || 0)}
                             />
-                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">/ 100</span>
+                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">/ 10</span>
                         </div>
                     </div>
 
@@ -355,8 +357,8 @@ export default function SubmissionView({ assignmentId, submission, currentUser, 
                 <div className="space-y-2">
                     <h3 className="text-xl font-bold">Đã chấm điểm</h3>
                     <div className="text-5xl font-black text-green-600 dark:text-green-400 tracking-tighter">
-                        {submission.score}
-                        <span className="text-2xl text-muted-foreground font-medium ml-1">/100</span>
+                        {formatScore(submission.score)}
+                        <span className="text-2xl text-muted-foreground font-medium ml-1">/10</span>
                     </div>
                 </div>
 

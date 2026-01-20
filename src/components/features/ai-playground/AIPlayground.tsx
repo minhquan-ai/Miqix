@@ -1593,15 +1593,15 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                     {/* Chat Messages */}
                     <div className="flex-1 flex overflow-hidden pt-16 pb-32 px-4">
                         <div className={cn(
-                            "mx-auto transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] flex gap-6",
-                            messages.length === 0 ? "w-full px-6 max-w-[98%]" : "w-full max-w-2xl px-4"
+                            "mx-auto transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] flex gap-6 w-full",
+                            messages.length === 0 ? "" : "max-w-2xl px-4"
                         )}>
                             {/* Messages Content */}
                             {messages.length === 0 ? (
-                                <div className="flex flex-col md:flex-row gap-6 w-full min-h-[75vh] items-stretch justify-between animate-in fade-in zoom-in duration-500">
+                                <div className="flex flex-col 2xl:flex-row gap-6 w-full min-h-[75vh] items-stretch justify-center animate-in fade-in zoom-in duration-500">
                                     {/* Left Widgets */}
                                     {!isCanvasOpen && (
-                                        <div className="hidden xl:flex xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
+                                        <div className="hidden 2xl:flex 2xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
                                             {/* Widget Column Header - Left Side */}
                                             <div className="flex items-center justify-between mb-3 px-1">
                                                 <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider">Tiện ích</h3>
@@ -1678,7 +1678,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                     )}
 
                                     {/* Center Content - Toggle between Greeting and Tool Hub */}
-                                    <div className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto px-4 py-6 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative">
+                                    <div className="flex-1 flex flex-col items-center justify-center min-w-0 max-w-2xl mx-auto px-4 py-6 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] relative">
                                         {/* Toggle Button */}
                                         <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
                                             <button
@@ -1837,35 +1837,35 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                             </div>
                                         ) : (
                                             /* Greeting View (Default) */
-                                            <div className="text-center space-y-6">
+                                            <div className="text-center space-y-5 px-4 w-full">
                                                 <div className="relative inline-block">
-                                                    <div className="w-20 h-20 bg-card border-2 border-border rounded-2xl flex items-center justify-center shadow-lg">
-                                                        <Bot className="w-10 h-10 text-teal-500" />
+                                                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-card border-2 border-border rounded-2xl flex items-center justify-center shadow-lg">
+                                                        <Bot className="w-8 h-8 sm:w-10 sm:h-10 text-teal-500" />
                                                     </div>
-                                                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-card rounded-full flex items-center justify-center shadow-md border border-border">
-                                                        <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+                                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-card rounded-full flex items-center justify-center shadow-md border border-border">
+                                                        <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-teal-400" />
                                                     </div>
                                                 </div>
 
-                                                <div className="space-y-3">
-                                                    <h2 className="text-2xl font-bold text-foreground">
+                                                <div className="space-y-2">
+                                                    <h2 className="text-xl sm:text-2xl font-bold text-foreground">
                                                         Chào {isTeacher ? "Thầy/Cô" : "bạn"}, mình là MiQiX AI!
                                                     </h2>
-                                                    <p className="text-base text-muted-foreground font-medium max-w-md mx-auto">
+                                                    <p className="text-sm sm:text-base text-muted-foreground font-medium max-w-md mx-auto px-2">
                                                         {isTeacher ? "Trợ lý giảng dạy cá nhân của Thầy/Cô. Sẵn sàng hỗ trợ mọi lúc." : "Trợ lý học tập cá nhân của bạn. Sẵn sàng hỗ trợ mọi lúc."}
                                                     </p>
                                                 </div>
 
-                                                {/* Suggestions Grid */}
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg mx-auto">
+                                                {/* Suggestions - Stack on mobile, 2-col on md+ */}
+                                                <div className="flex flex-col gap-2.5 w-full max-w-md mx-auto">
                                                     {currentModeInfo.recommendations.map((text, idx) => (
                                                         <button
                                                             key={idx}
                                                             onClick={() => handleSend(text)}
-                                                            className="flex items-center gap-3 p-4 bg-card border border-border hover:border-teal-200 hover:bg-teal-50/30 rounded-2xl text-sm font-medium text-foreground/80 hover:text-teal-700 text-left transition-all shadow-sm hover:shadow-md group"
+                                                            className="flex items-center gap-3 p-3.5 sm:p-4 bg-card border border-border hover:border-teal-200 hover:bg-teal-50/30 rounded-xl sm:rounded-2xl text-sm font-medium text-foreground/80 hover:text-teal-700 text-left transition-all shadow-sm hover:shadow-md group w-full"
                                                         >
-                                                            <Sparkles className="w-5 h-5 text-teal-400 shrink-0" />
-                                                            <span>{text}</span>
+                                                            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-teal-400 shrink-0" />
+                                                            <span className="line-clamp-2">{text}</span>
                                                         </button>
                                                     ))}
                                                 </div>
@@ -1875,7 +1875,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
 
                                     {/* Right Widgets */}
                                     {!isCanvasOpen && (
-                                        <div className="hidden xl:flex xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
+                                        <div className="hidden 2xl:flex 2xl:flex-col w-80 2xl:w-88 shrink-0 h-[calc(100vh-180px)]">
                                             <div className="flex items-center justify-between mb-3 px-1">
                                                 <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-wider">Tiện ích</h3>
                                                 <button

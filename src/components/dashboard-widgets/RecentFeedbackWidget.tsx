@@ -1,6 +1,7 @@
 import { MessageSquare, Star } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
+import { formatScore } from "@/lib/score-utils";
 
 interface RecentFeedbackWidgetProps {
     feedback?: {
@@ -39,7 +40,7 @@ export default function RecentFeedbackWidget({ feedback }: RecentFeedbackWidgetP
                     </div>
                     <div className="flex flex-col items-end">
                         <div className="text-2xl font-black text-primary">
-                            {feedback.score}<span className="text-sm text-muted-foreground font-normal">/{feedback.maxScore}</span>
+                            {formatScore(feedback.score)}<span className="text-sm text-muted-foreground font-normal">/{formatScore(feedback.maxScore)}</span>
                         </div>
                     </div>
                 </div>

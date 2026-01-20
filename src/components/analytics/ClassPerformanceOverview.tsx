@@ -3,6 +3,7 @@
 import { getClassOverviewStats, ClassOverviewStats } from "@/lib/analytics";
 import { User, Submission, Assignment } from "@/types";
 import { TrendingUp, Users, CheckCircle2, AlertTriangle } from "lucide-react";
+import { formatScore } from "@/lib/score-utils";
 
 interface ClassPerformanceOverviewProps {
     users: User[];
@@ -36,7 +37,7 @@ export function ClassPerformanceOverview({
                 <StatCard
                     icon={<TrendingUp className="w-5 h-5" />}
                     label="Điểm TB"
-                    value={`${stats.averageScore}/100`}
+                    value={`${formatScore(stats.averageScore / 10)}/10`}
                     color="green"
                 />
 
@@ -62,7 +63,7 @@ export function ClassPerformanceOverview({
                 <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p className="text-sm text-yellow-900">
                         🏆 <span className="font-semibold">Học sinh xuất sắc nhất:</span>{' '}
-                        {stats.topPerformer.name} ({Math.round(stats.topPerformer.score)}/100)
+                        {stats.topPerformer.name} ({formatScore(stats.topPerformer.score / 10)}/10)
                     </p>
                 </div>
             )}
