@@ -289,7 +289,7 @@
   /* Page container - full height with consistent padding */
   .page-container {
     @apply w-full h-full overflow-y-auto;
-    @apply px-4 py-4 md:px-6 md:py-6;
+    @apply px-6 py-6 md:px-8 md:py-8;
     scrollbar-width: thin;
     scrollbar-color: #e2e8f0 transparent;
   }

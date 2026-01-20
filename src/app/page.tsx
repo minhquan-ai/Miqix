@@ -4,12 +4,21 @@ import Link from "next/link";
 import {
   ArrowRight, BookOpen, CheckCircle2, GraduationCap,
   Sparkles, Users, BrainCircuit, Calendar, ClipboardCheck,
-  BarChart3, FileText, Clock, Target, Award, ChevronRight
+  BarChart3, FileText, Clock, Target, Award, ChevronRight,
+  X, Github, MapPin, School, Heart, Code2, ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import Aurora from "@/components/ui/Aurora";
+
+// Facebook icon component (lucide doesn't have it)
+const FacebookIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+  </svg>
+);
+
 
 // --- Landing Page based on actual Miqix features ---
 // Primary: #F26C21 (Orange)  
@@ -17,7 +26,7 @@ import Aurora from "@/components/ui/Aurora";
 
 // --- Components ---
 
-function Navbar() {
+function Navbar({ onOpenFounderModal }: { onOpenFounderModal: () => void }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -53,6 +62,14 @@ function Navbar() {
             Cho học sinh
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#F26C21] transition-all group-hover:w-full" />
           </Link>
+          <button
+            onClick={onOpenFounderModal}
+            className="hover:text-[#F26C21] transition-colors relative group flex items-center gap-1.5"
+          >
+            <Heart className="w-3.5 h-3.5" />
+            Về đội ngũ
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#F26C21] transition-all group-hover:w-full" />
+          </button>
         </nav>
         <div className="flex items-center gap-4">
           <Link
@@ -71,6 +88,197 @@ function Navbar() {
         </div>
       </div>
     </header>
+  );
+}
+
+
+// Founder Modal Component
+function FounderModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  if (!isOpen) return null;
+
+  const team = [
+    {
+      name: "Nguyễn Minh Quân",
+      role: "Người sáng lập & Phát triển chính",
+      avatar: "🧑‍💻",
+      info: "Học sinh lớp 11/1 • THPT Đặng Huy Trứ",
+      location: "Thành Phố Huế",
+      birthday: "16/09/2009",
+      isFounder: true,
+      links: [
+        { type: "facebook", url: "https://www.facebook.com/mquan169" },
+        { type: "github", url: "https://github.com/minhquan-ai" }
+      ]
+    },
+    {
+      name: "Trần Ngọc Như Quỳnh",
+      role: "Thành viên dự án",
+      avatar: "👩‍💻",
+      info: "Học sinh lớp 11/1 • THPT Đặng Huy Trứ",
+      isFounder: false,
+      links: [
+        { type: "facebook", url: "https://www.facebook.com/tran.ngoc.nhu.quynh.934318" }
+      ]
+    },
+    {
+      name: "Cô Hà Thị Kim Ánh",
+      role: "Giáo viên hướng dẫn",
+      avatar: "👩‍🏫",
+      info: "Giáo viên Tin học • THPT Đặng Huy Trứ",
+      isFounder: false,
+      links: [
+        { type: "facebook", url: "https://www.facebook.com/anh.hakim.5648" }
+      ]
+    }
+  ];
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        {/* Backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        />
+
+        {/* Modal */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          className="relative w-full max-w-2xl bg-gray-900 rounded-3xl shadow-2xl border border-white/10 overflow-hidden"
+        >
+          {/* Header */}
+          <div className="relative p-6 pb-4 border-b border-white/10">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#F26C21]/20 to-[#00D9A5]/20" />
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F26C21] to-[#FF8A4C] flex items-center justify-center">
+                  <Heart className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Đội ngũ phát triển</h2>
+                  <p className="text-sm text-gray-400">Những người đứng sau MiQiX</p>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-2 rounded-xl hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+            {/* Mission Statement */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-[#F26C21]/10 to-[#00D9A5]/10 border border-white/5">
+              <p className="text-sm text-gray-300 leading-relaxed">
+                <span className="font-bold text-[#F26C21]">MiQiX</span> được tạo ra để giải quyết những khó khăn thực tế mà học sinh Việt Nam đang gặp phải:
+                quá tải bài tập, thiếu công cụ tổ chức học tập hiệu quả, và không có ai hỗ trợ khi gặp bài khó ngoài giờ học.
+                Với sự hỗ trợ của AI, MiQiX mong muốn trở thành người bạn đồng hành đáng tin cậy trong hành trình học tập của mọi học sinh.
+              </p>
+            </div>
+
+            {/* Team Members */}
+            <div className="space-y-4">
+              {team.map((member, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className={cn(
+                    "p-4 rounded-2xl border transition-all",
+                    member.isFounder
+                      ? "bg-gradient-to-br from-[#F26C21]/20 to-[#FF8A4C]/10 border-[#F26C21]/30"
+                      : "bg-white/5 border-white/10 hover:bg-white/10"
+                  )}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={cn(
+                      "w-14 h-14 rounded-2xl flex items-center justify-center text-2xl",
+                      member.isFounder ? "bg-[#F26C21]" : "bg-gray-800"
+                    )}>
+                      {member.avatar}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold text-white">{member.name}</h3>
+                        {member.isFounder && (
+                          <span className="px-2 py-0.5 rounded-full bg-[#F26C21] text-[10px] font-bold text-white uppercase">Founder</span>
+                        )}
+                      </div>
+                      <p className="text-sm text-[#00D9A5] font-medium mb-1">{member.role}</p>
+                      <p className="text-xs text-gray-400 flex items-center gap-1">
+                        <School className="w-3 h-3" />
+                        {member.info}
+                      </p>
+                      {member.location && (
+                        <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                          <MapPin className="w-3 h-3" />
+                          {member.location} • Sinh {member.birthday}
+                        </p>
+                      )}
+
+                      {/* Social Links */}
+                      <div className="flex items-center gap-2 mt-3">
+                        {member.links.map((link, j) => (
+                          <a
+                            key={j}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={cn(
+                              "p-2 rounded-xl transition-all",
+                              link.type === "facebook"
+                                ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            )}
+                          >
+                            {link.type === "facebook" ? (
+                              <FacebookIcon className="w-4 h-4" />
+                            ) : (
+                              <Github className="w-4 h-4" />
+                            )}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Note */}
+            <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+              <div className="flex items-start gap-3">
+                <Code2 className="w-5 h-5 text-emerald-400 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-emerald-400 mb-1">100% Phát triển độc lập</p>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    Toàn bộ ứng dụng MiQiX được thiết kế và phát triển bởi đội ngũ học sinh THPT Đặng Huy Trứ,
+                    không có sự trợ giúp từ bên ngoài. Đây là sản phẩm dự thi thể hiện đam mê công nghệ và mong muốn
+                    cải thiện trải nghiệm học tập cho học sinh Việt Nam.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-white/10 bg-black/30">
+            <p className="text-center text-xs text-gray-500">
+              © 2025-2026 MiQiX • Được phát triển với <span className="text-red-400">❤️</span> tại Huế, Việt Nam
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
   );
 }
 
@@ -532,7 +740,7 @@ function CTASection() {
   );
 }
 
-function Footer() {
+function Footer({ onOpenFounderModal }: { onOpenFounderModal: () => void }) {
   return (
     <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-white/10 py-16 text-sm">
       <div className="container max-w-7xl mx-auto px-6">
@@ -547,6 +755,25 @@ function Footer() {
             <p className="text-gray-400 text-base leading-relaxed">
               Nền tảng quản lý lớp học thông minh với AI, giúp giáo viên và học sinh kết nối hiệu quả hơn.
             </p>
+            {/* Social Links */}
+            <div className="flex items-center gap-3 pt-2">
+              <a
+                href="https://www.facebook.com/mquan169"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 flex items-center justify-center text-blue-400 transition-all hover:scale-110"
+              >
+                <FacebookIcon className="w-5 h-5" />
+              </a>
+              <a
+                href="https://github.com/minhquan-ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-xl bg-gray-500/10 hover:bg-gray-500/20 flex items-center justify-center text-gray-400 transition-all hover:scale-110"
+              >
+                <Github className="w-5 h-5" />
+              </a>
+            </div>
           </div>
           <div className="text-left">
             <h4 className="font-black uppercase tracking-widest text-[10px] text-gray-400 mb-4">Tính năng</h4>
@@ -562,12 +789,25 @@ function Footer() {
             <ul className="space-y-3 font-medium text-gray-500 dark:text-gray-400">
               <li><Link href="#for-teachers" className="hover:text-[#F26C21] transition-colors">Cho giáo viên</Link></li>
               <li><Link href="#for-students" className="hover:text-[#F26C21] transition-colors">Cho học sinh</Link></li>
+              <li>
+                <button
+                  onClick={onOpenFounderModal}
+                  className="hover:text-[#F26C21] transition-colors flex items-center gap-1"
+                >
+                  <Heart className="w-3 h-3" />
+                  Về đội ngũ
+                </button>
+              </li>
             </ul>
           </div>
           <div className="text-left">
             <h4 className="font-black uppercase tracking-widest text-[10px] text-gray-400 mb-4">Liên hệ</h4>
             <ul className="space-y-3 font-medium text-gray-500 dark:text-gray-400">
-              <li><a href="mailto:hello@miqix.edu.vn" className="hover:text-[#F26C21] transition-colors">hello@miqix.edu.vn</a></li>
+              <li>
+                <a href="mailto:quannm1609@gmail.com" className="hover:text-[#F26C21] transition-colors flex items-center gap-2">
+                  <span>quannm1609@gmail.com</span>
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -575,15 +815,25 @@ function Footer() {
           <div className="flex gap-6 font-medium text-gray-400">
             <Link href="#" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Điều khoản</Link>
             <Link href="#" className="hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Bảo mật</Link>
+            <button
+              onClick={onOpenFounderModal}
+              className="hover:text-[#F26C21] transition-colors flex items-center gap-1.5 px-3 py-1 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/10"
+            >
+              <Heart className="w-3 h-3" />
+              <span>Về đội ngũ</span>
+            </button>
           </div>
-          <p className="text-gray-400 font-medium">&copy; {new Date().getFullYear()} MiQiX. All rights reserved.</p>
+          <p className="text-gray-400 font-medium">&copy; {new Date().getFullYear()} MiQiX. Được phát triển bởi học sinh THPT Đặng Huy Trứ 🇻🇳</p>
         </div>
       </div>
     </footer>
   );
 }
 
+
 export default function Home() {
+  const [showFounderModal, setShowFounderModal] = useState(false);
+
   useEffect(() => {
     // Force dark mode for landing page
     document.documentElement.classList.add('dark');
@@ -598,7 +848,7 @@ export default function Home() {
   return (
     <div className="dark">
       <div className="min-h-screen bg-white dark:bg-[#050505] text-gray-900 dark:text-white font-sans selection:bg-[#F26C21]/20">
-        <Navbar />
+        <Navbar onOpenFounderModal={() => setShowFounderModal(true)} />
         <main>
           <HeroSection />
           <FeaturesSection />
@@ -606,8 +856,10 @@ export default function Home() {
           <ForStudentsSection />
           <CTASection />
         </main>
-        <Footer />
+        <Footer onOpenFounderModal={() => setShowFounderModal(true)} />
+        <FounderModal isOpen={showFounderModal} onClose={() => setShowFounderModal(false)} />
       </div>
     </div>
   );
 }
+
