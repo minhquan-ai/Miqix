@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getClassesAction } from '@/lib/actions';
+import { getClassesAction, setMainClassAction } from '@/lib/actions';
 import { Class, User } from '@/types';
 import { Shield, Check, Star } from 'lucide-react';
 import { useToast } from '../ui/Toast';
@@ -15,6 +15,7 @@ export const SelectMainClassModal: React.FC<SelectMainClassModalProps> = ({ isOp
     const [classes, setClasses] = useState<Class[]>([]);
     const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
     const { showToast } = useToast();
 
     useEffect(() => {
@@ -41,23 +42,22 @@ export const SelectMainClassModal: React.FC<SelectMainClassModalProps> = ({ isOp
     const handleConfirm = async () => {
         if (!selectedClassId) return;
 
+        setSaving(true);
         try {
-            // Update user's main class
-            // Update user's main class
-            // TODO: Implement setMainClass action
+            const result = await setMainClassAction(selectedClassId);
 
-            // For prototype:
-            currentUser.classId = selectedClassId;
-
-            // Update mock data logic removed
-
-            showToast("Đã chọn Bang hội chính thành công!", "success");
-            onClose();
-            // Force reload to reflect changes
-            window.location.reload();
-
+            if (result.success) {
+                showToast("Đã chọn lớp chính thành công!", "success");
+                onClose();
+                // Force reload to reflect changes
+                window.location.reload();
+            } else {
+                showToast(result.message || "Có lỗi xảy ra", "error");
+            }
         } catch (error) {
             showToast("Có lỗi xảy ra", "error");
+        } finally {
+            setSaving(false);
         }
     };
 

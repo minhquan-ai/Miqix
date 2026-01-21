@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Sparkles, TrendingUp, TrendingDown, AlertTriangle,
@@ -16,35 +16,86 @@ interface AIInsightsWidgetProps {
     submissions: any[];
 }
 
-// Mocked AI insights data
-const getMockInsights = (students: any[], assignments: any[], submissions: any[]) => {
+// Calculate real insights from actual data
+const getInsightsFromData = (students: any[], assignments: any[], submissions: any[]) => {
     const totalStudents = students.length;
+    const totalAssignments = assignments.length;
     const submittedCount = submissions.filter(s => s.status === 'submitted' || s.status === 'graded').length;
     const gradedSubmissions = submissions.filter(s => s.status === 'graded');
 
-    // Generate dynamic mock insights based on actual data
-    const insights = {
+    // Calculate average score
+    const avgScore = gradedSubmissions.length > 0
+        ? gradedSubmissions.reduce((sum, s) => sum + (s.score || 0), 0) / gradedSubmissions.length
+        : 0;
+
+    // Identify at-risk students (low scores or missing submissions)
+    const studentSubmissionMap: Record<string, { count: number; avgScore: number; name: string; lateMissions: number }> = {};
+
+    students.forEach(student => {
+        const studentSubs = submissions.filter(s => s.studentId === student.id);
+        const gradedSubs = studentSubs.filter(s => s.status === 'graded');
+        const lateSubs = studentSubs.filter(s => s.isLate);
+
+        studentSubmissionMap[student.id] = {
+            name: student.name,
+            count: studentSubs.length,
+            avgScore: gradedSubs.length > 0
+                ? gradedSubs.reduce((sum, s) => sum + (s.score || 0), 0) / gradedSubs.length
+                : 0,
+            lateMissions: lateSubs.length
+        };
+    });
+
+    // Find at-risk students: low avg score (<5) or many late submissions or missing submissions
+    const atRiskStudents = Object.values(studentSubmissionMap)
+        .filter(s => s.avgScore < 5 || s.lateMissions >= 2 || (totalAssignments > 0 && s.count < totalAssignments * 0.5))
+        .slice(0, 3)
+        .map(s => ({
+            name: s.name,
+            reason: s.avgScore < 5
+                ? `Điểm trung bình thấp (${s.avgScore.toFixed(1)})`
+                : s.lateMissions >= 2
+                    ? `Nộp bài muộn ${s.lateMissions} lần`
+                    : `Thiếu ${totalAssignments - s.count} bài nộp`,
+            trend: 'down' as const
+        }));
+
+    // Find improving students: high recent scores
+    const improvingStudents = Object.values(studentSubmissionMap)
+        .filter(s => s.avgScore >= 8 && s.count >= totalAssignments * 0.8)
+        .slice(0, 2)
+        .map(s => ({
+            name: s.name,
+            reason: `Điểm trung bình cao (${s.avgScore.toFixed(1)})`,
+            trend: 'up' as const
+        }));
+
+    // Generate suggested actions based on data
+    const suggestedActions: { id: string; label: string; type: string }[] = [];
+
+    if (atRiskStudents.length > 0) {
+        suggestedActions.push({ id: '1', label: 'Gửi nhắc nhở đến học sinh cần hỗ trợ', type: 'remind' });
+    }
+    if (avgScore < 7 && gradedSubmissions.length > 0) {
+        suggestedActions.push({ id: '2', label: 'Tạo bài ôn tập cho phần điểm thấp', type: 'quiz' });
+    }
+    if (improvingStudents.length > 0) {
+        suggestedActions.push({ id: '3', label: 'Khen thưởng học sinh xuất sắc', type: 'praise' });
+    }
+
+    // Fallback suggestions if none generated
+    if (suggestedActions.length === 0) {
+        suggestedActions.push({ id: '1', label: 'Tạo bài tập mới cho lớp', type: 'quiz' });
+    }
+
+    return {
         pulse: totalStudents > 0
-            ? `Lớp học đang hoạt động tích cực. ${submittedCount} bài nộp trong tuần qua từ ${totalStudents} học sinh.`
+            ? `Lớp học có ${totalStudents} học sinh với ${submittedCount} bài nộp. ${avgScore > 0 ? `Điểm trung bình: ${avgScore.toFixed(1)}` : ''}`
             : 'Chưa có dữ liệu để phân tích.',
-
-        atRiskStudents: [
-            { name: 'Nguyễn Văn A', reason: 'Nộp bài muộn 3 lần liên tiếp', trend: 'down' },
-            { name: 'Trần Thị B', reason: 'Điểm giảm 20% trong 2 tuần qua', trend: 'down' },
-        ],
-
-        improvingStudents: [
-            { name: 'Lê Văn C', reason: 'Điểm tăng 15% so với tháng trước', trend: 'up' },
-        ],
-
-        suggestedActions: [
-            { id: '1', label: 'Gửi nhắc nhở đến học sinh chậm nộp bài', type: 'remind' },
-            { id: '2', label: 'Tạo bài quiz ôn tập cho phần học sinh hay sai', type: 'quiz' },
-            { id: '3', label: 'Khen thưởng học sinh tiến bộ', type: 'praise' },
-        ]
+        atRiskStudents,
+        improvingStudents,
+        suggestedActions
     };
-
-    return insights;
 };
 
 export default function AIInsightsWidget({
@@ -56,19 +107,25 @@ export default function AIInsightsWidget({
     const [isExpanded, setIsExpanded] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
 
-    const insights = getMockInsights(students, assignments, submissions);
+    // Use useMemo to recompute insights when data changes
+    const insights = useMemo(() =>
+        getInsightsFromData(students, assignments, submissions),
+        [students, assignments, submissions]
+    );
 
     const handleRefresh = () => {
         setIsGenerating(true);
-        // Simulate AI thinking
+        // Simulate refresh delay
         setTimeout(() => {
             setIsGenerating(false);
-        }, 1500);
+        }, 800);
     };
 
     const handleAction = (actionId: string) => {
-        // Mock action - in real app, this would trigger actual functionality
-        alert(`Thực hiện hành động: ${insights.suggestedActions.find(a => a.id === actionId)?.label}`);
+        const action = insights.suggestedActions.find(a => a.id === actionId);
+        if (action) {
+            alert(`Tính năng "${action.label}" đang được phát triển`);
+        }
     };
 
     return (

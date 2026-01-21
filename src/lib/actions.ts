@@ -2396,11 +2396,89 @@ export async function importStudentsFromCSVAction(
     classId: string,
     students: { name: string; email: string }[]
 ): Promise<{ success: boolean; message: string; results?: { added: number; failed: number; errors: string[] } }> {
-    // TODO: Implement CSV import
+    const session = await auth();
+    if (!session?.user?.id) {
+        return { success: false, message: "Unauthorized" };
+    }
+
+    // Verify user is teacher of the class
+    const classData = await db.class.findFirst({
+        where: { id: classId, teacherId: session.user.id }
+    });
+
+    if (!classData) {
+        return { success: false, message: "Không tìm thấy lớp học hoặc bạn không có quyền" };
+    }
+
+    let added = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    for (const student of students) {
+        try {
+            if (!student.email || !student.name) {
+                errors.push(`Bỏ qua dòng thiếu thông tin: ${student.name || student.email || 'không có dữ liệu'}`);
+                failed++;
+                continue;
+            }
+
+            // Check if user exists
+            let user = await db.user.findUnique({
+                where: { email: student.email }
+            });
+
+            // Create user if not exists
+            if (!user) {
+                user = await db.user.create({
+                    data: {
+                        name: student.name,
+                        email: student.email,
+                        role: 'student',
+                        password: '$2a$10$defaultHashedPassword' // Default password
+                    }
+                });
+            }
+
+            // Check if already enrolled
+            const existingEnrollment = await db.classEnrollment.findUnique({
+                where: {
+                    userId_classId: {
+                        userId: user.id,
+                        classId
+                    }
+                }
+            });
+
+            if (existingEnrollment) {
+                errors.push(`${student.email} đã tham gia lớp học`);
+                failed++;
+                continue;
+            }
+
+            // Create enrollment
+            await db.classEnrollment.create({
+                data: {
+                    userId: user.id,
+                    classId,
+                    role: 'student',
+                    status: 'active'
+                }
+            });
+
+            added++;
+        } catch (error) {
+            console.error(`Error importing ${student.email}:`, error);
+            errors.push(`Lỗi khi thêm ${student.email}`);
+            failed++;
+        }
+    }
+
+    revalidatePath(`/dashboard/classes/${classId}`);
+
     return {
         success: true,
-        message: `Import completed. Added: ${students.length}, Failed: 0`,
-        results: { added: students.length, failed: 0, errors: [] }
+        message: `Đã thêm ${added} học sinh${failed > 0 ? `, ${failed} lỗi` : ''}`,
+        results: { added, failed, errors }
     };
 }
 
@@ -2813,7 +2891,7 @@ export async function getClassStatsAction(classId: string) {
     if (!session) return null;
 
     try {
-        const [studentCount, assignments, pendingGrading, classData] = await Promise.all([
+        const [studentCount, assignments, pendingGrading, classData, attendanceData] = await Promise.all([
             db.classEnrollment.count({ where: { classId, status: 'active' } }),
             db.assignment.count({
                 where: {
@@ -2831,11 +2909,26 @@ export async function getClassStatsAction(classId: string) {
             db.class.findUnique({
                 where: { id: classId },
                 select: { maxStudents: true }
+            }),
+            // Fetch attendance records to calculate real rate
+            db.attendanceRecord.groupBy({
+                by: ['status'],
+                where: {
+                    session: { classId }
+                },
+                _count: { status: true }
             })
         ]);
 
-        // Mock attendance for now
-        const attendanceRate = 95;
+        // Calculate real attendance rate
+        let attendanceRate = 0;
+        if (attendanceData.length > 0) {
+            const totalRecords = attendanceData.reduce((sum, d) => sum + d._count.status, 0);
+            const presentCount = attendanceData
+                .filter(d => d.status === 'PRESENT' || d.status === 'LATE')
+                .reduce((sum, d) => sum + d._count.status, 0);
+            attendanceRate = totalRecords > 0 ? Math.round((presentCount / totalRecords) * 100) : 0;
+        }
 
         return {
             studentCount,
@@ -2853,5 +2946,259 @@ export async function getClassStatsAction(classId: string) {
             pendingGrading: 0,
             maxStudents: 50
         };
+    }
+}
+
+// --- Dashboard Counts Action ---
+
+export async function getDashboardCountsAction() {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return {
+            pendingAssignments: 0,
+            unreadNotifications: 0,
+            unreadMessages: 0,
+            draftAssignments: 0
+        };
+    }
+
+    const user = await db.user.findUnique({
+        where: { email: session.user.email! },
+        select: { id: true, role: true }
+    });
+
+    if (!user) {
+        return {
+            pendingAssignments: 0,
+            unreadNotifications: 0,
+            unreadMessages: 0,
+            draftAssignments: 0
+        };
+    }
+
+    try {
+        if (user.role === 'teacher') {
+            // Teacher: count submissions that need grading
+            const [pendingGrading, unreadNotifications, draftAssignments] = await Promise.all([
+                db.submission.count({
+                    where: {
+                        assignment: { teacherId: user.id },
+                        status: 'submitted',
+                        score: null
+                    }
+                }),
+                db.notification.count({
+                    where: {
+                        userId: user.id,
+                        isRead: false
+                    }
+                }),
+                db.assignment.count({
+                    where: {
+                        teacherId: user.id,
+                        status: 'draft'
+                    }
+                })
+            ]);
+
+            return {
+                pendingAssignments: pendingGrading,
+                unreadNotifications,
+                unreadMessages: 0, // Messaging system not implemented yet
+                draftAssignments
+            };
+        } else {
+            // Student: count pending assignments to submit
+            const [pendingAssignments, unreadNotifications] = await Promise.all([
+                db.assignment.count({
+                    where: {
+                        status: 'open',
+                        dueDate: { gte: new Date() },
+                        assignmentClasses: {
+                            some: {
+                                class: {
+                                    enrollments: {
+                                        some: {
+                                            userId: user.id,
+                                            status: 'active'
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        submissions: {
+                            none: {
+                                studentId: user.id
+                            }
+                        }
+                    }
+                }),
+                db.notification.count({
+                    where: {
+                        userId: user.id,
+                        isRead: false
+                    }
+                })
+            ]);
+
+            return {
+                pendingAssignments,
+                unreadNotifications,
+                unreadMessages: 0,
+                draftAssignments: 0
+            };
+        }
+    } catch (error) {
+        console.error("Error fetching dashboard counts:", error);
+        return {
+            pendingAssignments: 0,
+            unreadNotifications: 0,
+            unreadMessages: 0,
+            draftAssignments: 0
+        };
+    }
+}
+
+// --- Main Class Action ---
+
+export async function setMainClassAction(classId: string) {
+    const session = await auth();
+    if (!session?.user?.email) {
+        return { success: false, message: "Unauthorized" };
+    }
+
+    try {
+        await db.user.update({
+            where: { email: session.user.email },
+            data: { classId }
+        });
+
+        revalidatePath('/dashboard');
+        return { success: true, message: "Đã cập nhật lớp chính thành công" };
+    } catch (error) {
+        console.error("Error setting main class:", error);
+        return { success: false, message: "Lỗi khi cập nhật lớp chính" };
+    }
+}
+
+// --- Student Profile Action ---
+
+export async function getStudentProfileDataAction(classId: string, studentId: string) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return { success: false, message: "Unauthorized" };
+    }
+
+    try {
+        // Check if user is teacher of this class
+        const isTeacher = await db.class.findFirst({
+            where: { id: classId, teacherId: session.user.id }
+        });
+
+        if (!isTeacher) {
+            return { success: false, message: "Không có quyền xem thông tin này" };
+        }
+
+        // Get student info
+        const enrollment = await db.classEnrollment.findFirst({
+            where: { classId, userId: studentId },
+            include: { user: true }
+        });
+
+        if (!enrollment) {
+            return { success: false, message: "Không tìm thấy học sinh trong lớp" };
+        }
+
+        // Get assignments for this class
+        const assignments = await db.assignment.findMany({
+            where: {
+                assignmentClasses: { some: { classId } }
+            },
+            select: { id: true, title: true, maxScore: true, dueDate: true }
+        });
+
+        // Get student submissions
+        const submissions = await db.submission.findMany({
+            where: {
+                studentId,
+                assignment: {
+                    assignmentClasses: { some: { classId } }
+                }
+            },
+            include: {
+                assignment: {
+                    select: { id: true, title: true, maxScore: true, dueDate: true }
+                }
+            },
+            orderBy: { submittedAt: 'desc' }
+        });
+
+        // Get attendance records
+        const attendanceRecords = await db.attendanceRecord.findMany({
+            where: {
+                studentId,
+                session: { classId }
+            }
+        });
+
+        // Calculate stats
+        const gradedSubmissions = submissions.filter(s => s.score !== null);
+        const averageScore = gradedSubmissions.length > 0
+            ? gradedSubmissions.reduce((sum, s) => sum + (s.score || 0), 0) / gradedSubmissions.length
+            : 0;
+
+        const submissionRate = assignments.length > 0
+            ? Math.round((submissions.length / assignments.length) * 100)
+            : 0;
+
+        const onTimeSubmissions = submissions.filter(s => {
+            const dueDate = s.assignment.dueDate;
+            return s.submittedAt <= dueDate;
+        });
+        const onTimeRate = submissions.length > 0
+            ? Math.round((onTimeSubmissions.length / submissions.length) * 100)
+            : 0;
+
+        // Attendance breakdown
+        const attendance = {
+            total: attendanceRecords.length,
+            present: attendanceRecords.filter(r => r.status === 'PRESENT').length,
+            late: attendanceRecords.filter(r => r.status === 'LATE').length,
+            absent: attendanceRecords.filter(r => r.status === 'ABSENT').length,
+            excused: attendanceRecords.filter(r => r.status === 'EXCUSED').length
+        };
+
+        return {
+            success: true,
+            data: {
+                student: {
+                    id: enrollment.user.id,
+                    name: enrollment.user.name,
+                    email: enrollment.user.email,
+                    avatarUrl: enrollment.user.avatarUrl || undefined,
+                    joinedAt: enrollment.joinedAt.toISOString()
+                },
+                submissions: submissions.map(s => ({
+                    id: s.id,
+                    assignmentTitle: s.assignment.title,
+                    assignmentId: s.assignmentId,
+                    score: s.score,
+                    maxScore: s.assignment.maxScore || 10,
+                    status: s.status,
+                    submittedAt: s.submittedAt.toISOString(),
+                    isLate: s.submittedAt > s.assignment.dueDate
+                })),
+                attendance,
+                stats: {
+                    averageScore,
+                    submissionRate,
+                    onTimeRate,
+                    totalAssignments: assignments.length
+                }
+            }
+        };
+    } catch (error) {
+        console.error("Error fetching student profile:", error);
+        return { success: false, message: "Lỗi khi tải thông tin học sinh" };
     }
 }

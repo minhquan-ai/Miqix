@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 
-import { getUserEnrollmentsAction, getCurrentUserAction } from "@/lib/actions";
+import { getUserEnrollmentsAction, getCurrentUserAction, getDashboardCountsAction } from "@/lib/actions";
 import { logout } from "@/lib/auth-actions";
 import { User } from "@/types";
 import Sidebar from "@/components/Sidebar";
@@ -19,13 +19,20 @@ export default function DashboardLayout({
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [userClasses, setUserClasses] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [counts, setCounts] = useState({
+        pendingAssignments: 0,
+        unreadNotifications: 0,
+        unreadMessages: 0,
+        draftAssignments: 0
+    });
 
     useEffect(() => {
         async function loadData() {
             try {
-                const [user, classes] = await Promise.all([
+                const [user, classes, dashboardCounts] = await Promise.all([
                     getCurrentUserAction(),
-                    getUserEnrollmentsAction()
+                    getUserEnrollmentsAction(),
+                    getDashboardCountsAction()
                 ]);
 
                 if (!user) {
@@ -38,6 +45,7 @@ export default function DashboardLayout({
 
                 setCurrentUser(user);
                 setUserClasses(classes);
+                setCounts(dashboardCounts);
             } catch (error) {
                 console.error("Failed to load classes", error);
             } finally {
@@ -67,14 +75,6 @@ export default function DashboardLayout({
         const newState = !isSidebarCollapsed;
         setIsSidebarCollapsed(newState);
         localStorage.setItem('sidebar-collapsed', String(newState));
-    };
-
-    // Mock counts for now - in real app these would come from server actions
-    const counts = {
-        pendingAssignments: 5,
-        unreadNotifications: 3,
-        unreadMessages: 1,
-        draftAssignments: 2
     };
 
     return (
