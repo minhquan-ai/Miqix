@@ -2,9 +2,10 @@ export const AI_CONFIG = {
     provider: 'openrouter',
     apiKey: process.env.OPENROUTER_API_KEY || process.env.GROQ_API_KEY, // Fallback for backward compat
     models: {
+        // Primary models - MiMo V2 Flash as requested
         FAST: "xiaomi/mimo-v2-flash:free",      // For quick chat, UI responses
-        SMART: "meta-llama/llama-3.3-70b-instruct:free", // For complex logic, math
-        REASONING: "deepseek/deepseek-r1-distill-llama-70b:free", // For heavy reasoning
+        SMART: "xiaomi/mimo-v2-flash:free",     // Same model for consistency
+        REASONING: "xiaomi/mimo-v2-flash:free", // Same model for all tasks
     },
     defaultParams: {
         temperature: 0.7,

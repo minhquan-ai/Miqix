@@ -68,8 +68,9 @@ export const AICore = {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                console.error("[AICore] API Error:", errorData);
-                throw new Error(`AI Provider Error: ${response.statusText}`);
+                console.error("[AICore] API Error:", response.status, response.statusText, errorData);
+                const errorMessage = errorData.error?.message || errorData.message || response.statusText;
+                throw new Error(`AI Provider Error: ${errorMessage}`);
             }
 
             const data = await response.json();
