@@ -14,9 +14,10 @@ interface ProfileData {
     name: string;
     email?: string;
     role: string;
-    avatarUrl?: string;
-    bio?: string;
-    schoolName?: string;
+    avatarUrl?: string | null;
+    bio?: string | null;
+    phoneNumber?: string | null;
+    schoolName?: string | null;
     teachingSubjects: string[];
     createdAt: string;
     isOwnProfile: boolean;

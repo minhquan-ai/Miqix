@@ -124,7 +124,6 @@ export default function DashboardLayout({
 
                 {/* Bottom Navigation - only on mobile */}
                 <BottomNavigation
-                    unreadNotifications={counts.unreadNotifications}
                     pendingAssignments={counts.pendingAssignments}
                 />
             </div>
