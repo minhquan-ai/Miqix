@@ -3202,3 +3202,149 @@ export async function getStudentProfileDataAction(classId: string, studentId: st
         return { success: false, message: "Lỗi khi tải thông tin học sinh" };
     }
 }
+
+// --- Profile Actions ---
+
+export async function getFullUserProfileAction(userId?: string) {
+    const session = await auth();
+    if (!session?.user?.email) {
+        return { success: false, message: "Unauthorized" };
+    }
+
+    try {
+        const targetUserId = userId || session.user.id;
+        const isOwnProfile = !userId || userId === session.user.id;
+
+        const user = await db.user.findUnique({
+            where: { id: targetUserId },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                avatarUrl: true,
+                bio: true,
+                phoneNumber: true,
+                schoolName: true,
+                teachingSubjects: true,
+                xp: true,
+                level: true,
+                streak: true,
+                createdAt: true,
+                _count: {
+                    select: {
+                        classes: true, // for teachers
+                        enrollments: true, // for students
+                        createdAssignments: true,
+                        submissions: true
+                    }
+                }
+            }
+        });
+
+        if (!user) {
+            return { success: false, message: "Không tìm thấy người dùng" };
+        }
+
+        // Get additional stats
+        let stats: any = {};
+
+        if (user.role === 'teacher') {
+            // Count total students across all classes
+            const studentCount = await db.classEnrollment.count({
+                where: {
+                    class: { teacherId: user.id },
+                    status: 'active'
+                }
+            });
+            stats = {
+                classCount: user._count.classes,
+                studentCount,
+                assignmentCount: user._count.createdAssignments
+            };
+        } else {
+            // Student stats
+            const submissions = await db.submission.findMany({
+                where: { studentId: user.id, score: { not: null } },
+                select: { score: true }
+            });
+            const avgScore = submissions.length > 0
+                ? submissions.reduce((sum, s) => sum + (s.score || 0), 0) / submissions.length
+                : 0;
+
+            const attendanceRecords = await db.attendanceRecord.findMany({
+                where: { studentId: user.id }
+            });
+            const attendanceRate = attendanceRecords.length > 0
+                ? Math.round((attendanceRecords.filter(r => r.status === 'PRESENT' || r.status === 'LATE').length / attendanceRecords.length) * 100)
+                : 0;
+
+            stats = {
+                classCount: user._count.enrollments,
+                submissionCount: user._count.submissions,
+                averageScore: avgScore,
+                attendanceRate,
+                xp: user.xp,
+                level: user.level,
+                streak: user.streak
+            };
+        }
+
+        return {
+            success: true,
+            data: {
+                id: user.id,
+                name: user.name,
+                email: isOwnProfile ? user.email : undefined, // Hide email for other users
+                role: user.role,
+                avatarUrl: user.avatarUrl,
+                bio: user.bio,
+                phoneNumber: isOwnProfile ? user.phoneNumber : undefined,
+                schoolName: user.schoolName,
+                teachingSubjects: user.teachingSubjects ? user.teachingSubjects.split(',').map((s: string) => s.trim()) : [],
+                createdAt: user.createdAt.toISOString(),
+                isOwnProfile,
+                stats
+            }
+        };
+    } catch (error) {
+        console.error("Error fetching user profile:", error);
+        return { success: false, message: "Lỗi khi tải hồ sơ" };
+    }
+}
+
+interface UpdateProfileData {
+    name?: string;
+    bio?: string;
+    phoneNumber?: string;
+    schoolName?: string;
+    teachingSubjects?: string;
+    avatarUrl?: string;
+}
+
+export async function updateProfileAction(data: UpdateProfileData) {
+    const session = await auth();
+    if (!session?.user?.email) {
+        return { success: false, message: "Unauthorized" };
+    }
+
+    try {
+        await db.user.update({
+            where: { email: session.user.email },
+            data: {
+                name: data.name,
+                bio: data.bio,
+                phoneNumber: data.phoneNumber,
+                schoolName: data.schoolName,
+                teachingSubjects: data.teachingSubjects,
+                avatarUrl: data.avatarUrl
+            }
+        });
+
+        revalidatePath('/dashboard/profile');
+        return { success: true, message: "Đã cập nhật hồ sơ" };
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        return { success: false, message: "Lỗi khi cập nhật hồ sơ" };
+    }
+}

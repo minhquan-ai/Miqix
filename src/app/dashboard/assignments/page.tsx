@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, CheckCircle, Clock, Plus, Search, FileEdit } from "lucide-react";
@@ -11,43 +11,90 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AssignmentCreatorModal } from "@/components/features/AssignmentCreatorModal";
 import { Suspense } from "react";
 
+// Cache for faster subsequent loads
+const dataCache = {
+    user: null as User | null,
+    assignments: [] as Assignment[],
+    submissions: [] as Submission[],
+    lastFetch: 0,
+    TTL: 30000, // 30 seconds cache
+};
+
 function AssignmentsContent() {
     const router = useRouter();
-    const [user, setUser] = useState<User | null>(null);
-    const [assignments, setAssignments] = useState<Assignment[]>([]);
-    const [submissions, setSubmissions] = useState<Submission[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(dataCache.user);
+    const [assignments, setAssignments] = useState<Assignment[]>(dataCache.assignments);
+    const [submissions, setSubmissions] = useState<Submission[]>(dataCache.submissions);
+    const [loading, setLoading] = useState(!dataCache.user);
+    const [isRefreshing, startRefresh] = useTransition();
     const [searchQuery, setSearchQuery] = useState("");
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [viewAllSection, setViewAllSection] = useState<{ title: string; assignments: Assignment[] } | null>(null);
 
-    useEffect(() => {
-        async function loadData() {
-            try {
-                const currentUser = await getCurrentUserAction();
-                if (!currentUser) {
-                    router.push('/login');
-                    return;
-                }
-                setUser(currentUser);
+    // Fast parallel data loading
+    const loadData = useCallback(async (forceRefresh = false) => {
+        const now = Date.now();
+        const isCacheValid = dataCache.user && (now - dataCache.lastFetch) < dataCache.TTL;
 
-                const [allAssignments, allSubmissions] = await Promise.all([
-                    getAssignmentsAction(currentUser.role === 'student' ? (currentUser as any).classId : undefined),
-                    currentUser.role === 'teacher'
-                        ? getSubmissionsForTeacherAction(currentUser.id)
-                        : getUserSubmissionsAction(currentUser.id)
-                ]);
+        // Use cache for instant display, then refresh in background
+        if (isCacheValid && !forceRefresh) {
+            setUser(dataCache.user);
+            setAssignments(dataCache.assignments);
+            setSubmissions(dataCache.submissions);
+            setLoading(false);
 
-                setAssignments(allAssignments);
-                setSubmissions(allSubmissions);
-            } catch (error) {
-                console.error("Failed to load data", error);
-            } finally {
+            // Background refresh
+            startRefresh(async () => {
+                await fetchFreshData();
+            });
+            return;
+        }
+
+        await fetchFreshData();
+    }, [router]);
+
+    const fetchFreshData = async () => {
+        try {
+            // Get user first (fast, usually cached)
+            const currentUser = await getCurrentUserAction();
+            if (!currentUser) {
+                router.push('/login');
+                return;
+            }
+
+            // Set user immediately for progressive UI
+            setUser(currentUser);
+            dataCache.user = currentUser;
+
+            // Show partial data immediately if we have cache
+            if (dataCache.assignments.length > 0) {
                 setLoading(false);
             }
+
+            // Fetch assignments and submissions in parallel
+            const [allAssignments, allSubmissions] = await Promise.all([
+                getAssignmentsAction(currentUser.role === 'student' ? (currentUser as any).classId : undefined),
+                currentUser.role === 'teacher'
+                    ? getSubmissionsForTeacherAction(currentUser.id)
+                    : getUserSubmissionsAction(currentUser.id)
+            ]);
+
+            // Update state and cache
+            setAssignments(allAssignments);
+            setSubmissions(allSubmissions);
+            dataCache.assignments = allAssignments;
+            dataCache.submissions = allSubmissions;
+            dataCache.lastFetch = Date.now();
+        } catch (error) {
+            console.error("Failed to load data", error);
+        } finally {
+            setLoading(false);
         }
+    };
+
+    useEffect(() => {
         loadData();
-    }, [router]);
+    }, [loadData]);
 
     const filteredAssignments = useMemo(() => {
         return assignments.filter(assignment => {

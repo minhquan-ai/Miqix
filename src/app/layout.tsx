@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,9 +12,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#4F46E5"
+};
+
 export const metadata: Metadata = {
   title: "MiQiX - Nền tảng học tập thông minh",
   description: "Trợ lý AI cá nhân giúp tối ưu hóa việc dạy và học.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "MiQiX"
+  },
+  formatDetection: {
+    telephone: false
+  }
 };
 
 import { ToastProvider } from "@/components/ui/Toast";

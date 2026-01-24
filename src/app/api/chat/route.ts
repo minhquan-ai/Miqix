@@ -96,8 +96,10 @@ export async function POST(request: Request) {
             }
         }
 
-        // 2. Build General Context
+        // 2. Build General Context (Enhanced with Deep Context)
         let generalContext = "";
+        let deepContextInfo = "";
+
         if (context) {
             const userTypeLabel = isTeacher ? 'GIÁO VIÊN' : 'HỌC SINH';
             const assignmentsList = context.assignments ? context.assignments.join(", ") : "Không có";
@@ -112,6 +114,59 @@ export async function POST(request: Request) {
                 "- Lịch trình: " + eventsList,
                 "- Analytics: " + analyticsInfo
             ].join("\n");
+
+            // Process Deep Class Context from client
+            if (context.selectedClassContext) {
+                const cc = context.selectedClassContext;
+                const scheduleStr = cc.schedule?.map((s: any) => `${s.day}: ${s.time} - ${s.subject}`).join("; ") || "Chưa có thời khóa biểu";
+                const assignmentsStr = cc.assignments?.map((a: any) => `"${a.title}" (${a.subject}, ${a.status}, deadline: ${a.dueDate})`).join("; ") || "Chưa có bài tập";
+                const announcementsStr = cc.announcements?.map((an: any) => `[${an.date}] ${an.title}`).join("; ") || "Chưa có thông báo";
+
+                deepContextInfo += [
+                    "",
+                    "=== NGỮA CẢNH SÂU: LỚP HỌC ĐƯỢC CHỌN ===",
+                    `Người dùng đang tập trung vào lớp "${cc.className}"`,
+                    "",
+                    "📅 THỜI KHÓA BIỂU:",
+                    scheduleStr,
+                    "",
+                    "📝 BÀI TẬP TRONG LỚP:",
+                    assignmentsStr,
+                    "",
+                    "📢 THÔNG BÁO GẦN ĐÂY:",
+                    announcementsStr,
+                    "",
+                    `👥 SỐ THÀNH VIÊN: ${cc.memberCount?.students || 0} học sinh`,
+                    "",
+                    "HÃY SỬ DỤNG THÔNG TIN NÀY ĐỂ TRẢ LỜI CÂU HỎI PHÙ HỢP VỚI NGỮ CẢNH LỚP HỌC.",
+                    "=== KẾT THÚC NGỮU CẢNH LỚP HỌC ==="
+                ].join("\n");
+            }
+
+            // Process Deep Assignment Context from client
+            if (context.selectedAssignmentContext) {
+                const ac = context.selectedAssignmentContext;
+                deepContextInfo += [
+                    "",
+                    "=== NGỮ CẢNH SÂU: BÀI TẬP ĐƯỢC CHỌN ===",
+                    `Người dùng đang tập trung vào bài tập "${ac.title}"`,
+                    "",
+                    "📋 CHI TIẾT BÀI TẬP:",
+                    `- Tiêu đề: ${ac.title}`,
+                    `- Lớp: ${ac.className}`,
+                    `- Deadline: ${ac.dueDate}`,
+                    `- Mô tả: ${ac.description || "Không có mô tả chi tiết"}`,
+                    "",
+                    "📊 THỐNG KÊ NỘP BÀI:",
+                    `- Tổng số: ${ac.submissionStats?.total || 0}`,
+                    `- Đã nộp: ${ac.submissionStats?.submitted || 0}`,
+                    `- Đã chấm: ${ac.submissionStats?.graded || 0}`,
+                    ac.hasAttachments ? "📎 Có file đính kèm" : "",
+                    "",
+                    "HÃY TRẢ LỜI DỰA TRÊN NGỮ CẢNH BÀI TẬP NÀY. NẾU LÀ GIÁO VIÊN, HỖ TRỢ SOẠN/CHẤM. NẾU LÀ HỌC SINH, HỖ TRỢ GIẢI/ÔN.",
+                    "=== KẾT THÚC NGỮ CẢNH BÀI TẬP ==="
+                ].join("\n");
+            }
         }
 
         // 3. Build role-specific instructions (Strict)
@@ -165,6 +220,7 @@ export async function POST(request: Request) {
             targetedAssignmentContext,
             targetedClassContext,
             generalContext,
+            deepContextInfo, // Deep context for selected class/assignment
             "",
             roleInstructions,
             "",

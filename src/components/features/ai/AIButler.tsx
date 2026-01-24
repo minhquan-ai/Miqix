@@ -108,7 +108,7 @@ export function AIButler() {
                         initial={{ scale: 0, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0, opacity: 0, y: 20 }}
-                        className="fixed bottom-8 right-8 z-[100] flex flex-col items-end gap-3"
+                        className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-[100] flex flex-col items-end gap-3"
                     >
                         {/* Intelligent Label on Hover */}
                         <motion.div
@@ -130,7 +130,7 @@ export function AIButler() {
                                 }
                             }}
                             className={cn(
-                                "w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all border-4 border-white group relative",
+                                "w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-2xl transition-all border-4 border-white group relative",
                                 mode === "learning" ? "bg-indigo-600" :
                                     mode === "schedule" ? "bg-violet-600" :
                                         mode === "class" ? "bg-teal-600" :
@@ -142,7 +142,7 @@ export function AIButler() {
                                 <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-white/20 animate-spin-slow opacity-30" />
                             </div>
 
-                            <Sparkles className="w-8 h-8 text-white relative z-10 group-hover:rotate-12 transition-transform duration-300" />
+                            <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-white relative z-10 group-hover:rotate-12 transition-transform duration-300" />
 
                             {/* Mode Indicator Pulse - Properly positioned outside overflow */}
                             <div className="absolute top-0 right-0 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-md z-20 translate-x-1 -translate-y-1">

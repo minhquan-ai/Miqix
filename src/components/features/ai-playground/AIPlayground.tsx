@@ -783,9 +783,11 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
 
     // Canvas State
     const { isCanvasOpen, setCanvasOpen: setIsCanvasOpen } = useAIContext();
-    const [canvasContent, setCanvasContent] = useState<any>(null); // Changed to any to support objects
+    const [canvasContent, setCanvasContent] = useState<any>(null);
     const [canvasViewMode, setCanvasViewMode] = useState<"dashboard" | "content" | "flashcards" | "lesson_plan" | "socratic">("dashboard");
-    const [isEditingContent, setIsEditingContent] = useState(false); // New state for editing mode
+    const [isEditingContent, setIsEditingContent] = useState(false);
+    const [canvasHistory, setCanvasHistory] = useState<{ id: string; type: string; title: string; content: any; timestamp: number }[]>([]);
+    const [showCanvasHistory, setShowCanvasHistory] = useState(false);
 
     // Socratic State
     const [socraticCurrentStep, setSocraticCurrentStep] = useState<SocraticStep | null>(null);
@@ -804,6 +806,27 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
     const [allClasses, setAllClasses] = useState<any[]>([]);
     const [showAssignmentSelector, setShowAssignmentSelector] = useState(false);
     const [showClassSelector, setShowClassSelector] = useState(false);
+
+    // Deep Context State - Dữ liệu chi tiết khi chọn lớp/bài tập
+    const [deepClassContext, setDeepClassContext] = useState<{
+        classId: string;
+        className: string;
+        schedule: any[];
+        assignments: any[];
+        announcements: any[];
+        members: { students: number; teachers: number };
+        recentActivity: any[];
+    } | null>(null);
+    const [deepAssignmentContext, setDeepAssignmentContext] = useState<{
+        assignmentId: string;
+        title: string;
+        description: string;
+        dueDate: Date | null;
+        className: string;
+        submissions: { total: number; submitted: number; graded: number };
+        attachments: any[];
+    } | null>(null);
+    const [isLoadingContext, setIsLoadingContext] = useState(false);
 
     // Search State
     const [searchQuery, setSearchQuery] = useState("");
@@ -1077,6 +1100,87 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
         scrollToBottom(behavior as ScrollBehavior);
     }, [messages.length, currentSessionId, isCanvasOpen, isLoading, thinkingExpanded]);
 
+    // Fetch deep context for selected class
+    const fetchDeepClassContext = useCallback(async (classId: string) => {
+        setIsLoadingContext(true);
+        try {
+            // Fetch all class data in parallel
+            const [classData, assignmentsData, announcementsData, scheduleData] = await Promise.all([
+                fetch(`/api/classes/${classId}`).then(r => r.json()).catch(() => null),
+                fetch(`/api/classes/${classId}/assignments`).then(r => r.json()).catch(() => []),
+                fetch(`/api/classes/${classId}/announcements`).then(r => r.json()).catch(() => []),
+                fetch(`/api/classes/${classId}/schedule`).then(r => r.json()).catch(() => [])
+            ]);
+
+            if (classData) {
+                setDeepClassContext({
+                    classId,
+                    className: classData.name || 'Lớp học',
+                    schedule: scheduleData || [],
+                    assignments: assignmentsData || [],
+                    announcements: announcementsData || [],
+                    members: {
+                        students: classData._count?.students || classData.studentCount || 0,
+                        teachers: classData._count?.teachers || 1
+                    },
+                    recentActivity: [] // Can be expanded later
+                });
+            }
+        } catch (error) {
+            console.error('Failed to fetch deep class context:', error);
+        } finally {
+            setIsLoadingContext(false);
+        }
+    }, []);
+
+    // Fetch deep context for selected assignment
+    const fetchDeepAssignmentContext = useCallback(async (assignmentId: string) => {
+        setIsLoadingContext(true);
+        try {
+            const [assignmentData, submissionsData] = await Promise.all([
+                fetch(`/api/assignments/${assignmentId}`).then(r => r.json()).catch(() => null),
+                fetch(`/api/assignments/${assignmentId}/submissions`).then(r => r.json()).catch(() => [])
+            ]);
+
+            if (assignmentData) {
+                setDeepAssignmentContext({
+                    assignmentId,
+                    title: assignmentData.title || 'Bài tập',
+                    description: assignmentData.description || '',
+                    dueDate: assignmentData.dueDate ? new Date(assignmentData.dueDate) : null,
+                    className: assignmentData.class?.name || '',
+                    submissions: {
+                        total: submissionsData?.length || 0,
+                        submitted: submissionsData?.filter((s: any) => s.status === 'submitted' || s.status === 'graded')?.length || 0,
+                        graded: submissionsData?.filter((s: any) => s.status === 'graded')?.length || 0
+                    },
+                    attachments: assignmentData.attachments || []
+                });
+            }
+        } catch (error) {
+            console.error('Failed to fetch deep assignment context:', error);
+        } finally {
+            setIsLoadingContext(false);
+        }
+    }, []);
+
+    // Auto-fetch deep context when target changes
+    useEffect(() => {
+        if (targetClassIds.length === 1) {
+            fetchDeepClassContext(targetClassIds[0]);
+        } else {
+            setDeepClassContext(null);
+        }
+    }, [targetClassIds, fetchDeepClassContext]);
+
+    useEffect(() => {
+        if (targetAssignmentIds.length === 1) {
+            fetchDeepAssignmentContext(targetAssignmentIds[0]);
+        } else {
+            setDeepAssignmentContext(null);
+        }
+    }, [targetAssignmentIds, fetchDeepAssignmentContext]);
+
     const getDueLabel = (date: Date) => {
         const now = new Date();
         const diff = date.getTime() - now.getTime();
@@ -1088,7 +1192,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
 
     const handleQuickAction = (action: "assignments" | "grades" | "flashcards" | "history" | "classes") => {
         let content = "";
-        const canvasData = null;
+        const canvasData: { type?: string; title?: string;[key: string]: any } | null = null;
 
         if (action === "assignments") {
             if (pendingAssignments.length === 0) {
@@ -1125,6 +1229,15 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
             setCanvasContent(canvasData);
             setCanvasViewMode("content");
             setIsCanvasOpen(true);
+            // Save to history
+            const data = canvasData as { type?: string; title?: string;[key: string]: any };
+            setCanvasHistory(prev => [{
+                id: Date.now().toString(),
+                type: data.type || 'content',
+                title: data.title || 'Nội dung Canvas',
+                content: canvasData,
+                timestamp: Date.now()
+            }, ...prev].slice(0, 20)); // Keep last 20 items
         }
     };
 
@@ -1142,7 +1255,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
             targetAssignmentIds,
             targetClassIds,
             previousMessages: history.slice(-10).map((m: any) => ({
-                role: m.role === 'ai' ? 'assistant' : m.role, // normalize
+                role: m.role === 'ai' ? 'assistant' : m.role,
                 content: m.content
             })),
             context: {
@@ -1156,7 +1269,37 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                 socraticContext: socraticCurrentStep ? {
                     currentStep: socraticCurrentStep.step_number,
                     historyCount: socraticHistory.length
-                } : undefined
+                } : undefined,
+                // Deep context for selected class - AI sẽ hiểu toàn bộ lớp học
+                selectedClassContext: deepClassContext ? {
+                    className: deepClassContext.className,
+                    schedule: deepClassContext.schedule.map((s: any) => ({
+                        day: s.dayOfWeek,
+                        time: s.startTime ? `${s.startTime} - ${s.endTime}` : 'N/A',
+                        subject: s.subjectName || s.title
+                    })),
+                    assignments: deepClassContext.assignments.map((a: any) => ({
+                        title: a.title,
+                        dueDate: a.dueDate ? format(new Date(a.dueDate), 'dd/MM/yyyy') : 'Không có deadline',
+                        status: a.status || 'pending',
+                        subject: a.subjectCode || a.subject
+                    })),
+                    announcements: deepClassContext.announcements.slice(0, 5).map((an: any) => ({
+                        title: an.title,
+                        content: an.content?.substring(0, 200),
+                        date: an.createdAt ? format(new Date(an.createdAt), 'dd/MM') : 'N/A'
+                    })),
+                    memberCount: deepClassContext.members
+                } : null,
+                // Deep context for selected assignment - AI sẽ hiểu chi tiết bài tập
+                selectedAssignmentContext: deepAssignmentContext ? {
+                    title: deepAssignmentContext.title,
+                    description: deepAssignmentContext.description?.substring(0, 500),
+                    dueDate: deepAssignmentContext.dueDate ? format(deepAssignmentContext.dueDate, 'dd/MM/yyyy HH:mm') : 'Không có deadline',
+                    className: deepAssignmentContext.className,
+                    submissionStats: deepAssignmentContext.submissions,
+                    hasAttachments: deepAssignmentContext.attachments.length > 0
+                } : null
             }
         };
 
@@ -1259,7 +1402,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
             hasCanvasContent: !!canvasDisplayContent
         };
 
-    }, [chatMode, user.role, isThinkingEnabled, isCanvasMode, isSocraticMode, targetAssignmentIds, targetClassIds, pendingAssignments, upcomingEvents, analytics, socraticCurrentStep, socraticHistory]);
+    }, [chatMode, user.role, isThinkingEnabled, isCanvasMode, isSocraticMode, targetAssignmentIds, targetClassIds, pendingAssignments, upcomingEvents, analytics, socraticCurrentStep, socraticHistory, deepClassContext, deepAssignmentContext]);
 
     // 2. Sync fetcher to ref
     useEffect(() => {
@@ -1409,24 +1552,26 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
 
                 {/* MAIN CHAT AREA */}
                 <div className={cn(
-                    "flex flex-col relative transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]",
-                    isCanvasOpen ? "w-1/2" : "w-full"
+                    "flex flex-col relative transition-all duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] w-full",
+                    isCanvasOpen && "md:w-1/2"
                 )}>
-                    {/* Header */}
-                    <header className="h-16 flex items-center justify-between px-6 border-b border-border shrink-0 sticky top-0 bg-card/80 backdrop-blur-md z-20">
-                        <div className="flex items-center gap-4">
+                    {/* Header - Modern GPT/Gemini Style */}
+                    <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b border-border/40 shrink-0 sticky top-0 bg-card/60 backdrop-blur-xl z-20">
+                        <div className="flex items-center gap-2 md:gap-4">
                             <button
                                 onClick={() => setIsHistoryVisible(!isHistoryVisible)}
-                                className="p-2 hover:bg-muted rounded-xl text-muted-foreground transition-colors"
+                                className="p-2 hover:bg-muted rounded-xl text-muted-foreground transition-all active:scale-95"
                                 title="Lịch sử chat"
                             >
                                 <PanelLeft className="w-5 h-5" />
                             </button>
-                            <div className="flex items-center gap-2">
-                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                                <h1 className="font-bold text-foreground group flex items-center gap-1.5">
+                            <div className="flex items-center gap-2 md:gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                                    <Sparkles className="w-4.5 h-4.5 text-indigo-500" />
+                                </div>
+                                <h1 className="font-bold text-base md:text-lg text-foreground tracking-tight flex items-center gap-1.5">
                                     {MODES.find(m => m.id === chatMode)?.label}
-                                    <ChevronDown className="w-4 h-4 text-muted-foreground/80" />
+                                    <span className={cn("hidden", !isCanvasOpen && "md:inline")}> Assistant</span>
                                 </h1>
                             </div>
                         </div>
@@ -1583,9 +1728,77 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                     )}
                                 </AnimatePresence>
                             </div>
-                            <div className="hidden sm:flex items-center bg-gray-100 rounded-full px-3 py-1 gap-2">
+                            <div className={cn("hidden items-center bg-gray-100 rounded-full px-3 py-1 gap-2", !isCanvasOpen && "lg:flex")}>
                                 <Zap className="w-3.5 h-3.5 text-blue-500" />
                                 <span className="text-[11px] font-black text-muted-foreground uppercase tracking-wider">MiMo V2 Flash</span>
+                            </div>
+                            {/* Canvas Toggle Button - Always visible */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => {
+                                        if (canvasContent || canvasHistory.length > 0) {
+                                            setIsCanvasOpen(!isCanvasOpen);
+                                        } else {
+                                            setShowCanvasHistory(!showCanvasHistory);
+                                        }
+                                    }}
+                                    className={cn(
+                                        "p-2 rounded-xl transition-all active:scale-95 flex items-center gap-2",
+                                        isCanvasOpen || canvasContent
+                                            ? "bg-purple-50 text-purple-600 hover:bg-purple-100"
+                                            : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-purple-600"
+                                    )}
+                                    title={isCanvasOpen ? "Đóng Canvas" : "Mở Canvas"}
+                                >
+                                    <Sparkles className="w-4 h-4" />
+                                    <span className="text-xs font-bold hidden md:inline">Canvas</span>
+                                    {canvasHistory.length > 0 && (
+                                        <span className="w-4 h-4 rounded-full bg-purple-500 text-white text-[10px] font-bold flex items-center justify-center">
+                                            {canvasHistory.length}
+                                        </span>
+                                    )}
+                                </button>
+
+                                {/* Canvas History Dropdown */}
+                                {showCanvasHistory && canvasHistory.length > 0 && (
+                                    <div className="absolute top-full right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-border p-3 z-50 animate-in fade-in slide-in-from-top-2">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Lịch sử Canvas</h4>
+                                            <button
+                                                onClick={() => setShowCanvasHistory(false)}
+                                                className="p-1 hover:bg-muted rounded-lg"
+                                            >
+                                                <X className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                                            {canvasHistory.map((item) => (
+                                                <button
+                                                    key={item.id}
+                                                    onClick={() => {
+                                                        setCanvasContent(item.content);
+                                                        setCanvasViewMode(item.type as any || "content");
+                                                        setIsCanvasOpen(true);
+                                                        setShowCanvasHistory(false);
+                                                    }}
+                                                    className="w-full text-left p-3 rounded-xl hover:bg-purple-50 transition-colors group"
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+                                                            <Sparkles className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
+                                                            <p className="text-[10px] text-muted-foreground">
+                                                                {format(item.timestamp, "HH:mm - dd/MM")}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </header>
@@ -1836,36 +2049,45 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                 </div>
                                             </div>
                                         ) : (
-                                            /* Greeting View (Default) */
-                                            <div className="text-center space-y-5 px-4 w-full">
-                                                <div className="relative inline-block">
-                                                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-card border-2 border-border rounded-2xl flex items-center justify-center shadow-lg">
-                                                        <Bot className="w-8 h-8 sm:w-10 sm:h-10 text-teal-500" />
+                                            /* Greeting View (GPT/Gemini Style) */
+                                            <div className="flex flex-col items-center justify-center text-center space-y-8 px-4 w-full max-w-3xl animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                                                <div className="relative">
+                                                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white dark:bg-gray-900 border border-border rounded-[2rem] flex items-center justify-center shadow-2xl shadow-indigo-500/10 transition-transform hover:scale-105 duration-500">
+                                                        <Bot className="w-10 h-10 sm:w-12 sm:h-12 text-indigo-500" />
                                                     </div>
-                                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-card rounded-full flex items-center justify-center shadow-md border border-border">
-                                                        <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-teal-400" />
-                                                    </div>
+                                                    <motion.div
+                                                        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+                                                        transition={{ repeat: Infinity, duration: 3 }}
+                                                        className="absolute -top-2 -right-2 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white dark:border-gray-900"
+                                                    >
+                                                        <Sparkles className="w-4 h-4 text-white" />
+                                                    </motion.div>
                                                 </div>
 
-                                                <div className="space-y-2">
-                                                    <h2 className="text-xl sm:text-2xl font-bold text-foreground">
-                                                        Chào {isTeacher ? "Thầy/Cô" : "bạn"}, mình là MiQiX AI!
+                                                <div className="space-y-3">
+                                                    <h2 className="text-3xl sm:text-4xl font-black text-foreground tracking-tight leading-tight">
+                                                        Chào {isTeacher ? "Thầy/Cô" : "bạn"},<br />
+                                                        <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">mình là MiQiX AI!</span>
                                                     </h2>
-                                                    <p className="text-sm sm:text-base text-muted-foreground font-medium max-w-md mx-auto px-2">
-                                                        {isTeacher ? "Trợ lý giảng dạy cá nhân của Thầy/Cô. Sẵn sàng hỗ trợ mọi lúc." : "Trợ lý học tập cá nhân của bạn. Sẵn sàng hỗ trợ mọi lúc."}
+                                                    <p className="text-base sm:text-lg text-muted-foreground font-medium max-w-lg mx-auto leading-relaxed">
+                                                        {isTeacher
+                                                            ? "Công cụ này giúp bạn quản lý lớp học và theo dõi học sinh hiệu quả hơn."
+                                                            : "Công cụ này giúp bạn học tập thông minh và đạt kết quả cao hơn."}
                                                     </p>
                                                 </div>
 
-                                                {/* Suggestions - Stack on mobile, 2-col on md+ */}
-                                                <div className="flex flex-col gap-2.5 w-full max-w-md mx-auto">
-                                                    {currentModeInfo.recommendations.map((text, idx) => (
+                                                {/* Suggestions - Modern Glass Pills */}
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl">
+                                                    {currentModeInfo.recommendations.slice(0, 4).map((text, idx) => (
                                                         <button
                                                             key={idx}
                                                             onClick={() => handleSend(text)}
-                                                            className="flex items-center gap-3 p-3.5 sm:p-4 bg-card border border-border hover:border-teal-200 hover:bg-teal-50/30 rounded-xl sm:rounded-2xl text-sm font-medium text-foreground/80 hover:text-teal-700 text-left transition-all shadow-sm hover:shadow-md group w-full"
+                                                            className="flex items-center gap-3 p-4 bg-card hover:bg-muted border border-border rounded-2xl text-sm font-semibold text-foreground/80 hover:text-indigo-600 text-left transition-all hover:shadow-xl hover:shadow-indigo-500/5 group relative overflow-hidden active:scale-[0.98]"
                                                         >
-                                                            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-teal-400 shrink-0" />
-                                                            <span className="line-clamp-2">{text}</span>
+                                                            <div className="w-8 h-8 rounded-lg bg-indigo-500/5 flex items-center justify-center shrink-0 group-hover:bg-indigo-500/10 transition-colors">
+                                                                <Sparkles className="w-4 h-4 text-indigo-500" />
+                                                            </div>
+                                                            <span className="line-clamp-2 leading-snug">{text}</span>
                                                         </button>
                                                     ))}
                                                 </div>
@@ -1956,30 +2178,31 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                 <div className="flex-1 space-y-8 pb-4 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                     {messages.map((msg, idx) => {
                                         const isLatest = idx === messages.length - 1;
+                                        const isUser = msg.role === "user";
                                         return (
                                             <div
                                                 key={msg.id}
                                                 id={`msg-${msg.id}`}
                                                 className={cn(
-                                                    "flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300 transition-colors rounded-2xl p-2 -mx-2",
-                                                    msg.role === "user" ? "flex-row-reverse" : "flex-row"
+                                                    "flex gap-3 md:gap-5 animate-in fade-in slide-in-from-bottom-2 duration-500",
+                                                    isUser ? "flex-row-reverse" : "flex-row"
                                                 )}
                                             >
                                                 <div className={cn(
-                                                    "w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm",
-                                                    msg.role === "user" ? "bg-gray-900 text-white" : "bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+                                                    "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm transition-transform hover:scale-110",
+                                                    isUser ? "bg-foreground text-card" : "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white"
                                                 )}>
-                                                    {msg.role === "user" ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
+                                                    {isUser ? <User className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
                                                 </div>
                                                 <div className={cn(
-                                                    "flex flex-col max-w-[85%] sm:max-w-[75%]",
-                                                    msg.role === "user" ? "items-end" : "items-start"
+                                                    "flex flex-col max-w-[90%] sm:max-w-[85%]",
+                                                    isUser ? "items-end" : "items-start"
                                                 )}>
                                                     <div className={cn(
-                                                        "px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm break-words overflow-hidden",
-                                                        msg.role === "user"
-                                                            ? "bg-gray-900 text-white rounded-br-none"
-                                                            : "bg-card dark:bg-card border border-border text-foreground rounded-bl-none"
+                                                        "px-4 md:px-6 py-3 md:py-4 rounded-[1.5rem] md:rounded-[2rem] text-[14px] md:text-[16px] leading-relaxed shadow-sm transition-all duration-300",
+                                                        isUser
+                                                            ? "bg-foreground text-card rounded-tr-none hover:shadow-lg hover:shadow-foreground/5"
+                                                            : "bg-card dark:bg-card border border-border text-foreground rounded-tl-none hover:shadow-lg hover:shadow-indigo-500/5"
                                                     )}>
                                                         {(msg.role === "ai" || msg.role === 'assistant') && msg.reasoning && (
                                                             <ThinkingBar
@@ -1992,7 +2215,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                                                         {(msg.role === "ai" || msg.role === 'assistant') && isLatest && latestMessageId === msg.id ? (
                                                             <TypewriterText text={msg.content} onComplete={() => setLatestMessageId(null)} />
                                                         ) : (
-                                                            <div className="prose prose-sm max-w-none dark:prose-invert break-words">
+                                                            <div className="prose prose-sm md:prose-base max-w-none dark:prose-invert break-words leading-7">
                                                                 <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{msg.content}</ReactMarkdown>
                                                             </div>
                                                         )}
@@ -2021,375 +2244,382 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                         </div>
                     </div>
 
-                    {/* Chat Input Area */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent pt-10 px-4 md:px-6 z-20">
-                        <div className="max-w-2xl mx-auto bg-card rounded-[2rem] shadow-xl shadow-blue-900/5 border border-border p-3 relative group focus-within:ring-2 focus-within:ring-blue-100 transition-all">
-                            {/* Selected Context Indicators */}
-                            {(targetAssignmentIds.length > 0 || targetClassIds.length > 0 || isCanvasMode) && (
-                                <div className="absolute -top-9 left-3 flex items-center gap-1.5 flex-wrap">
-                                    {targetAssignmentIds.map(id => (
-                                        <button
-                                            key={id}
-                                            onClick={() => toggleAssignment(id)}
-                                            className="flex items-center gap-1 bg-card border border-border text-muted-foreground pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-muted transition-colors animate-in fade-in zoom-in duration-200"
-                                        >
-                                            <ListTodo className="w-3 h-3 text-blue-500" />
-                                            <span className="truncate max-w-[100px]">
-                                                {allAssignments.find(a => a.id === id)?.title || "Bài tập"}
-                                            </span>
-                                            <X className="w-3 h-3 text-muted-foreground/80" />
-                                        </button>
-                                    ))}
-                                    {targetClassIds.map(id => (
-                                        <button
-                                            key={id}
-                                            onClick={() => toggleClass(id)}
-                                            className="flex items-center gap-1 bg-card border border-border text-muted-foreground pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-muted transition-colors animate-in fade-in zoom-in duration-200"
-                                        >
-                                            <LayoutGrid className="w-3 h-3 text-indigo-500" />
-                                            <span className="truncate max-w-[100px]">
-                                                {allClasses.find(c => c.id === id)?.name || "Lớp học"}
-                                            </span>
-                                            <X className="w-3 h-3 text-muted-foreground/80" />
-                                        </button>
-                                    ))}
-                                    {isCanvasMode && (
-                                        <button
-                                            onClick={() => setIsCanvasMode(false)}
-                                            className="flex items-center gap-1 bg-purple-50 border border-purple-200 text-purple-600 pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-purple-100 transition-colors"
-                                        >
-                                            <Sparkles className="w-3 h-3" />
-                                            <span>Canvas</span>
-                                            <X className="w-3 h-3 text-purple-400" />
-                                        </button>
-                                    )}
-                                    {isSocraticMode && (
-                                        <button
-                                            onClick={() => setIsSocraticMode(false)}
-                                            className="flex items-center gap-1 bg-indigo-50 border border-indigo-200 text-indigo-600 pl-2 pr-1.5 py-1 rounded-lg text-xs font-medium shadow-sm hover:bg-indigo-100 transition-colors"
-                                        >
-                                            <GraduationCap className="w-3 h-3" />
-                                            <span>Socratic</span>
-                                            <X className="w-3 h-3 text-indigo-400" />
-                                        </button>
-                                    )}
+                    {/* Chat Input Area - Modern Floating Pill */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 bg-gradient-to-t from-background via-background/95 to-transparent pt-12 z-20">
+                        <div className="max-w-3xl mx-auto relative">
+                            {/* Selected Context Indicators - Floating above input */}
+                            {(targetAssignmentIds.length > 0 || targetClassIds.length > 0 || isCanvasMode || isSocraticMode) && (
+                                <div className="absolute -top-10 left-4 flex items-center gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden no-scrollbar w-full">
+                                    <AnimatePresence>
+                                        {targetAssignmentIds.map(id => (
+                                            <motion.button
+                                                key={id}
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.8 }}
+                                                onClick={() => toggleAssignment(id)}
+                                                className="flex items-center gap-1.5 bg-card/80 backdrop-blur-md border border-border/60 text-muted-foreground pl-2.5 pr-1.5 py-1.5 rounded-xl text-xs font-bold shadow-sm hover:bg-muted transition-colors shrink-0"
+                                            >
+                                                <ListTodo className="w-3.5 h-3.5 text-blue-500" />
+                                                <span className="truncate max-w-[120px]">
+                                                    {allAssignments.find(a => a.id === id)?.title || "Bài tập"}
+                                                </span>
+                                                <X className="w-3 h-3 text-muted-foreground/60 hover:text-foreground" />
+                                            </motion.button>
+                                        ))}
+                                        {targetClassIds.map(id => (
+                                            <motion.button
+                                                key={id}
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.8 }}
+                                                onClick={() => toggleClass(id)}
+                                                className="flex items-center gap-1.5 bg-card/80 backdrop-blur-md border border-border/60 text-muted-foreground pl-2.5 pr-1.5 py-1.5 rounded-xl text-xs font-bold shadow-sm hover:bg-muted transition-colors shrink-0"
+                                            >
+                                                <LayoutGrid className="w-3.5 h-3.5 text-indigo-500" />
+                                                <span className="truncate max-w-[120px]">
+                                                    {allClasses.find(c => c.id === id)?.name || "Lớp học"}
+                                                </span>
+                                                <X className="w-3 h-3 text-muted-foreground/60 hover:text-foreground" />
+                                            </motion.button>
+                                        ))}
+                                        {isCanvasMode && (
+                                            <motion.button
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.8 }}
+                                                onClick={() => setIsCanvasMode(false)}
+                                                className="flex items-center gap-1.5 bg-purple-500/10 border border-purple-500/20 text-purple-600 pl-2.5 pr-1.5 py-1.5 rounded-xl text-xs font-bold shadow-sm hover:bg-purple-500/20 transition-colors shrink-0"
+                                            >
+                                                <Sparkles className="w-3.5 h-3.5" />
+                                                <span>Canvas</span>
+                                                <X className="w-3 h-3 text-purple-400" />
+                                            </motion.button>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-2 relative">
-                                <button
-                                    onClick={() => setShowModeMenu(!showModeMenu)}
-                                    className="p-3 bg-muted hover:bg-muted rounded-full text-muted-foreground transition-colors shrink-0"
-                                >
-                                    <Plus className={cn("w-5 h-5 transition-transform", showModeMenu && "rotate-45")} />
-                                </button>
-
-                                {/* Mode Menu Popup */}
-                                {showModeMenu && (
-                                    <div
-                                        ref={menuRef}
-                                        className="fixed md:absolute bottom-full left-0 md:left-0 mb-5 w-[calc(100vw-32px)] md:w-[420px] lg:w-[500px] bg-white/95 backdrop-blur-2xl rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-border p-5 z-50 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-300"
+                            <div className="bg-card dark:bg-card/80 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.12)] border border-border p-2 focus-within:ring-4 focus-within:ring-indigo-500/5 transition-all duration-500">
+                                <div className="flex items-center gap-2 relative px-2">
+                                    <button
+                                        onClick={() => setShowModeMenu(!showModeMenu)}
+                                        className="p-3 bg-muted hover:bg-muted/80 rounded-full text-muted-foreground transition-all shrink-0 hover:rotate-90 active:scale-95 shadow-sm"
                                     >
-                                        {/* Header */}
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-1 h-4 bg-indigo-500 rounded-full" />
-                                                <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-[0.2em]">Chọn chế độ trợ lý</h3>
-                                            </div>
-                                            <button onClick={() => setShowModeMenu(false)} className="p-2 hover:bg-muted rounded-xl transition-all">
-                                                <X className="w-5 h-5 text-muted-foreground/80" />
-                                            </button>
-                                        </div>
+                                        <Plus className={cn("w-5 h-5 transition-transform", showModeMenu && "rotate-45")} />
+                                    </button>
 
-                                        {/* Mode Grid - Horizontal style */}
-                                        <div className={cn(
-                                            "grid gap-2.5 mb-5",
-                                            (user.role === 'teacher' ? TEACHER_MODES : STUDENT_MODES).length > 2
-                                                ? "grid-cols-1 md:grid-cols-2"
-                                                : "grid-cols-1 md:grid-cols-2"
-                                        )}>
-                                            {(user.role === 'teacher' ? TEACHER_MODES : STUDENT_MODES).map((mode) => {
-                                                const IconComponent = mode.icon;
-                                                const isActive = chatMode === mode.id;
-                                                return (
-                                                    <div
-                                                        key={mode.id}
+                                    {/* Mode Menu Popup */}
+                                    {showModeMenu && (
+                                        <div
+                                            ref={menuRef}
+                                            className="fixed md:absolute bottom-full left-0 md:left-0 mb-5 w-[calc(100vw-32px)] md:w-[420px] lg:w-[500px] bg-white/95 backdrop-blur-2xl rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-border p-5 z-50 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-300"
+                                        >
+                                            {/* Header */}
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-1 h-4 bg-indigo-500 rounded-full" />
+                                                    <h3 className="text-xs font-bold text-muted-foreground/80 uppercase tracking-[0.2em]">Chọn chế độ trợ lý</h3>
+                                                </div>
+                                                <button onClick={() => setShowModeMenu(false)} className="p-2 hover:bg-muted rounded-xl transition-all">
+                                                    <X className="w-5 h-5 text-muted-foreground/80" />
+                                                </button>
+                                            </div>
+
+                                            {/* Mode Grid - Horizontal style */}
+                                            <div className={cn(
+                                                "grid gap-2.5 mb-5",
+                                                (user.role === 'teacher' ? TEACHER_MODES : STUDENT_MODES).length > 2
+                                                    ? "grid-cols-1 md:grid-cols-2"
+                                                    : "grid-cols-1 md:grid-cols-2"
+                                            )}>
+                                                {(user.role === 'teacher' ? TEACHER_MODES : STUDENT_MODES).map((mode) => {
+                                                    const IconComponent = mode.icon;
+                                                    const isActive = chatMode === mode.id;
+                                                    return (
+                                                        <div
+                                                            key={mode.id}
+                                                            onClick={() => {
+                                                                setChatMode(mode.id);
+                                                                if (window.innerWidth < 1024) setShowModeMenu(false);
+                                                            }}
+                                                            className={cn(
+                                                                "p-2.5 rounded-xl cursor-pointer border-2 transition-all relative group flex items-center gap-3 text-left",
+                                                                isActive
+                                                                    ? "bg-card dark:bg-card border-indigo-500 shadow-sm"
+                                                                    : "bg-muted/30 border-transparent hover:border-indigo-100 hover:bg-white"
+                                                            )}
+                                                        >
+                                                            <div className={cn(
+                                                                "w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0",
+                                                                isActive
+                                                                    ? "bg-indigo-500 text-white shadow-sm"
+                                                                    : "bg-card dark:bg-card text-indigo-400 border border-border group-hover:bg-indigo-50"
+                                                            )}>
+                                                                <IconComponent className="w-5 h-5" />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h4 className={cn("font-bold text-[14px] leading-tight transition-colors", isActive ? "text-indigo-900" : "text-foreground")}>
+                                                                    {mode.label}
+                                                                </h4>
+                                                            </div>
+
+                                                            {isActive && (
+                                                                <div className="animate-pulse">
+                                                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            {/* Dynamic Sub-options (Only shows when active mode has them) */}
+                                            <AnimatePresence mode="wait">
+                                                {chatMode === "tutor" && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                                        animate={{ opacity: 1, height: "auto", marginTop: 12 }}
+                                                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <div className="p-3 bg-gradient-to-br from-indigo-50/50 to-white rounded-2xl border border-indigo-100/50 shadow-sm">
+                                                            <div className="flex items-center justify-between gap-3">
+                                                                <div className="flex items-center gap-2.5">
+                                                                    <div className="w-8 h-8 bg-card rounded-lg flex items-center justify-center text-indigo-500 shadow-sm">
+                                                                        <GraduationCap className="w-4 h-4" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-[12px] font-bold text-foreground">Phương pháp Socratic</p>
+                                                                        <p className="text-[10px] text-muted-foreground font-medium">AI gợi mở thay vì trả lời ngay</p>
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setIsSocraticMode(!isSocraticMode);
+                                                                    }}
+                                                                    className={cn(
+                                                                        "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none",
+                                                                        isSocraticMode ? "bg-indigo-600 shadow-[0_0_10px_rgba(99,102,241,0.4)]" : "bg-gray-200"
+                                                                    )}
+                                                                >
+                                                                    <span className={cn(
+                                                                        "inline-block h-3.5 w-3.5 transform rounded-full bg-card transition-transform shadow-sm",
+                                                                        isSocraticMode ? "translate-x-4.5" : "translate-x-1"
+                                                                    )} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+
+                                            {/* Divider */}
+                                            <div className="border-t border-border my-3" />
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-3">
+                                                {/* Assignment Selector */}
+                                                <div className="relative">
+                                                    <button
                                                         onClick={() => {
-                                                            setChatMode(mode.id);
-                                                            if (window.innerWidth < 1024) setShowModeMenu(false);
+                                                            setShowAssignmentSelector(!showAssignmentSelector);
+                                                            setShowClassSelector(false);
                                                         }}
                                                         className={cn(
-                                                            "p-2.5 rounded-xl cursor-pointer border-2 transition-all relative group flex items-center gap-3 text-left",
-                                                            isActive
-                                                                ? "bg-card dark:bg-card border-indigo-500 shadow-sm"
-                                                                : "bg-muted/30 border-transparent hover:border-indigo-100 hover:bg-white"
+                                                            "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left",
+                                                            targetAssignmentIds.length > 0 ? "bg-blue-50/80 border border-blue-200 text-blue-700" : "bg-muted/50 border border-border hover:border-gray-300 text-foreground/80"
                                                         )}
                                                     >
                                                         <div className={cn(
-                                                            "w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0",
-                                                            isActive
-                                                                ? "bg-indigo-500 text-white shadow-sm"
-                                                                : "bg-card dark:bg-card text-indigo-400 border border-border group-hover:bg-indigo-50"
+                                                            "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
+                                                            targetAssignmentIds.length > 0 ? "bg-card dark:bg-card shadow-sm" : "bg-card dark:bg-card border border-border"
                                                         )}>
-                                                            <IconComponent className="w-5 h-5" />
+                                                            <ListTodo className="w-3 h-3" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className={cn("font-bold text-[14px] leading-tight transition-colors", isActive ? "text-indigo-900" : "text-foreground")}>
-                                                                {mode.label}
-                                                            </h4>
+                                                            <p className="text-[11px] font-bold truncate">
+                                                                {targetAssignmentIds.length > 0 ? `${targetAssignmentIds.length} bài tập` : "Chọn bài tập"}
+                                                            </p>
                                                         </div>
+                                                        <ChevronDown className={cn("w-3 h-3 opacity-50 transition-transform", showAssignmentSelector && "rotate-180")} />
+                                                    </button>
 
-                                                        {isActive && (
-                                                            <div className="animate-pulse">
-                                                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-
-                                        {/* Dynamic Sub-options (Only shows when active mode has them) */}
-                                        <AnimatePresence mode="wait">
-                                            {chatMode === "tutor" && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                                                    animate={{ opacity: 1, height: "auto", marginTop: 12 }}
-                                                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                                                    className="overflow-hidden"
-                                                >
-                                                    <div className="p-3 bg-gradient-to-br from-indigo-50/50 to-white rounded-2xl border border-indigo-100/50 shadow-sm">
-                                                        <div className="flex items-center justify-between gap-3">
-                                                            <div className="flex items-center gap-2.5">
-                                                                <div className="w-8 h-8 bg-card rounded-lg flex items-center justify-center text-indigo-500 shadow-sm">
-                                                                    <GraduationCap className="w-4 h-4" />
-                                                                </div>
-                                                                <div>
-                                                                    <p className="text-[12px] font-bold text-foreground">Phương pháp Socratic</p>
-                                                                    <p className="text-[10px] text-muted-foreground font-medium">AI gợi mở thay vì trả lời ngay</p>
-                                                                </div>
-                                                            </div>
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setIsSocraticMode(!isSocraticMode);
-                                                                }}
-                                                                className={cn(
-                                                                    "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-all duration-300 focus:outline-none",
-                                                                    isSocraticMode ? "bg-indigo-600 shadow-[0_0_10px_rgba(99,102,241,0.4)]" : "bg-gray-200"
-                                                                )}
+                                                    <AnimatePresence>
+                                                        {showAssignmentSelector && (
+                                                            <motion.div
+                                                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                                className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-card rounded-2xl shadow-2xl border border-border p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
                                                             >
-                                                                <span className={cn(
-                                                                    "inline-block h-3.5 w-3.5 transform rounded-full bg-card transition-transform shadow-sm",
-                                                                    isSocraticMode ? "translate-x-4.5" : "translate-x-1"
-                                                                )} />
-                                                            </button>
+                                                                <div className="p-1 space-y-1">
+                                                                    {allAssignments.map(a => (
+                                                                        <button
+                                                                            key={a.id}
+                                                                            onClick={() => toggleAssignment(a.id)}
+                                                                            className={cn(
+                                                                                "w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold transition-all truncate text-left",
+                                                                                targetAssignmentIds.includes(a.id) ? "bg-blue-50 text-blue-700" : "hover:bg-muted text-muted-foreground"
+                                                                            )}
+                                                                        >
+                                                                            {targetAssignmentIds.includes(a.id) ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : <div className="w-3.5 h-3.5" />}
+                                                                            <span className="truncate">{a.title}</span>
+                                                                        </button>
+                                                                    ))}
+                                                                    {allAssignments.length === 0 && <p className="text-xs text-muted-foreground/80 text-center py-2">Không có dữ liệu</p>}
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </div>
+
+                                                {/* Class Selector */}
+                                                <div className="relative">
+                                                    <button
+                                                        onClick={() => {
+                                                            setShowClassSelector(!showClassSelector);
+                                                            setShowAssignmentSelector(false);
+                                                        }}
+                                                        className={cn(
+                                                            "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left",
+                                                            targetClassIds.length > 0 ? "bg-indigo-50/80 border border-indigo-200 text-indigo-700" : "bg-muted/50 border border-border hover:border-gray-300 text-foreground/80"
+                                                        )}
+                                                    >
+                                                        <div className={cn(
+                                                            "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
+                                                            targetClassIds.length > 0 ? "bg-card dark:bg-card shadow-sm" : "bg-card dark:bg-card border border-border"
+                                                        )}>
+                                                            <LayoutGrid className="w-3 h-3" />
                                                         </div>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-[11px] font-bold truncate">
+                                                                {targetClassIds.length > 0 ? `${targetClassIds.length} lớp học` : "Chọn lớp học"}
+                                                            </p>
+                                                        </div>
+                                                        <ChevronDown className={cn("w-3 h-3 opacity-50 transition-transform", showClassSelector && "rotate-180")} />
+                                                    </button>
 
-                                        {/* Divider */}
-                                        <div className="border-t border-border my-3" />
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-3">
-                                            {/* Assignment Selector */}
-                                            <div className="relative">
-                                                <button
-                                                    onClick={() => {
-                                                        setShowAssignmentSelector(!showAssignmentSelector);
-                                                        setShowClassSelector(false);
-                                                    }}
-                                                    className={cn(
-                                                        "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left",
-                                                        targetAssignmentIds.length > 0 ? "bg-blue-50/80 border border-blue-200 text-blue-700" : "bg-muted/50 border border-border hover:border-gray-300 text-foreground/80"
-                                                    )}
-                                                >
-                                                    <div className={cn(
-                                                        "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
-                                                        targetAssignmentIds.length > 0 ? "bg-card dark:bg-card shadow-sm" : "bg-card dark:bg-card border border-border"
-                                                    )}>
-                                                        <ListTodo className="w-3 h-3" />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-[11px] font-bold truncate">
-                                                            {targetAssignmentIds.length > 0 ? `${targetAssignmentIds.length} bài tập` : "Chọn bài tập"}
-                                                        </p>
-                                                    </div>
-                                                    <ChevronDown className={cn("w-3 h-3 opacity-50 transition-transform", showAssignmentSelector && "rotate-180")} />
-                                                </button>
-
-                                                <AnimatePresence>
-                                                    {showAssignmentSelector && (
-                                                        <motion.div
-                                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                                            className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-card rounded-2xl shadow-2xl border border-border p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
-                                                        >
-                                                            <div className="p-1 space-y-1">
-                                                                {allAssignments.map(a => (
-                                                                    <button
-                                                                        key={a.id}
-                                                                        onClick={() => toggleAssignment(a.id)}
-                                                                        className={cn(
-                                                                            "w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold transition-all truncate text-left",
-                                                                            targetAssignmentIds.includes(a.id) ? "bg-blue-50 text-blue-700" : "hover:bg-muted text-muted-foreground"
-                                                                        )}
-                                                                    >
-                                                                        {targetAssignmentIds.includes(a.id) ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : <div className="w-3.5 h-3.5" />}
-                                                                        <span className="truncate">{a.title}</span>
-                                                                    </button>
-                                                                ))}
-                                                                {allAssignments.length === 0 && <p className="text-xs text-muted-foreground/80 text-center py-2">Không có dữ liệu</p>}
-                                                            </div>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
+                                                    <AnimatePresence>
+                                                        {showClassSelector && (
+                                                            <motion.div
+                                                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                                className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-card rounded-2xl shadow-2xl border border-border p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
+                                                            >
+                                                                <div className="p-1 space-y-1">
+                                                                    {allClasses.map(c => (
+                                                                        <button
+                                                                            key={c.id}
+                                                                            onClick={() => toggleClass(c.id)}
+                                                                            className={cn(
+                                                                                "w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold transition-all truncate text-left",
+                                                                                targetClassIds.includes(c.id) ? "bg-indigo-50 text-indigo-700" : "hover:bg-muted text-muted-foreground"
+                                                                            )}
+                                                                        >
+                                                                            {targetClassIds.includes(c.id) ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : <div className="w-3.5 h-3.5" />}
+                                                                            <span className="truncate">{c.name}</span>
+                                                                        </button>
+                                                                    ))}
+                                                                    {allClasses.length === 0 && <p className="text-xs text-muted-foreground/80 text-center py-2">Không có dữ liệu</p>}
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </div>
                                             </div>
 
-                                            {/* Class Selector */}
-                                            <div className="relative">
-                                                <button
-                                                    onClick={() => {
-                                                        setShowClassSelector(!showClassSelector);
-                                                        setShowAssignmentSelector(false);
-                                                    }}
-                                                    className={cn(
-                                                        "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left",
-                                                        targetClassIds.length > 0 ? "bg-indigo-50/80 border border-indigo-200 text-indigo-700" : "bg-muted/50 border border-border hover:border-gray-300 text-foreground/80"
-                                                    )}
-                                                >
-                                                    <div className={cn(
-                                                        "w-6 h-6 rounded-lg flex items-center justify-center shrink-0",
-                                                        targetClassIds.length > 0 ? "bg-card dark:bg-card shadow-sm" : "bg-card dark:bg-card border border-border"
-                                                    )}>
-                                                        <LayoutGrid className="w-3 h-3" />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-[11px] font-bold truncate">
-                                                            {targetClassIds.length > 0 ? `${targetClassIds.length} lớp học` : "Chọn lớp học"}
-                                                        </p>
-                                                    </div>
-                                                    <ChevronDown className={cn("w-3 h-3 opacity-50 transition-transform", showClassSelector && "rotate-180")} />
-                                                </button>
+                                            {/* Divider */}
+                                            <div className="border-t border-border my-3" />
 
-                                                <AnimatePresence>
-                                                    {showClassSelector && (
-                                                        <motion.div
-                                                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                                            className="absolute bottom-full left-0 w-full mb-2 z-[60] bg-card rounded-2xl shadow-2xl border border-border p-1.5 space-y-0.5 max-h-48 overflow-y-auto"
-                                                        >
-                                                            <div className="p-1 space-y-1">
-                                                                {allClasses.map(c => (
-                                                                    <button
-                                                                        key={c.id}
-                                                                        onClick={() => toggleClass(c.id)}
-                                                                        className={cn(
-                                                                            "w-full flex items-center gap-2 p-2 rounded-xl text-xs font-bold transition-all truncate text-left",
-                                                                            targetClassIds.includes(c.id) ? "bg-indigo-50 text-indigo-700" : "hover:bg-muted text-muted-foreground"
-                                                                        )}
-                                                                    >
-                                                                        {targetClassIds.includes(c.id) ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : <div className="w-3.5 h-3.5" />}
-                                                                        <span className="truncate">{c.name}</span>
-                                                                    </button>
-                                                                ))}
-                                                                {allClasses.length === 0 && <p className="text-xs text-muted-foreground/80 text-center py-2">Không có dữ liệu</p>}
-                                                            </div>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-                                            </div>
+                                            {/* Canvas Toggle */}
+                                            <button
+                                                onClick={() => setIsCanvasMode(!isCanvasMode)}
+                                                className={cn(
+                                                    "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left mt-2.5 group",
+                                                    isCanvasMode
+                                                        ? "bg-purple-50 border border-purple-200 text-purple-700"
+                                                        : "bg-muted/50 hover:bg-purple-50/50 border border-border hover:border-purple-200 text-muted-foreground hover:text-purple-700"
+                                                )}
+                                            >
+                                                <div className={cn(
+                                                    "w-6 h-6 rounded-lg flex items-center justify-center transition-all",
+                                                    isCanvasMode ? "bg-purple-500 text-white shadow-sm" : "bg-card dark:bg-card border border-border text-muted-foreground/80 group-hover:text-purple-500"
+                                                )}>
+                                                    <Sparkles className="w-3 h-3" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <span className="text-[11px] font-bold leading-none block mb-0.5">Canvas Mode</span>
+                                                    <p className="text-[9px] opacity-60 font-medium">
+                                                        {isCanvasMode ? "AI sẽ hiển thị nội dung ra vùng làm việc Canvas" : "Kết quả AI sẽ chỉ hiển thị trong ô chat"}
+                                                    </p>
+                                                </div>
+                                                <div className={cn(
+                                                    "w-7 h-4 rounded-full transition-all flex items-center px-0.5",
+                                                    isCanvasMode ? "bg-purple-500" : "bg-gray-300"
+                                                )}>
+                                                    <div className={cn(
+                                                        "w-3 h-3 bg-card rounded-full shadow-sm transition-transform",
+                                                        isCanvasMode && "translate-x-3"
+                                                    )} />
+                                                </div>
+                                            </button>
                                         </div>
+                                    )}
+                                    <textarea
+                                        ref={textareaRef}
+                                        value={inputValue}
+                                        onChange={(e) => setInputValue(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" && !e.shiftKey) {
+                                                e.preventDefault();
+                                                handleSend();
+                                            }
+                                        }}
+                                        placeholder={currentModeInfo.prompt || "Hỏi mình bất cứ điều gì..."}
+                                        className="flex-1 max-h-[200px] min-h-[52px] py-3.5 bg-transparent border-none text-foreground placeholder-muted-foreground/60 focus:ring-0 focus:outline-none outline-none resize-none font-medium text-[16px] md:text-[17px] thin-scrollbar transition-all leading-relaxed"
+                                        rows={1}
+                                    />
 
-                                        {/* Divider */}
-                                        <div className="border-t border-border my-3" />
-
-                                        {/* Canvas Toggle */}
+                                    <div className="flex items-center gap-1.5 self-center">
                                         <button
-                                            onClick={() => setIsCanvasMode(!isCanvasMode)}
+                                            onClick={() => setIsThinkingEnabled(!isThinkingEnabled)}
                                             className={cn(
-                                                "w-full flex items-center gap-2.5 p-2 rounded-xl transition-all text-left mt-2.5 group",
-                                                isCanvasMode
-                                                    ? "bg-purple-50 border border-purple-200 text-purple-700"
-                                                    : "bg-muted/50 hover:bg-purple-50/50 border border-border hover:border-purple-200 text-muted-foreground hover:text-purple-700"
+                                                "p-3 rounded-2xl transition-all shrink-0 active:scale-95 group relative",
+                                                isThinkingEnabled ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20" : "hover:bg-muted text-muted-foreground/70"
+                                            )}
+                                            title="Chế độ suy nghĩ chuyên sâu"
+                                        >
+                                            <BrainCircuit className="w-5 h-5" />
+                                            {isThinkingEnabled && (
+                                                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
+                                            )}
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleSend()}
+                                            disabled={!inputValue.trim() || isLoading}
+                                            className={cn(
+                                                "p-3.5 rounded-full transition-all shadow-xl active:scale-90 flex items-center justify-center",
+                                                !inputValue.trim() || isLoading
+                                                    ? "bg-muted text-muted-foreground/30 cursor-not-allowed"
+                                                    : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-500/20"
                                             )}
                                         >
-                                            <div className={cn(
-                                                "w-6 h-6 rounded-lg flex items-center justify-center transition-all",
-                                                isCanvasMode ? "bg-purple-500 text-white shadow-sm" : "bg-card dark:bg-card border border-border text-muted-foreground/80 group-hover:text-purple-500"
-                                            )}>
-                                                <Sparkles className="w-3 h-3" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <span className="text-[11px] font-bold leading-none block mb-0.5">Canvas Mode</span>
-                                                <p className="text-[9px] opacity-60 font-medium">
-                                                    {isCanvasMode ? "AI sẽ hiển thị nội dung ra vùng làm việc Canvas" : "Kết quả AI sẽ chỉ hiển thị trong ô chat"}
-                                                </p>
-                                            </div>
-                                            <div className={cn(
-                                                "w-7 h-4 rounded-full transition-all flex items-center px-0.5",
-                                                isCanvasMode ? "bg-purple-500" : "bg-gray-300"
-                                            )}>
-                                                <div className={cn(
-                                                    "w-3 h-3 bg-card rounded-full shadow-sm transition-transform",
-                                                    isCanvasMode && "translate-x-3"
-                                                )} />
-                                            </div>
+                                            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                                         </button>
                                     </div>
-                                )}
-                                <textarea
-                                    ref={textareaRef}
-                                    value={inputValue}
-                                    onChange={(e) => setInputValue(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter" && !e.shiftKey) {
-                                            e.preventDefault();
-                                            handleSend();
-                                        }
-                                    }}
-                                    placeholder={currentModeInfo.prompt || "Nhập tin nhắn..."}
-                                    className="flex-1 max-h-[200px] min-h-[44px] py-3 bg-transparent border-none text-foreground placeholder-gray-400 focus:ring-0 focus:outline-none outline-none resize-none font-medium text-[15px] thin-scrollbar transition-[height] duration-200"
-                                    rows={1}
-                                />
-
-                                <button
-                                    onClick={() => setIsThinkingEnabled(!isThinkingEnabled)}
-                                    className={cn(
-                                        "flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all shrink-0",
-                                        isThinkingEnabled ? "bg-purple-100 text-purple-600" : "hover:bg-muted text-muted-foreground/80"
-                                    )}
-                                    title="Chế độ suy nghĩ sâu"
-                                >
-                                    <BrainCircuit className="w-5 h-5" />
-                                    {isThinkingEnabled && <span className="text-xs font-semibold">Thinking</span>}
-                                </button>
-
-                                <button
-                                    onClick={() => handleSend()}
-                                    disabled={!inputValue.trim() || isLoading}
-                                    className={cn(
-                                        "p-3 rounded-full transition-all shadow-md",
-                                        !inputValue.trim() || isLoading
-                                            ? "bg-gray-100 text-muted-foreground/80 cursor-not-allowed"
-                                            : "bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 shadow-blue-200"
-                                    )}
-                                >
-                                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-0.5" />}
-                                </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* RIGHT CANVAS AREA */}
+                {/* RIGHT CANVAS AREA - Nằm song song với Main Chat Area */}
                 {
                     isCanvasOpen && (
-                        <div className="w-1/2 bg-muted/50 border-l border-border flex flex-col h-full animate-in slide-in-from-right duration-500 shadow-2xl z-10">
+                        <div className="flex flex-col w-1/2 bg-muted/50 border-l border-border h-full animate-in slide-in-from-right duration-300 shadow-2xl">
                             {/* Canvas Header */}
                             <div className="h-16 px-6 border-b border-border flex items-center justify-between bg-card shrink-0">
                                 <div className="flex items-center gap-3">
@@ -2472,17 +2702,16 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                         </div>
                     )
                 }
-            </div >
+            </div>
 
             {/* Widget Store Modal */}
-            < WidgetStore
+            <WidgetStore
                 isOpen={isWidgetStoreOpen}
-                onClose={() => setIsWidgetStoreOpen(false)
-                }
+                onClose={() => setIsWidgetStoreOpen(false)}
                 onAddWidget={handleAddWidget}
                 userRole={user.role as any}
                 currentWidgets={activeWidgetColumn ? widgetsConfig[activeWidgetColumn] : []}
             />
-        </div >
+        </div>
     );
 }

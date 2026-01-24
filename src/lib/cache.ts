@@ -10,7 +10,7 @@ interface CacheEntry<T> {
 
 class SimpleCache {
     private cache = new Map<string, CacheEntry<unknown>>();
-    private defaultTTL = 60 * 1000; // 60 seconds default (increased for better performance)
+    private defaultTTL = 120 * 1000; // 120 seconds default (increased for better performance)
 
     get<T>(key: string): T | null {
         const entry = this.cache.get(key) as CacheEntry<T> | undefined;
