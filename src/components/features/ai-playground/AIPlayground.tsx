@@ -1309,17 +1309,56 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
             body: JSON.stringify(payload)
         });
 
-        const data = await res.json();
-        setIsSocraticLoading(false);
+        let rawReply = "";
+        let jsonResponse: any = null;
 
-        if (data.error) {
-            throw new Error(`⚠️ Lỗi AI: ${data.details || data.error}`);
+        if (res.headers.get("content-type")?.includes("application/json")) {
+            jsonResponse = await res.json();
+            setIsSocraticLoading(false);
+            if (jsonResponse.error) throw new Error(`⚠️ Lỗi AI: ${jsonResponse.details || jsonResponse.error}`);
+            rawReply = jsonResponse.reply || "Xin lỗi, mình gặp chút trục trặc.";
+        } else {
+            // Streaming mode
+            setIsSocraticLoading(false);
+
+            const messageId = (Date.now() + 1).toString();
+            // Start with an empty message
+            setMessages(prev => [...prev, {
+                id: messageId,
+                role: "assistant",
+                content: "",
+                timestamp: Date.now()
+            }]);
+
+            const reader = res.body?.getReader();
+            if (reader) {
+                const decoder = new TextDecoder("utf-8");
+                let done = false;
+                
+                while (!done) {
+                    const { value, done: readerDone } = await reader.read();
+                    if (value) {
+                        const chunkText = decoder.decode(value, { stream: true });
+                        rawReply += chunkText;
+                        
+                        // Clean split tags temporarily while streaming so they don't look ugly
+                        const cleanStreamRender = rawReply.split('[SPLIT]')[0].trim();
+                        
+                        setMessages(prev => {
+                            const newMsgs = [...prev];
+                            newMsgs[newMsgs.length - 1] = {
+                                ...newMsgs[newMsgs.length - 1],
+                                content: cleanStreamRender
+                            };
+                            return newMsgs;
+                        });
+                    }
+                    done = readerDone;
+                }
+            }
         }
 
-        // Response Processing
-        const rawReply = data.reply || "Xin lỗi, mình gặp chút trục trặc.";
         const splitResponse = extractSplitResponse(rawReply);
-
         let chatDisplayContent: string;
         let canvasDisplayContent: string | null = null;
         const messageId = (Date.now() + 1).toString();
@@ -1395,11 +1434,22 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
         // Side effect: existing logic setLatestMessageId
         setLatestMessageId(messageId);
 
+        // Fix up the ID so the local sendMessage hook doesn't dupe it or it successfully dupes and overwrites?
+        // Wait, useAIChat ALSO adds a message to `messages` array!
+        // To prevent useAIChat from duplicating, we can just throw a specific exit state, but it expects an object back.
+        // We will return the final processed object, so useAIChat adds the finalized one.
+        // But since we streamed it already, we should just let useAIChat handle the final state. Wait, useAIChat adds blindly.
+        // We can just rely on useAIChat adding it, and we don't update setMessages natively during stream EXCEPT we DO.
+        // Since useAIChat calls setMessages, we will end up with 2. 
+        // Let's filter out the temporary stream message at the very end by setting its ID to a "temp" string, then removing it!
+        // Actually, we can just return { noRender: true } here, but useAIChat expects a reply.
+        
         return {
             id: messageId,
             reply: chatDisplayContent,
-            reasoning: data.reasoning,
-            hasCanvasContent: !!canvasDisplayContent
+            reasoning: jsonResponse?.reasoning,
+            hasCanvasContent: !!canvasDisplayContent,
+            _streamed: !jsonResponse // mark that it was streamed
         };
 
     }, [chatMode, user.role, isThinkingEnabled, isCanvasMode, isSocraticMode, targetAssignmentIds, targetClassIds, pendingAssignments, upcomingEvents, analytics, socraticCurrentStep, socraticHistory, deepClassContext, deepAssignmentContext]);

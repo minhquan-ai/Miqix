@@ -273,22 +273,42 @@ export async function POST(request: Request) {
 
         const systemPrompt = systemPromptParts.filter(Boolean).join("\n");
 
-        // 5. Use AICore to generate response
-        // Note: AICore handles the API call and error handling
-        const responseCallback = await AICore.generateText(message, {
-            systemPrompt: systemPrompt,
-            jsonMode: socraticMode, // Enforce JSON for Socratic
-            reasoning: includeReasoning,
-            model: AI_CONFIG.models.SMART // Use smarter model for chat
-        });
+        // 5. Use stream natively if not forcing JSON
+        const forceJson = socraticMode; // JSON parsing is hard to stream
 
-        if (responseCallback.error) {
-            throw new Error(responseCallback.error);
+        if (forceJson) {
+            const responseCallback = await AICore.generateText(message, {
+                systemPrompt: systemPrompt,
+                jsonMode: true,
+                reasoning: includeReasoning,
+                model: AI_CONFIG.models.SMART
+            });
+
+            if (responseCallback.error) {
+                throw new Error(responseCallback.error);
+            }
+
+            return NextResponse.json({
+                reply: responseCallback.text,
+                reasoning: responseCallback.reasoning
+            });
         }
 
-        return NextResponse.json({
-            reply: responseCallback.text,
-            reasoning: responseCallback.reasoning
+        // Return standard Text Stream to frontend
+        const stream = await AICore.generateStream(message, {
+            systemPrompt: systemPrompt,
+            jsonMode: false,
+            reasoning: includeReasoning,
+            model: AI_CONFIG.models.SMART
+        });
+
+        return new NextResponse(stream, {
+            headers: {
+                "Content-Type": "text/plain; charset=utf-8",
+                "Transfer-Encoding": "chunked",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+            },
         });
 
     } catch (error: any) {

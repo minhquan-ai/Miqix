@@ -54,9 +54,9 @@ export const AICore = {
             console.log(`[AICore] Calling ${model} via OpenRouter SDK...`);
 
             // Stream the response to get reasoning tokens in usage
-            const stream = await openrouter.chat.send({
+            const stream = (await openrouter.chat.send({
                 chatRequest: sendOptions
-            });
+            })) as any;
 
             let responseText = "";
             let reasoningTokens = 0;
@@ -90,6 +90,51 @@ export const AICore = {
                 error: error.message || "Unknown Error"
             };
         }
+    },
+
+    /**
+     * Generate a ReadableStream for continuous UI streaming
+     */
+    generateStream: async (prompt: string, options: AIRequestOptions = {}): Promise<ReadableStream> => {
+        const apiKey = AI_CONFIG.apiKey;
+        if (!apiKey) throw new Error("Missing AI API Key (OPENROUTER_API_KEY)");
+
+        const openrouter = new OpenRouter({ apiKey });
+        const model = options.model || "nvidia/nemotron-3-super-120b-a12b:free";
+        const systemPrompt = options.systemPrompt || "Bạn là trợ lý AI thông minh của MiQiX. Hãy giao tiếp bằng tiếng Việt.";
+
+        const messages: any[] = [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: prompt }
+        ];
+
+        const sendOptions: any = {
+            model: model,
+            messages: messages,
+            stream: true,
+            temperature: options.temperature ?? AI_CONFIG.defaultParams.temperature,
+            max_tokens: options.maxTokens ?? AI_CONFIG.defaultParams.max_tokens,
+        };
+
+        const stream = (await openrouter.chat.send({
+            chatRequest: sendOptions
+        })) as any;
+
+        return new ReadableStream({
+            async start(controller) {
+                try {
+                    for await (const chunk of stream) {
+                        const content = chunk.choices?.[0]?.delta?.content;
+                        if (content) {
+                            controller.enqueue(new TextEncoder().encode(content));
+                        }
+                    }
+                    controller.close();
+                } catch (error) {
+                    controller.error(error);
+                }
+            }
+        });
     },
 
     /**

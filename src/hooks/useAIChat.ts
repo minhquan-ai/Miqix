@@ -78,7 +78,17 @@ export function useAIChat(options: UseAIChatOptions = {}) {
                 ...rest
             };
 
-            setMessages(prev => [...prev, assistantMsg]);
+            setMessages(prev => {
+                // Remove the temporary stream message if it exists (assuming it was pushed with the same ID or we just replace the last message if it was streaming)
+                const isStreamed = rest._streamed;
+                if (isStreamed) {
+                    // Update the last message to the final structured message instead of appending duplicate
+                    const newMsgs = [...prev];
+                    newMsgs[newMsgs.length - 1] = assistantMsg;
+                    return newMsgs;
+                }
+                return [...prev, assistantMsg];
+            });
 
             if (options.onSuccess) {
                 options.onSuccess(data);
