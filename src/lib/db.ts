@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined;
@@ -21,7 +23,10 @@ if (!dbUrl || dbUrl.startsWith("file:") || !dbUrl.startsWith("postgres")) {
 // We can securely override the environment variable directly before instantiation
 process.env.DATABASE_URL = dbUrl;
 
-export const db = globalForPrisma.prisma ?? new PrismaClient();
+// Setup Prisma adapter for Prisma 7
+const pool = new Pool({ connectionString: dbUrl });
+const adapter = new PrismaPg(pool);
+
+export const db = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
-
