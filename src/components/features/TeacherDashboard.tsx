@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { LogOut, Calendar as CalendarIcon, FileText, CheckCircle, Users, BookOpen, BrainCircuit, GraduationCap, Zap } from "lucide-react";
-import { logout } from "@/lib/auth-actions";
+import { logout } from "@/lib/actions/auth-actions";
 import { useRouter } from "next/navigation";
 import { Class, User } from "@/types";
-import { getTeacherDashboardAnalyticsAction } from "@/lib/analytics-actions";
+import { getTeacherDashboardAnalyticsAction } from "@/lib/actions/analytics-actions";
 import { getClassesAction } from "@/lib/actions";
 import { NotificationBell } from "@/components/features/NotificationBell";
 import { ClassCreatorModal } from "./ClassCreatorModal";
@@ -14,7 +14,7 @@ import { useToast } from "@/components/ui/Toast";
 import QuickAccessGrid, { QuickAccessItem } from "@/components/dashboard/QuickAccessGrid";
 import AtRiskWidget from "@/components/dashboard-widgets/AtRiskWidget";
 import UpcomingWidget from "@/components/dashboard-widgets/UpcomingWidget";
-import { ClassAnalytics } from "@/lib/class-analytics";
+import { ClassAnalytics } from "@/lib/analytics/class-analytics";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";

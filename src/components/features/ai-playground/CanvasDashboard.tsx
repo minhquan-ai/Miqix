@@ -1,5 +1,5 @@
 import { User } from "@/types";
-import { ScheduleEvent } from "@/lib/schedule-actions";
+import { ScheduleEvent } from "@/lib/actions/schedule-actions";
 import { ListTodo, Activity, Zap, Target, LayoutGrid, Sparkles, History } from "lucide-react";
 import { format } from "date-fns";
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Send, Paperclip, X } from "lucide-react";
-import { createAnnouncementAction } from "@/lib/announcement-actions";
+import { createAnnouncementAction } from "@/lib/actions/announcement-actions";
 
 interface CreateAnnouncementFormProps {
     classId: string;

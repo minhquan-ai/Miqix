@@ -1,6 +1,6 @@
 export const AI_CONFIG = {
     provider: 'openrouter',
-    apiKey: process.env.OPENROUTER_API_KEY || process.env.GROQ_API_KEY, // Fallback for backward compat
+    apiKey: process.env.OPENROUTER_API_KEY,
     models: {
         // Primary models - MiMo V2 Flash as requested
         FAST: "xiaomi/mimo-v2-flash:free",      // For quick chat, UI responses

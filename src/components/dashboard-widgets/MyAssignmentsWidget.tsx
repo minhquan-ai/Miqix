@@ -1,6 +1,6 @@
 "use client";
 
-import { StudentAnalytics } from "@/lib/student-analytics";
+import { StudentAnalytics } from "@/lib/analytics/student-analytics";
 import { ClipboardList, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 

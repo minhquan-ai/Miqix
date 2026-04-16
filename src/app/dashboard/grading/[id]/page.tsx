@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Bot, CheckCircle, Download, FileText, Save, Send, User } from "lucide-react";
-import { AIService } from "@/lib/ai-service";
+import { AIService } from "@/lib/ai/service";
 import { getCurrentUserAction, getSubmissionByIdAction, getAssignmentByIdAction, updateSubmissionAction } from "@/lib/actions";
 import { Assignment, Submission, User as UserType } from "@/types";
 import { useToast } from "@/components/ui/Toast";

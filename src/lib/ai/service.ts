@@ -1,4 +1,4 @@
-import { generateQuizAction, getHintAction, analyzeSubmissionAction } from "./ai-actions";
+import { generateQuizAction, getHintAction, analyzeSubmissionAction } from "../actions/ai-actions";
 
 export interface QuizQuestion {
     id: string;

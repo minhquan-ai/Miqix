@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Clock, TrendingUp, TrendingDown, Minus, Flame, BookOpen, Target, BarChart3, ChevronDown, ChevronUp } from "lucide-react";
-import { getWeeklyFocusSessionsAction, getFocusComparisonAction, getFocusStreakAction } from "@/lib/focus-actions";
+import { getWeeklyFocusSessionsAction, getFocusComparisonAction, getFocusStreakAction } from "@/lib/actions/focus-actions";
 import { cn } from "@/lib/utils";
 
 interface FocusStats {

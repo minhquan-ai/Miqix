@@ -22,7 +22,7 @@ import {
     updateClassSettingsAction,
     regenerateClassCodeAction,
     exportClassRosterAction
-} from "@/lib/class-settings-actions";
+} from "@/lib/actions/class-settings-actions";
 import { useToast } from "@/components/ui/Toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

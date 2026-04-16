@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Upload, FileText, CheckCircle, AlertCircle, Send, X, Loader2, Sparkles, Bot, Trash2, Save, Maximize, Minimize, Mic, Video } from "lucide-react";
 import { Submission, User, FileAttachment } from "@/types";
 import { submitAssignmentAction, gradeAssignmentAction, checkAssignmentDraftAction } from "@/lib/actions";
-import { processTextWithAIAction } from "@/lib/ai-text-action";
+import { processTextWithAIAction } from "@/lib/ai/text-action";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { FileAttachmentCard } from "./ui/FileAttachmentCard";

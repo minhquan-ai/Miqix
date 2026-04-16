@@ -1,8 +1,8 @@
 'use server';
 
 import { db } from "@/lib/db";
-import { StudentAnalytics, PendingAssignment, UngradedSubmission } from "@/lib/student-analytics";
-import { ClassAnalytics, AtRiskStudent, RecentActivity, UpcomingDeadline } from "@/lib/class-analytics";
+import { StudentAnalytics, PendingAssignment, UngradedSubmission } from "@/lib/analytics/student-analytics";
+import { ClassAnalytics, AtRiskStudent, RecentActivity, UpcomingDeadline } from "@/lib/analytics/class-analytics";
 import { User } from "@/types";
 
 import { auth } from "@/auth";

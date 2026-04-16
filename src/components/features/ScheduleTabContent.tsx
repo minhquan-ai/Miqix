@@ -7,7 +7,7 @@ import { vi } from "date-fns/locale";
 import { Calendar as CalendarIcon, Clock, MapPin } from "lucide-react";
 import { Class, User } from "@/types";
 import { motion } from "framer-motion";
-import { ScheduleEvent } from "@/lib/schedule-actions";
+import { ScheduleEvent } from "@/lib/actions/schedule-actions";
 
 interface ScheduleTabContentProps {
     classData: Class | null;

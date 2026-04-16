@@ -3,7 +3,7 @@
 import { useActionState, useState, useEffect } from "react";
 import Link from "next/link";
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Sparkles, BookOpen, GraduationCap } from "lucide-react";
-import { authenticate } from "@/lib/auth-actions";
+import { authenticate } from "@/lib/actions/auth-actions";
 import { motion } from "framer-motion";
 
 export function LoginForm() {

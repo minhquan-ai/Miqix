@@ -5,7 +5,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 
-import { fetchMissionsAssignedTo, fetchMissionsCreatedBy } from "@/lib/mission-service";
+import { fetchMissionsAssignedTo, fetchMissionsCreatedBy } from "@/lib/services/mission-service";
 import { Mission, SocialEvent, User, Class, Assignment, Submission, ClassSession } from '@/types';
 
 // --- User Actions ---
@@ -315,7 +315,7 @@ export async function checkAssignmentDraftAction(assignmentId: string, content: 
         // but analyzeSubmission is close enough: it gives feedback and score estimate.
         // We will mask the exact score in the UI to avoid "gaming".
 
-        const { AIService } = await import("@/lib/ai-service"); // Dynamic import to avoid circular deps if any
+        const { AIService } = await import("@/lib/ai/service"); // Dynamic import to avoid circular deps if any
         const result = await AIService.analyzeSubmission(context, content);
 
         return {

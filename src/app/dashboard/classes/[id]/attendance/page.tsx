@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { Calendar as CalendarIcon, Save, CheckCircle, XCircle, Clock, User, ChevronLeft, ChevronRight, Loader2, Search } from "lucide-react";
 import { getAttendanceSessionAction, saveAttendanceAction, getClassByIdAction } from "@/lib/actions";
-import { getClassMembersAction } from "@/lib/class-member-actions";
+import { getClassMembersAction } from "@/lib/actions/class-member-actions";
 import { useToast } from "@/components/ui/Toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

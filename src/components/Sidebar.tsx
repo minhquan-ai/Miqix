@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { logout } from "@/lib/auth-actions";
+import { logout } from "@/lib/actions/auth-actions";
 import {
     LayoutDashboard,
     Users,

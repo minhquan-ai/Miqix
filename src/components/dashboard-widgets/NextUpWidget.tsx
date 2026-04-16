@@ -1,4 +1,4 @@
-import { PendingAssignment } from "@/lib/student-analytics";
+import { PendingAssignment } from "@/lib/analytics/student-analytics";
 import { Clock, ArrowRight, Calendar } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";

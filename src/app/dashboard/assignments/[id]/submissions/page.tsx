@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getCurrentUserAction, getAssignmentByIdAction, getSubmissionsByAssignmentIdAction } from "@/lib/actions";
-import { getClassMembersAction } from "@/lib/class-member-actions";
+import { getClassMembersAction } from "@/lib/actions/class-member-actions";
 import { Assignment, Submission, User } from "@/types";
 import { ArrowLeft, BookOpen, Calendar, CheckCircle, Clock, FileText, Search, User as UserIcon, X } from "lucide-react";
 import SubmissionView from "@/components/SubmissionView";

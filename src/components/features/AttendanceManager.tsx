@@ -13,7 +13,7 @@ import {
     createClassSessionAction,
     updateAttendanceAction,
     getClassSessionsAction
-} from '@/lib/attendance-actions';
+} from '@/lib/actions/attendance-actions';
 import { useToast } from '../ui/Toast';
 import { cn } from '@/lib/utils';
 

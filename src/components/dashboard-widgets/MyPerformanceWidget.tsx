@@ -1,6 +1,6 @@
 "use client";
 
-import { StudentAnalytics } from "@/lib/student-analytics";
+import { StudentAnalytics } from "@/lib/analytics/student-analytics";
 import { TrendingUp, Award, Users, Target } from "lucide-react";
 
 interface MyPerformanceWidgetProps {

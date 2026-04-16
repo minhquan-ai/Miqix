@@ -1,6 +1,6 @@
 "use client";
 
-import { RecentActivity } from "@/lib/class-analytics";
+import { RecentActivity } from "@/lib/analytics/class-analytics";
 import { Clock, FileText, MessageSquare, CheckCircle, User } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";

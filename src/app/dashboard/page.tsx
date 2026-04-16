@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { getDashboardDataAction, DashboardData } from "@/lib/analytics-actions";
+import { getDashboardDataAction, DashboardData } from "@/lib/actions/analytics-actions";
 import { DashboardSkeleton } from "@/components/skeletons";
 import { AIPlayground } from "@/components/features/ai-playground/AIPlayground";
 

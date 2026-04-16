@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchMissionsAssignedTo, fetchMissionsCreatedBy } from '@/lib/mission-service';
+import { fetchMissionsAssignedTo, fetchMissionsCreatedBy } from '@/lib/services/mission-service';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);

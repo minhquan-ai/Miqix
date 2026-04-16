@@ -1,6 +1,6 @@
 "use client";
 
-import { UpcomingDeadline } from "@/lib/class-analytics";
+import { UpcomingDeadline } from "@/lib/analytics/class-analytics";
 import { Calendar, Clock, Users } from "lucide-react";
 import Link from "next/link";
 

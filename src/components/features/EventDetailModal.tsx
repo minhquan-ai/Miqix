@@ -7,7 +7,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { ScheduleEvent, deletePersonalEventAction } from "@/lib/schedule-actions";
+import { ScheduleEvent, deletePersonalEventAction } from "@/lib/actions/schedule-actions";
 
 interface EventDetailModalProps {
     event: ScheduleEvent | null;

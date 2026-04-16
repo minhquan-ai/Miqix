@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { createPersonalEventAction } from "@/lib/schedule-actions";
+import { createPersonalEventAction } from "@/lib/actions/schedule-actions";
 import { X, Clock, MapPin, Repeat, CheckCircle2, Type, Calendar, AlignLeft, Sparkles, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/components/ui/Toast";

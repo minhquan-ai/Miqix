@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AIService, QuizQuestion } from "@/lib/ai-service";
+import { AIService, QuizQuestion } from "@/lib/ai/service";
 import { Sparkles, Loader2, Check, RefreshCw, X, Zap, Target, BrainCircuit, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -51,7 +51,7 @@ export function AIQuizGenerator({ onAccept, onCancel }: AIQuizGeneratorProps) {
                             <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gray-900">Groq AI Quiz Generator</h3>
+                            <h3 className="font-semibold text-gray-900">AI Quiz Generator</h3>
                             <p className="text-xs text-gray-500">Tạo câu hỏi trắc nghiệm tự động</p>
                         </div>
                     </div>

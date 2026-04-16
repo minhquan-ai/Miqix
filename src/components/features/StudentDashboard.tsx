@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { LogOut, Plus, Target, Clock, BookOpen, ChevronRight, Calendar, User as UserIcon, Sparkles, AlertCircle } from "lucide-react";
-import { logout } from "@/lib/auth-actions";
+import { logout } from "@/lib/actions/auth-actions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -11,7 +11,7 @@ import { User } from "@/types";
 import { NotificationBell } from "@/components/features/NotificationBell";
 import { JoinClassModal } from "@/components/features/JoinClassModal";
 import { FocusAnalyticsWidget } from "@/components/features/FocusAnalyticsWidget";
-import { StudentAnalytics } from "@/lib/student-analytics";
+import { StudentAnalytics } from "@/lib/analytics/student-analytics";
 import { motion } from 'framer-motion';
 import { format, formatDistanceToNow, isToday, isTomorrow, isPast } from "date-fns";
 import { vi } from "date-fns/locale";

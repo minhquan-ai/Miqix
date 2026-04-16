@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getCurrentUserAction, getPendingEnrollmentsAction, approveEnrollmentAction, rejectEnrollmentAction, getClassByIdAction } from "@/lib/actions";
-import { getClassMembersAction, removeStudentFromClassAction } from "@/lib/class-member-actions";
+import { getClassMembersAction, removeStudentFromClassAction } from "@/lib/actions/class-member-actions";
 import { Class, User } from "@/types";
 import { ArrowLeft, Search, Users, Clock, CheckCircle, XCircle, Trash2, Copy } from "lucide-react";
 import Link from "next/link";

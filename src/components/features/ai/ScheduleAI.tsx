@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Sparkles, ArrowRight, Loader2, Bot, MessageCircle, PenLine, ChevronDown, Plus, Mic, Globe, History, Image as ImageIcon, MoreHorizontal, X } from "lucide-react";
-import { analyzeScheduleAIAction, createPersonalEventAction, deletePersonalEventAction } from "@/lib/schedule-actions";
+import { analyzeScheduleAIAction, createPersonalEventAction, deletePersonalEventAction } from "@/lib/actions/schedule-actions";
 import { format, parseISO } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { AIPanelShell, saveToAIHistory } from "./AIPanelShell";

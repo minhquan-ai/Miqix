@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { PendingAssignment } from '@/lib/student-analytics';
+import { PendingAssignment } from '@/lib/analytics/student-analytics';
 import { Calendar, Clock, AlertCircle, ArrowRight, BookOpen } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';

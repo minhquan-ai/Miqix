@@ -1,6 +1,6 @@
 "use client";
 
-import { ClassAnalytics } from "@/lib/class-analytics";
+import { ClassAnalytics } from "@/lib/analytics/class-analytics";
 import { TrendingUp, TrendingDown, Minus, Users, ClipboardList, Calendar, Activity } from "lucide-react";
 
 interface PerformanceWidgetProps {

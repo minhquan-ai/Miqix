@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 
 import { getUserEnrollmentsAction, getCurrentUserAction, getDashboardCountsAction } from "@/lib/actions";
-import { logout } from "@/lib/auth-actions";
+import { logout } from "@/lib/actions/auth-actions";
 import { User } from "@/types";
 import Sidebar from "@/components/Sidebar";
 import BottomNavigation from "@/components/BottomNavigation";

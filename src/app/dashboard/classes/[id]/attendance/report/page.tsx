@@ -6,7 +6,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 import { vi } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Download, ArrowLeft, CheckCircle, XCircle, Clock, User as UserIcon, Loader2 } from "lucide-react";
 import { getClassSessionsAction, getClassByIdAction } from "@/lib/actions";
-import { getClassMembersAction } from "@/lib/class-member-actions";
+import { getClassMembersAction } from "@/lib/actions/class-member-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";

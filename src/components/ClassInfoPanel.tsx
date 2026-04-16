@@ -39,7 +39,7 @@ import {
     assignStudentRoleAction,
     toggleMemberNotificationsAction,
     StudentRole,
-} from "@/lib/class-settings-actions";
+} from "@/lib/actions/class-settings-actions";
 import { leaveClassAction, exportGradesAction } from "@/lib/actions";
 
 interface ClassInfoPanelProps {

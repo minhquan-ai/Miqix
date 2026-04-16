@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { CheckSquare, Plus, Trash2, Check, Loader2 } from "lucide-react";
-import { createTodoAction, deleteTodoAction, getTodosAction, toggleTodoAction } from "@/lib/todo-actions";
+import { createTodoAction, deleteTodoAction, getTodosAction, toggleTodoAction } from "@/lib/actions/todo-actions";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 

@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { ClassSession, User } from '@/types';
 import { createClassSessionAction, updateClassSessionAction } from '@/lib/actions';
-import { getClassMembersAction } from '@/lib/class-member-actions';
+import { getClassMembersAction } from '@/lib/actions/class-member-actions';
 import { Loader2, Save, X } from 'lucide-react';
 
 interface SessionFormProps {

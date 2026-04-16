@@ -7,7 +7,7 @@ import {
     CheckCircle2, Sparkles, GraduationCap, User,
     School, Check, X, Eye, EyeOff, BookOpen
 } from "lucide-react";
-import { authenticate, register } from "@/lib/auth-actions";
+import { authenticate, register } from "@/lib/actions/auth-actions";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 

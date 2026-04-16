@@ -1,6 +1,6 @@
 "use client";
 
-import { AtRiskStudent } from "@/lib/class-analytics";
+import { AtRiskStudent } from "@/lib/analytics/class-analytics";
 import { AlertTriangle, Mail, Eye, MoreHorizontal } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 

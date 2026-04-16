@@ -1,4 +1,4 @@
-import { ClassAnalytics } from "@/lib/class-analytics";
+import { ClassAnalytics } from "@/lib/analytics/class-analytics";
 import { Users, FileCheck, GraduationCap, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import Link from "next/link";
 
