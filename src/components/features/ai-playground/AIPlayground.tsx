@@ -1414,7 +1414,7 @@ export function AIPlayground({ user, initialData }: AIPlaygroundProps) {
                         return {
                             id: messageId,
                             reply: `**Socratic Step ${stepData.step_number}:** ${stepData.question}`,
-                            reasoning: data.reasoning,
+                            reasoning: jsonResponse?.reasoning,
                             hasCanvasContent: true,
                             timestamp: Date.now()
                         };
