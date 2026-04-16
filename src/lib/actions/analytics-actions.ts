@@ -7,7 +7,7 @@ import { User } from "@/types";
 
 import { auth } from "@/auth";
 import { serverCache } from "@/lib/cache";
-import { getClassesAction, getAssignmentsAction } from "./actions";
+import { getClassesAction, getAssignmentsAction } from "./index";
 import { getAggregatedScheduleAction, ScheduleEvent } from "./schedule-actions";
 import { startOfWeek } from "date-fns";
 

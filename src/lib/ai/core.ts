@@ -1,4 +1,5 @@
 import { AI_CONFIG } from './config';
+import { OpenRouter } from "@openrouter/sdk";
 
 interface AIRequestOptions {
     model?: string;
@@ -17,7 +18,7 @@ interface AIResponse {
 
 export const AICore = {
     /**
-     * Generate text/response from AI
+     * Generate text/response from AI using OpenRouter SDK
      */
     generateText: async (prompt: string, options: AIRequestOptions = {}): Promise<AIResponse> => {
         try {
@@ -26,68 +27,64 @@ export const AICore = {
                 throw new Error("Missing AI API Key (OPENROUTER_API_KEY)");
             }
 
-            const model = options.model || AI_CONFIG.models.FAST;
+            const openrouter = new OpenRouter({ apiKey: apiKey });
+            
+            // Use Gemma by default for all tasks now based on request
+            const model = options.model || "nvidia/nemotron-3-super-120b-a12b:free";
             const systemPrompt = options.systemPrompt || "Bạn là trợ lý AI thông minh của MiQiX.";
 
-            // Validate model availability (optional step in future)
-
-            const messages = [
+            const messages: any[] = [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: prompt }
             ];
 
-            const body: any = {
+            const sendOptions: any = {
                 model: model,
                 messages: messages,
+                stream: true,
                 temperature: options.temperature ?? AI_CONFIG.defaultParams.temperature,
                 max_tokens: options.maxTokens ?? AI_CONFIG.defaultParams.max_tokens,
             };
 
             // Force JSON mode if requested
             if (options.jsonMode) {
-                body.response_format = { type: "json_object" };
+                sendOptions.response_format = { type: "json_object" };
             }
 
-            // Include reasoning output if requested (provider dependent)
-            if (options.reasoning) {
-                body.include_reasoning = true;
-            }
+            console.log(`[AICore] Calling ${model} via OpenRouter SDK...`);
 
-            console.log(`[AICore] Calling ${model}...`);
-
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${apiKey}`,
-                    "Content-Type": "application/json",
-                    "HTTP-Referer": "https://miqix.edu.vn",
-                    "X-Title": "MiQiX Platform"
-                },
-                body: JSON.stringify(body)
+            // Stream the response to get reasoning tokens in usage
+            const stream = await openrouter.chat.send({
+                chatRequest: sendOptions
             });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error("[AICore] API Error:", response.status, response.statusText, errorData);
-                const errorMessage = errorData.error?.message || errorData.message || response.statusText;
-                throw new Error(`AI Provider Error: ${errorMessage}`);
+            let responseText = "";
+            let reasoningTokens = 0;
+
+            for await (const chunk of stream) {
+                const content = chunk.choices?.[0]?.delta?.content;
+                if (content) {
+                    responseText += content;
+                }
+
+                // Usage information comes in the final chunk
+                if (chunk.usage && chunk.usage.reasoningTokens) {
+                    reasoningTokens = chunk.usage.reasoningTokens;
+                    console.log("\n[AICore] Reasoning tokens used:", reasoningTokens);
+                }
             }
 
-            const data = await response.json();
-            const choice = data.choices?.[0];
-
-            if (!choice) {
+            if (!responseText) {
                 throw new Error("No response from AI Provider");
             }
 
             return {
-                text: choice.message.content || "",
-                reasoning: choice.message.reasoning || null // Some providers return this
+                text: responseText,
+                reasoning: reasoningTokens > 0 ? `Tokens: ${reasoningTokens}` : null
             };
 
         } catch (error: any) {
             console.error("[AICore] Exception:", error);
-            // Default safe fallback for UI to not crash
             return {
                 text: "",
                 error: error.message || "Unknown Error"
@@ -102,7 +99,7 @@ export const AICore = {
         const result = await AICore.generateText(prompt, {
             jsonMode: true,
             systemPrompt: systemPrompt + " \nQUAN TRỌNG: Chỉ trả về chuỗi JSON thuần túy, không markdown.",
-            model: AI_CONFIG.models.SMART // Use smarter model for JSON structure
+            model: "nvidia/nemotron-3-super-120b-a12b:free"
         });
 
         if (result.error || !result.text) return null;

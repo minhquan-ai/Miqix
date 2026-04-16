@@ -1,23 +1,7 @@
-import { auth } from "@/auth";
-import { NextResponse } from "next/server";
+import NextAuth from "next-auth";
+import { authConfig } from "./auth.config";
 
-export default auth((req) => {
-    const isLoggedIn = !!req.auth;
-    const isOnDashboard = req.nextUrl.pathname.startsWith('/dashboard');
-    const isOnLogin = req.nextUrl.pathname.startsWith('/login');
-
-    if (isOnDashboard && !isLoggedIn) {
-        return NextResponse.redirect(new URL('/login', req.url));
-    }
-
-    if (isOnLogin && isLoggedIn) {
-        return NextResponse.redirect(new URL('/dashboard', req.url));
-    }
-
-    const response = NextResponse.next();
-    response.headers.set('ngrok-skip-browser-warning', 'true');
-    return response;
-});
+export default NextAuth(authConfig).auth;
 
 export const config = {
     matcher: [

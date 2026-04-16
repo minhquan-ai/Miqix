@@ -2,10 +2,10 @@ export const AI_CONFIG = {
     provider: 'openrouter',
     apiKey: process.env.OPENROUTER_API_KEY,
     models: {
-        // Primary models - MiMo V2 Flash as requested
-        FAST: "xiaomi/mimo-v2-flash:free",      // For quick chat, UI responses
-        SMART: "xiaomi/mimo-v2-flash:free",     // Same model for consistency
-        REASONING: "xiaomi/mimo-v2-flash:free", // Same model for all tasks
+        // Primary models - Nvidia Nemotron 120B as requested
+        FAST: "nvidia/nemotron-3-super-120b-a12b:free",
+        SMART: "nvidia/nemotron-3-super-120b-a12b:free",
+        REASONING: "nvidia/nemotron-3-super-120b-a12b:free",
     },
     defaultParams: {
         temperature: 0.7,
