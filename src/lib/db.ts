@@ -17,9 +17,11 @@ if (!dbUrl || dbUrl.startsWith("file:") || !dbUrl.startsWith("postgres")) {
     console.log("✅ DATABASE_URL looks correct:", dbUrl.substring(0, 15) + "...");
 }
 
-export const db = globalForPrisma.prisma ?? new PrismaClient({
-    datasourceUrl: dbUrl,
-});
+// Since Prisma 7 blocks direct URL injection in strict typescript generation without adapters
+// We can securely override the environment variable directly before instantiation
+process.env.DATABASE_URL = dbUrl;
+
+export const db = globalForPrisma.prisma ?? new PrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 
