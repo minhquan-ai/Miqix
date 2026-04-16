@@ -18,11 +18,7 @@ if (!dbUrl || dbUrl.startsWith("file:") || !dbUrl.startsWith("postgres")) {
 }
 
 export const db = globalForPrisma.prisma ?? new PrismaClient({
-    datasources: {
-        db: {
-            url: dbUrl,
-        },
-    },
+    datasourceUrl: dbUrl,
 });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
