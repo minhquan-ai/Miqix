@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { getCurrentUserAction } from "./actions";
+import { getCurrentUserAction } from "./index";
 import { startOfWeek, endOfWeek, startOfDay, endOfDay, subDays, format } from "date-fns";
 import { vi } from "date-fns/locale";
 
