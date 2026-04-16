@@ -3,9 +3,9 @@ import {
     getAssignmentsAction,
     createAssignmentAction,
     getCurrentUserAction
-} from "./actions";
-import { getTeacherDashboardAnalyticsAction, getStudentDashboardAnalyticsAction } from "./analytics-actions";
-import { createPersonalEventAction } from "./schedule-actions";
+} from "../actions/index";
+import { getTeacherDashboardAnalyticsAction, getStudentDashboardAnalyticsAction } from "../actions/analytics-actions";
+import { createPersonalEventAction } from "../actions/schedule-actions";
 
 export const AI_TOOLS = [
     {
